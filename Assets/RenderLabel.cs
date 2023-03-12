@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -161,7 +162,51 @@ public class RenderLabel : MonoBehaviour
          }
          distances.Add(dist);
       }
-      labelColor = palette[distances.IndexOf(distances.Max())];
+
+      //calculate color intensity
+      double total_intensity = 0;
+      float r = 0;
+      float g = 0;
+      float b = 0;
+
+
+      for (int j = 0; j < neighboringPixelColors.Count; j++){
+            total_intensity += neighboringPixelColors[j][0] * 0.2126 + neighboringPixelColors[j][1] * 0.7152 + neighboringPixelColors[j][2] * 0.0722;
+            r += neighboringPixelColors[j][0];
+            g += neighboringPixelColors[j][0];
+            b += neighboringPixelColors[j][0];
+      }
+      
+      Color average_color = new Color(r,g,b,1);
+
+      double r_inverse = (float)1.0 - r/ neighboringPixelColors.Count;
+      double g_inverse = (float)1.0 - g/ neighboringPixelColors.Count;
+      double b_inverse = (float)1.0 - b/ neighboringPixelColors.Count;
+
+      double intensity = total_intensity / neighboringPixelColors.Count;
+      // Debug.Log("intensity" + intensity);
+
+      //using intensity
+      // Color palette_col = palette[distances.IndexOf(distances.Max())];
+      // Color resulting_col = new Color(palette_col[0] * (float)intensity, palette_col[1] * (float)intensity, palette_col[2] * (float)intensity, 1);
+      // labelColor = resulting_col;
+
+      //using blur inverse
+      // labelColor =  new Color((float)r_inverse, (float)g_inverse, (float)b_inverse, 1);
+
+      //using 1-intensity
+      // labelColor =  new Color((float)1.0 - (float)intensity, (float)1.0 - (float)intensity, (float)1.0 - (float)intensity, 1);
+
+      //use HSV inverse
+      float H, S, V;
+      Color.RGBToHSV(average_color, out H, out S, out V);
+      H = (H + (float)0.5) % (float)1;
+      labelColor = Color.HSVToRGB(H, S, V);
+
+      //use 1-HSV inverse
+      Color HSV = Color.HSVToRGB(H, S, V);
+      // labelColor = new Color((float)1.0 - HSV[0],(float)1.0 - HSV[1], (float)1.0 - HSV[2] );
+
       return labelColor;
    }
 
@@ -178,6 +223,7 @@ public class RenderLabel : MonoBehaviour
       }
       return neighbors;
    }
+
    
 
 
@@ -188,3 +234,4 @@ public class RenderLabel : MonoBehaviour
       return Math.Sqrt(distance);
    }
 }
+
