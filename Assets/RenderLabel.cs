@@ -45,6 +45,19 @@ public class RenderLabel : MonoBehaviour
       }
    }
 
+
+   void Update()
+   {
+      // Update labelPlane's position and rotation according to ScreenshotCamera's rotation and position
+      float newZ = ScreenshotCamera.transform.position[2] + 8.5f; //This 8.5 may vary depending on the distance between the Screenshot camera and the label plane, which should remain consistent
+      labelPlane.transform.position = new Vector3(ScreenshotCamera.transform.position.x, ScreenshotCamera.transform.position.y, newZ);
+
+      float newXAngle = ScreenshotCamera.transform.eulerAngles.x;
+      float newYAngle = ScreenshotCamera.transform.eulerAngles.y;
+      labelPlane.transform.Rotate(newXAngle, newYAngle, ScreenshotCamera.transform.rotation[2]);
+
+   }
+
    
    
    // LateUpdate calls the function that extracts frames from ScreenshotCamera and generates label colors
@@ -75,14 +88,6 @@ public class RenderLabel : MonoBehaviour
 
       // Block out the layer that contains the label (it's a plane object that has a material + shader)
       ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
-      
-      // Update labelPlane's position and rotation according to ScreenshotCamera's rotation and position
-      float newZ = ScreenshotCamera.transform.position[2] + 8.5f; //This 8.5 may vary depending on the distance between the screenshot camera and the label plane, which should remain consistent
-      labelPlane.transform.position = new Vector3(ScreenshotCamera.transform.position[0], ScreenshotCamera.transform.position[1], newZ);
-      
-      float newXAngle = ScreenshotCamera.transform.eulerAngles.x;
-      float newYAngle = ScreenshotCamera.transform.eulerAngles.y;
-      labelPlane.transform.Rotate(newXAngle, newYAngle, ScreenshotCamera.transform.rotation[2]);
       
       // Extract the current frame from ScreenshotCamera and copy its pixel values into Screenshot
       RenderTexture screenTexture = new RenderTexture(Screen.width, Screen.height, 16);
@@ -118,7 +123,7 @@ public class RenderLabel : MonoBehaviour
       for (int i = 0; i < labelX.Count; i++)
       {
          int[] labelPixelCoord = new int[] {labelX[i], labelY[i]};
-         Color newColor = AssignColor(labelPixelCoord, Screenshot, 4); // 6 is the neighborhood size from which background pixels are sampled. This can change 
+         Color newColor = AssignColor_usingPalette(labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          renderedLabel.SetPixel(labelX[i], labelY[i], newColor);
       }
 
@@ -148,7 +153,27 @@ public class RenderLabel : MonoBehaviour
 
    // AssignColor samples neighboring pixels' values in a neighborhood of size neighborhoodSize+1 by neighborhoodSize+1 
    // and assigns a color to a label pixel at labelPixelCoord based on colors of pixels in the neigborhood
-   public Color AssignColor(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
+   public Color AssignColor_usingPalette(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
+   {
+      Color[] palette = { new Color(0, 0, 0, 1), new Color(1, 0, 0, 1), new Color(1, 1, 0, 1), new Color(0, 0, 1, 1), new Color(1, 0, 1, 1),  new Color(0, 1, 1, 1), new Color(1, 1, 1, 1)};
+      Color labelColor = palette[0]; // Default labelColor. May or may not change
+      List<double> distances = new List<double>();
+      List<Color> neighboringPixelColors = SamplePixelColors(labelPixelCoord, backgroundImage, neighborhoodSize);
+      for (int i = 0; i < palette.Length; i++)
+      {
+         double dist = 0;
+         for (int j = 0; j < neighboringPixelColors.Count; j++){
+            dist += CalculateDistance(palette[i], neighboringPixelColors[j]);
+         }
+         distances.Add(dist);
+      }
+      labelColor = palette[distances.IndexOf(distances.Max())];
+      return labelColor;
+   }
+
+   // AssignColor samples neighboring pixels' values in a neighborhood of size neighborhoodSize+1 by neighborhoodSize+1 
+   // and assigns a color to a label pixel at labelPixelCoord based on colors of pixels in the neigborhood
+   public Color AssignColor_usingHSV(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
    {
       Color[] palette = { new Color(0, 0, 0, 1), new Color(1, 0, 0, 1), new Color(1, 1, 0, 1), new Color(0, 0, 1, 1), new Color(1, 0, 1, 1),  new Color(0, 1, 1, 1), new Color(1, 1, 1, 1)};
       Color labelColor = palette[0]; // Default labelColor. May or may not change
