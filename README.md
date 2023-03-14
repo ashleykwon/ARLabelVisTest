@@ -4,7 +4,7 @@
 This scene contains 2 layers, Label and Default, each of which is used by Main Camera and Camera to render the label plane or everything else without the plane
 
 
-<h2>Scene components</h2> 
+## Scene components ## 
 * Plane: this is the plane onto which the label and the background are rendered. This belongs to the Label layer, so it can’t be seen by Camera.
 * Spheres: Yuanbo attached Materials to these to test label color generation when there’re objects with different colors in the scene. These belong to the Default layer, so they are seen by Camera.
 * Player: this is an empty object that contains Main Camera and Camera
