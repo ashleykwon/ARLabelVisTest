@@ -5,9 +5,9 @@ This scene contains 2 layers, Label and Default, each of which is used by Main C
 
 
 ## Scene components ## 
-* Plane: this is the plane onto which the label and the background are rendered. This belongs to the Label layer, so it can’t be seen by Camera.
+* Plane: this is the plane onto which the label and the background are rendered. This plane should move with the Player object as the user change their prepectives or moves around in the scene. This belongs to the Label layer, so it can’t be seen by Camera.
 * Spheres: Yuanbo attached Materials to these to test label color generation when there’re objects with different colors in the scene. These belong to the Default layer, so they are seen by Camera.
-* Player: this is an empty object that contains Main Camera and Camera
+* Player: This is an empty object that contains Main Camera and Camera. This object represents the user.
 * Main Camera: this camera only renders Plane
 * Camera: this camera does the following:
   1. Takes screenshot of the scene
