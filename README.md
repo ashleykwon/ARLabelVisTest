@@ -7,11 +7,11 @@ This scene contains 2 layers, Label and Default, each of which is used by Main C
 
 
 <h2>Scene components</h2> 
-- Plane: this is the plane onto which the label and the background are rendered. This belongs to the Label layer, so it can’t be seen by Camera.
-- 3 Spheres: Yuanbo attached Materials to these to test label color generation when there’re objects with different colors in the scene. These belong to the Default layer, so they are seen by Camera.
-- Player: this is an empty object that contains Main Camera and Camera
-- Main Camera: this camera only renders Plane
-- Camera: this camera does the following:
-#### Takes screenshot of the scene
-#### Uses the screenshot to generate label colors
-#### Renders the generated label colors + background on Plane 
+-  &nbsp Plane: this is the plane onto which the label and the background are rendered. This belongs to the Label layer, so it can’t be seen by Camera.
+-  &nbsp 3 Spheres: Yuanbo attached Materials to these to test label color generation when there’re objects with different colors in the scene. These belong to the Default layer, so they are seen by Camera.
+-  &nbsp Player: this is an empty object that contains Main Camera and Camera
+-  &nbsp Main Camera: this camera only renders Plane
+-  &nbsp Camera: this camera does the following:
+Takes screenshot of the scene
+Uses the screenshot to generate label colors
+Renders the generated label colors + background on Plane 
