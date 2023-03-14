@@ -61,10 +61,10 @@ public class RenderLabel : MonoBehaviour
 
    
    
-   // LateUpdate calls the function that extracts frames from ScreenshotCamera and generates label colors
+   // // LateUpdate calls the function that extracts frames from ScreenshotCamera and generates label colors
    void LateUpdate()
    {           
-      StartCoroutine(TakeScreenShot());
+      TakeScreenShot();
    }
 
 
@@ -80,9 +80,9 @@ public class RenderLabel : MonoBehaviour
  
 
      // Extract frames from ScreenshotCamera and generate label colors based on the frames
-   public IEnumerator TakeScreenShot()
+   public void TakeScreenShot()
    {
-      yield return new WaitForEndOfFrame();
+      //yield return new WaitForEndOfFrame();
 
       // Clear out pixels in labelPlane by setting its texture to be transparent
       // labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
@@ -131,7 +131,7 @@ public class RenderLabel : MonoBehaviour
       //    for (int j = 0; j < Screen.height; j++)
       //    {
       //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
-      //       Screenshot.SetPixel(i, j, transparentPxl);
+      //       renderedLabel.SetPixel(i, j, transparentPxl);
       //    }
       // }
 
@@ -153,10 +153,10 @@ public class RenderLabel : MonoBehaviour
       RenderTexture.active = null;
 
       // Save renderedTexture (only for debugging purposes)
-        byte[] byteArray = Screenshot.EncodeToPNG();
-        string filename = fileName(Convert.ToInt32(Screenshot.width), Convert.ToInt32(Screenshot.height));
-        path = Application.dataPath + filename;  
-        System.IO.File.WriteAllBytes(path, byteArray);
+      //   byte[] byteArray = Screenshot.EncodeToPNG();
+      //   string filename = fileName(Convert.ToInt32(Screenshot.width), Convert.ToInt32(Screenshot.height));
+      //   path = Application.dataPath + filename;  
+      //   System.IO.File.WriteAllBytes(path, byteArray);
 
         
       // Source: https://docs.unity3d.com/ScriptReference/Material.SetTexture.html
