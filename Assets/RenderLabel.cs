@@ -21,6 +21,7 @@ public class RenderLabel : MonoBehaviour
    public List<int> labelY = new List<int>();
    public Material labelPlaneMaterial;
 
+
    // Start is called before the first frame update
    void Start()
    {
@@ -84,15 +85,20 @@ public class RenderLabel : MonoBehaviour
       yield return new WaitForEndOfFrame();
 
       // Clear out pixels in labelPlane by setting its texture to be transparent
-      //labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
+      // labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
 
       // Block out the layer that contains the label (it's a plane object that has a material + shader)
       ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
       
-      // Extract the current frame from ScreenshotCamera and copy its pixel values into Screenshot
+      // Create a new render texture for the current frame
       RenderTexture screenTexture = new RenderTexture(Screen.width, Screen.height, 16);
+
+      // screenTexture settings to prevent antialiasing
       screenTexture.autoGenerateMips = false;
       screenTexture.filterMode = FilterMode.Point;
+
+      // Set ScreenshotCamera's target texture (the texture onto which the current scene is rendered) to screenTexture 
+      // and manually render the camera
       ScreenshotCamera.targetTexture = screenTexture;
       RenderTexture.active = screenTexture;
       ScreenshotCamera.Render();
@@ -100,26 +106,36 @@ public class RenderLabel : MonoBehaviour
       // Screenshot is the background without the label
       Texture2D Screenshot = new Texture2D(Screen.width, Screen.height);
 
-      // Read pixels on the screen into Screenshot
+      // for (int i = 0; i < Screen.width; i++)
+      // {
+      //    for (int j = 0; j < Screen.height; j++)
+      //    {
+      //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
+      //       Screenshot.SetPixel(i, j, transparentPxl);
+      //    }
+      // }
+
+      // Read pixels on the screen into Screenshot. The pixels on the screen should be those from screenTexture
       Screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
       Screenshot.filterMode = FilterMode.Point;
 
       // Read whatever that's in the scene before the labels are added to the renderedLabel texture
       Texture2D renderedLabel = new Texture2D(Screen.width, Screen.height);
       renderedLabel.filterMode = FilterMode.Point;
-      
-      // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
-      //renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0); 
 
-      // Clear out all pixel values that are already in renderedLabel (those from the previous frame)
-      for (int i = 0; i < Screen.width; i++)
-      {
-         for (int j = 0; j < Screen.height; j++)
-         {
-            Color transparentPixelVal = new Color(0f, 0f, 0f, 0f);
-            renderedLabel.SetPixel(i, j, transparentPixelVal);
-         } 
-      }
+      // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
+      renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0); 
+
+      // for (int i = 0; i < Screen.width; i++)
+      // {
+      //    for (int j = 0; j < Screen.height; j++)
+      //    {
+      //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
+      //       Screenshot.SetPixel(i, j, transparentPxl);
+      //    }
+      // }
+
+      // Set label pixel colors
       for (int i = 0; i < labelX.Count; i++)
       {
          int[] labelPixelCoord = new int[] {labelX[i], labelY[i]};
@@ -130,24 +146,20 @@ public class RenderLabel : MonoBehaviour
       // Render the new label colors on renderedLabel.
       renderedLabel.Apply();
 
-      
-
       // Set labelPlaneMaterial's _MainTex to generated label + background
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
       
-      // Source: https://docs.unity3d.com/ScriptReference/Material.SetTexture.html
-      
-
+      // Set RenderTexture to null for rendering the next frame
       RenderTexture.active = null;
 
       // Save renderedTexture (only for debugging purposes)
-      //   byte[] byteArray = renderedLabel.EncodeToPNG();
-      //   string filename = fileName(Convert.ToInt32(renderedLabel.width), Convert.ToInt32(renderedLabel.height));
-      //   path = Application.dataPath + filename;  
-      //   System.IO.File.WriteAllBytes(path, byteArray);
+        byte[] byteArray = Screenshot.EncodeToPNG();
+        string filename = fileName(Convert.ToInt32(Screenshot.width), Convert.ToInt32(Screenshot.height));
+        path = Application.dataPath + filename;  
+        System.IO.File.WriteAllBytes(path, byteArray);
 
         
-
+      // Source: https://docs.unity3d.com/ScriptReference/Material.SetTexture.html
       // Source: https://gamedevbeginner.com/how-to-capture-the-screen-in-unity-3-methods/ 
    }
 
