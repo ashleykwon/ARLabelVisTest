@@ -19,14 +19,12 @@ public class RenderLabel : MonoBehaviour
    public Texture2D label;
    public Texture2D transparentLayer;
 
-   public List<int> labelX = new List<int>();
-   public List<int> labelY = new List<int>();
+   private List<int> labelX = new List<int>();
+   private List<int> labelY = new List<int>();
    public Material labelPlaneMaterial;
 
    
    
-   
-   public string selectMethod;
    public enum contrastMethods {Palette, HSV};
 
    public contrastMethods selectedMethod;
