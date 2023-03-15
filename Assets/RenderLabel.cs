@@ -8,6 +8,8 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 
+
+
 public class RenderLabel : MonoBehaviour
 {
    public Camera ScreenshotCamera;
@@ -21,10 +23,22 @@ public class RenderLabel : MonoBehaviour
    public List<int> labelY = new List<int>();
    public Material labelPlaneMaterial;
 
+   
+   
+   
+   public string selectMethod;
+   public enum contrastMethods {Palette, HSV};
 
+   public contrastMethods selectedMethod;
+   public Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>> assignColors;
    // Start is called before the first frame update
    void Start()
    {
+      assignColors = new Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>>();
+      assignColors[contrastMethods.Palette] = AssignColor_usingPalette;
+      assignColors[contrastMethods.HSV] = AssignColor_usingHSV;
+      selectedMethod = contrastMethods.Palette;
+
       ScreenshotCamera = gameObject.GetComponent<Camera>(); 
       
       // Access labelPlane's material
@@ -37,7 +51,7 @@ public class RenderLabel : MonoBehaviour
       {
          for (int j = 0; j <= label.height; j++)
          {
-               if ((label.GetPixel(i,j)[0] == 1) && (label.GetPixel(i,j)[1] == 1) && (label.GetPixel(i,j)[2] == 1))
+               if (label.GetPixel(i,j) == Color.white)
                {
                   labelX.Add(i);
                   labelY.Add(j);
@@ -139,7 +153,7 @@ public class RenderLabel : MonoBehaviour
       for (int i = 0; i < labelX.Count; i++)
       {
          int[] labelPixelCoord = new int[] {labelX[i], labelY[i]};
-         Color newColor = AssignColor_usingPalette(labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+         Color newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          renderedLabel.SetPixel(labelX[i], labelY[i], newColor);
       }
 

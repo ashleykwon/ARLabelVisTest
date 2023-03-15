@@ -17,12 +17,27 @@ public class MovePlayer : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.UpArrow)) // use while key down
         {
-           player.transform.Translate(Vector3.forward*speed);
+           if (Input.GetKey(KeyCode.LeftShift)) // player moves up while holding shift
+           {
+               player.transform.Translate(Vector3.up*speed);
+           } 
+           else 
+           {
+               player.transform.Translate(Vector3.forward*speed);
+           }
+           
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            player.transform.Translate(Vector3.back*speed);
+           if (Input.GetKey(KeyCode.LeftShift)) // player moves down if holding shift
+           {
+               player.transform.Translate(Vector3.down*speed);
+           } 
+           else 
+           {
+               player.transform.Translate(Vector3.back*speed);
+           }
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
