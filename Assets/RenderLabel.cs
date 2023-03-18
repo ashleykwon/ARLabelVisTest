@@ -19,15 +19,17 @@ public class RenderLabel : MonoBehaviour
    public Texture2D label;
    public Texture2D transparentLayer;
 
-   private List<int> labelX = new List<int>();
-   private List<int> labelY = new List<int>();
+   private List<List<int>> labelX = new List<List<int>>();
+   private List<List<int>> labelY = new List<List<int>>();
    public Material labelPlaneMaterial;
 
    
    
    public enum contrastMethods {Palette, HSV};
+   public bool addOutline;
 
    public contrastMethods selectedMethod;
+
    public Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>> assignColors;
    // Start is called before the first frame update
    void Start()
@@ -51,8 +53,13 @@ public class RenderLabel : MonoBehaviour
          {
                if (label.GetPixel(i,j) == Color.white)
                {
-                  labelX.Add(i);
-                  labelY.Add(j);
+                  int is_edge = 0;
+                  if (addOutline && (label.GetPixel(i + 1, j)[0] == 0 || label.GetPixel(i, j + 1)[0] == 0 || label.GetPixel(i - 1, j)[0] == 0 || label.GetPixel(i, j - 1)[0] == 0))
+                    {
+                        is_edge = 1;
+                    }
+                  labelX.Add(new List<int> { i, is_edge });
+                  labelY.Add(new List<int> { j, is_edge });
                }   
          }
       }
@@ -136,27 +143,35 @@ public class RenderLabel : MonoBehaviour
       renderedLabel.filterMode = FilterMode.Point;
 
       // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
-      renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0); 
+      renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
-      // for (int i = 0; i < Screen.width; i++)
-      // {
-      //    for (int j = 0; j < Screen.height; j++)
-      //    {
-      //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
-      //       renderedLabel.SetPixel(i, j, transparentPxl);
-      //    }
-      // }
-
+        // for (int i = 0; i < Screen.width; i++)
+        // {
+        //    for (int j = 0; j < Screen.height; j++)
+        //    {
+        //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
+        //       renderedLabel.SetPixel(i, j, transparentPxl);
+        //    }
+        // }
+      
       // Set label pixel colors
       for (int i = 0; i < labelX.Count; i++)
       {
-         int[] labelPixelCoord = new int[] {labelX[i], labelY[i]};
-         Color newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
-         renderedLabel.SetPixel(labelX[i], labelY[i], newColor);
+         int[] labelPixelCoord = new int[] {labelX[i][0], labelY[i][0]};
+         Color newColor;
+            if (labelX[i][1] == 1)
+            {
+                newColor = Color.white;
+            }
+            else
+            {
+                newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+            }
+            renderedLabel.SetPixel(labelX[i][0], labelY[i][0], newColor);
       }
-
-      // Render the new label colors on renderedLabel.
-      renderedLabel.Apply();
+        
+        // Render the new label colors on renderedLabel.
+        renderedLabel.Apply();
 
       // Set labelPlaneMaterial's _MainTex to generated label + background
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
@@ -259,10 +274,8 @@ public class RenderLabel : MonoBehaviour
       return labelColor;
    }
 
-
-
-   // Samples neighboring pixels of labelPixelCoord in backgroundImage 
-   public List<Color> SamplePixelColors(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
+    // Samples neighboring pixels of labelPixelCoord in backgroundImage 
+    public List<Color> SamplePixelColors(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
    {
       List<Color> neighbors = new List<Color>();
       for (int i = -1 * (neighborhoodSize/2); i <= neighborhoodSize/2; i++){
@@ -282,5 +295,7 @@ public class RenderLabel : MonoBehaviour
       double distance = Math.Pow((labelPixel[0] - neighborPixel[0]), 2) + Math.Pow((labelPixel[1] - neighborPixel[1]), 2) + Math.Pow((labelPixel[2] - neighborPixel[2]), 2); 
       return Math.Sqrt(distance);
    }
+
+    
 }
 

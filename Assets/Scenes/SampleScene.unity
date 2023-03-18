@@ -862,9 +862,9 @@ MonoBehaviour:
   labelPlane: {fileID: 429003980}
   label: {fileID: 2800000, guid: ab4f09e3a872b394387e474b2283fab7, type: 3}
   transparentLayer: {fileID: 2800000, guid: 4890b843303c04344b372b2515e01c0d, type: 3}
-  labelX: 
-  labelY: 
   labelPlaneMaterial: {fileID: 0}
+  addOutline: 1
+  selectedMethod: 0
 --- !u!1 &1603653204
 GameObject:
   m_ObjectHideFlags: 0
