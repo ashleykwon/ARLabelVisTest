@@ -208,8 +208,61 @@ public class RenderLabel : MonoBehaviour
          distances.Add(dist);
       }
       labelColor = palette[distances.IndexOf(distances.Max())];
+
+      float r = 0;
+      float g = 0;
+      float b = 0;
+      for (int j = 0; j < neighboringPixelColors.Count; j++){
+            r += neighboringPixelColors[j][0] / neighboringPixelColors.Count;
+            g += neighboringPixelColors[j][1] / neighboringPixelColors.Count;
+            b += neighboringPixelColors[j][2]/ neighboringPixelColors.Count;
+      }
+      Color average_color = new Color(r,g,b,1);
+
+      // labelColor = method_three(average_color);
+
       return labelColor;
    }
+
+   public Color method_one(Color myCol){
+      //Saturation and value set to 1
+      float H, S, V;
+      Color.RGBToHSV(myCol, out H, out S, out V);
+      H = (float)1.0;
+      V = (float)1.0;
+      Color labelColor = Color.HSVToRGB(H, S, V);
+      return labelColor;
+   }
+
+   public Color method_two(Color myCol){
+      //Value = 0 if background_hsv.value > 0.5, Value = 1 if background_hsv.value <= 0.5
+      float H, S, V;
+      Color.RGBToHSV(myCol, out H, out S, out V);
+      if(V> 0.5){
+         V = (float)0.0;
+      }else{
+         V = (float)1.0;
+      }
+      Color labelColor = Color.HSVToRGB(H, S, V);
+      return labelColor;
+   }
+
+   public Color method_three(Color myCol){
+   //If saturation is larger than 0.5, invert the background’s hue and saturation in the label and set its value to 1
+   //Else, invert the value
+      float H, S, V;
+      Color.RGBToHSV(myCol, out H, out S, out V);
+      if(S > 0.5){
+         H = (float)1.0 - H;
+         V = (float)1.0 - V;
+         S = (float)1.0;
+      }else{
+         S = (float)1.0 - S;
+      }
+      Color labelColor = Color.HSVToRGB(H, S, V);
+      return labelColor;
+   }
+
 
    // AssignColor samples neighboring pixels' values in a neighborhood of size neighborhoodSize+1 by neighborhoodSize+1 
    // and assigns a color to a label pixel at labelPixelCoord based on colors of pixels in the neigborhood
@@ -263,13 +316,14 @@ public class RenderLabel : MonoBehaviour
       // labelColor =  new Color((float)1.0 - (float)intensity, (float)1.0 - (float)intensity, (float)1.0 - (float)intensity, 1);
 
       //use HSV inverse
-      float H, S, V;
-      Color.RGBToHSV(average_color, out H, out S, out V);
-      H = (H + (float)0.5) % (float)1;
-      labelColor = Color.HSVToRGB(H, S, V);
+      // float H, S, V;
+      // Color.RGBToHSV(average_color, out H, out S, out V);
+      // H = (float)1.0;
+      // V = (float)1.0;
+      // labelColor = Color.HSVToRGB(H, S, V);
 
       //use 1-HSV inverse
-      Color HSV = Color.HSVToRGB(H, S, V);
+      // Color HSV = Color.HSVToRGB(H, S, V);
       // labelColor = new Color((float)1.0 - HSV[0],(float)1.0 - HSV[1], (float)1.0 - HSV[2]);
 
       return labelColor;
