@@ -269,7 +269,7 @@ public class RenderLabel : MonoBehaviour
 
       //use 1-HSV inverse
       Color HSV = Color.HSVToRGB(H, S, V);
-      // labelColor = new Color((float)1.0 - HSV[0],(float)1.0 - HSV[1], (float)1.0 - HSV[2] );
+      // labelColor = new Color((float)1.0 - HSV[0],(float)1.0 - HSV[1], (float)1.0 - HSV[2]);
 
       return labelColor;
    }
@@ -294,6 +294,131 @@ public class RenderLabel : MonoBehaviour
    {
       double distance = Math.Pow((labelPixel[0] - neighborPixel[0]), 2) + Math.Pow((labelPixel[1] - neighborPixel[1]), 2) + Math.Pow((labelPixel[2] - neighborPixel[2]), 2); 
       return Math.Sqrt(distance);
+   }
+
+   // code based of http://www.easyrgb.com/en/math.php
+   public Vector3 RGB_to_LAB(Color RGB) {
+      double R = RGB[0];
+      double G = RGB[1];
+      double B = RGB[2];
+
+      // reference values, D65/2°
+      double Xr = 95.047;  
+      double Yr = 100.0;
+      double Zr = 108.883;
+
+      double var_R = (R / 255.0);
+      double var_G = (G / 255.0);
+      double var_B = (B / 255.0);
+
+      if (var_R > 0.04045) 
+         var_R = Math.Pow(((var_R + 0.055) / 1.055), 2.4);
+      else
+         var_R = var_R / 12.92;
+      if (var_G > 0.04045)
+         var_G = Math.Pow(((var_G + 0.055) / 1.055), 2.4);
+      else
+         var_G = var_G / 12.92;
+      if (var_B > 0.04045)
+         var_B = Math.Pow(((var_B + 0.055) / 1.055), 2.4);
+      else
+         var_B = var_B / 12.92;
+
+      var_R *= 100;
+      var_G *= 100;
+      var_B *= 100;
+
+      double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+      double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+      double Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+      // now convert from XYZ to LAB
+
+      double var_X = X / Xr;
+      double var_Y = Y / Yr;
+      double var_Z = Z / Zr;
+
+      if (var_X > 0.008856)
+         var_X = Math.Pow(var_X, 1/3.0);
+      else
+         var_X = (7.787 * var_X) + (16 / 116);
+      if (var_Y > 0.008856)
+         var_Y = Math.Pow(var_Y, 1/3.0);
+      else
+         var_Y = (7.787 * var_Y) + (16 / 116);
+      if (var_Z > 0.008856)
+         var_Z = Math.Pow(var_Z, 1/3.0)
+      else
+         var_Z = (7.787 * var_Z) + (16 / 116);
+
+      Vector3 LAB = new Vector3();
+
+      LAB[0] = (float) ((116 * var_Y) - 16);
+      LAB[1] = (float) (500 * (var_X - var_Y));
+      LAB[3] = (float) (200 * (var_Y - var_Z));
+
+      return LAB;
+   } 
+
+   // based off of http://www.easyrgb.com/en/math.php
+   public Color LAB_TO_RGB(Vector3 LAB){
+      double L = LAB[0];
+      double A = LAB[1];
+      double B = LAB[2];
+
+      // reference values, D65/2°
+      double Xr = 95.047;  
+      double Yr = 100.0;
+      double Zr = 108.883;
+
+      // first convert LAB to XYZ
+      double var_Y = (L + 16.0) / 116.0;
+      double var_X = A / 500 + var_Y;
+      double var_Z = var_Y - B / 200;
+
+      if (Math.Pow(var_Y, 3)  > 0.008856) 
+         var_Y = Math.Pow(var_Y, 3);
+      else
+         var_Y = (var_Y - 16 / 116) / 7.787;
+      if (Math.Pow(var_X, 3)  > 0.008856)
+         var_X = Math.Pow(var_X, 3);
+      else
+         var_X = (var_X - 16 / 116) / 7.787;
+      if (Math.Pow(var_Z, 3)  > 0.008856) 
+         var_Z = Math.Pow(var_Z, 3);
+      else
+         var_Z = (var_Z - 16 / 116) / 7.787;
+
+      double X = var_X * Xr;
+      double Y = var_Y * Yr;
+      double Z = var_Z * Zr;
+
+      // now convert XYZ to RGB
+
+      X /= 100.0;
+      Y /= 100.0;
+      Z /= 100.0;
+
+      double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+      double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
+      double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
+
+      if (var_R > 0.0031308) 
+         var_R = 1.055 * (Math.Pow(var_R, (1 / 2.4))) - 0.055;
+      else
+         var_R = 12.92 * var_R;
+      if (var_G > 0.0031308) 
+         var_G = 1.055 * (Math.Pow(var_G, (1 / 2.4))) - 0.055;
+      else
+         var_G = 12.92 * var_G;
+      if (var_B > 0.0031308) 
+         var_B = 1.055 * (Math.Pow(var_B, (1 / 2.4))) - 0.055;
+      else
+         var_B = 12.92 * var_B;
+
+
+      Color RGB = new Color((float)var_R, (float)var_G, (float)var_B);
+      return RGB;
    }
 
     
