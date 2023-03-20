@@ -343,9 +343,9 @@ public class RenderLabel : MonoBehaviour
       double Yr = 100.0;
       double Zr = 108.883;
 
-      double var_R = (R / 255.0);
-      double var_G = (G / 255.0);
-      double var_B = (B / 255.0);
+      double var_R = R; //(R / 255.0);
+      double var_G = G; //(G / 255.0);
+      double var_B = B; //(B / 255.0);
 
       if (var_R > 0.04045) 
          var_R = Math.Pow(((var_R + 0.055) / 1.055), 2.4);
@@ -452,7 +452,7 @@ public class RenderLabel : MonoBehaviour
       else
          var_B = 12.92 * var_B;
 
-
+      // Color RGB = new Color((float)var_R * 255, (float)var_G * 255, (float)var_B * 255);
       Color RGB = new Color((float)var_R, (float)var_G, (float)var_B);
       return RGB;
    }
