@@ -25,7 +25,7 @@ public class RenderLabel : MonoBehaviour
 
    
    
-   public enum contrastMethods {Palette, HSV};
+   public enum contrastMethods {Palette, HSV, LAB};
    public bool addOutline;
 
    public contrastMethods selectedMethod;
@@ -37,6 +37,7 @@ public class RenderLabel : MonoBehaviour
       assignColors = new Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>>();
       assignColors[contrastMethods.Palette] = AssignColor_usingPalette;
       assignColors[contrastMethods.HSV] = AssignColor_usingHSV;
+      assignColors[contrastMethods.LAB] = AssignColor_usingCIELAB;
       selectedMethod = contrastMethods.Palette;
 
       ScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -274,6 +275,41 @@ public class RenderLabel : MonoBehaviour
       return labelColor;
    }
 
+   // Naive method using thresholding
+   public Color AssignColor_usingCIELAB(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize) 
+   {
+      List<Color> neighboringPixelColors = SamplePixelColors(labelPixelCoord, backgroundImage, neighborhoodSize);
+      float R = 0, G = 0, B = 0;
+      foreach (Color c in neighboringPixelColors){
+         R += c[0];
+         G += c[1];
+         B += c[2];
+      }
+
+      R /= (float) neighboringPixelColors.Count;
+      G /= (float) neighboringPixelColors.Count;
+      B /= (float) neighboringPixelColors.Count;
+
+      
+      // Color bgCol = backgroundImage.GetPixel(labelPixelCoord[0], labelPixelCoord[1]);
+      Color bgCol = new Color(R, G, B);
+      
+      Vector3 bgLAB = RGB_to_LAB(bgCol);
+
+      float L = bgLAB[0];
+      float newL = 100 - L;
+
+      if (25 >= L && L <= 50){
+         newL += 25;
+      }
+
+      if (50 < L && L <= 25) {
+         newL -= 25;
+      }
+
+      return LAB_TO_RGB(bgLAB); // replace
+   }
+
     // Samples neighboring pixels of labelPixelCoord in backgroundImage 
     public List<Color> SamplePixelColors(int[] labelPixelCoord, Texture2D backgroundImage, int neighborhoodSize)
    {
@@ -347,7 +383,7 @@ public class RenderLabel : MonoBehaviour
       else
          var_Y = (7.787 * var_Y) + (16 / 116);
       if (var_Z > 0.008856)
-         var_Z = Math.Pow(var_Z, 1/3.0)
+         var_Z = Math.Pow(var_Z, 1/3.0);
       else
          var_Z = (7.787 * var_Z) + (16 / 116);
 
