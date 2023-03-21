@@ -102,10 +102,6 @@ public class RenderLabel : MonoBehaviour
      // Extract frames from ScreenshotCamera and generate label colors based on the frames
    public void TakeScreenShot()
    {
-      //yield return new WaitForEndOfFrame();
-
-      // Clear out pixels in labelPlane by setting its texture to be transparent
-      // labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
 
       // Block out the layer that contains the label (it's a plane object that has a material + shader)
       ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
@@ -126,15 +122,6 @@ public class RenderLabel : MonoBehaviour
       // Screenshot is the background without the label
       Texture2D Screenshot = new Texture2D(Screen.width, Screen.height);
 
-      // for (int i = 0; i < Screen.width; i++)
-      // {
-      //    for (int j = 0; j < Screen.height; j++)
-      //    {
-      //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
-      //       Screenshot.SetPixel(i, j, transparentPxl);
-      //    }
-      // }
-
       // Read pixels on the screen into Screenshot. The pixels on the screen should be those from screenTexture
       Screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
       Screenshot.filterMode = FilterMode.Point;
@@ -146,15 +133,6 @@ public class RenderLabel : MonoBehaviour
       // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
-        // for (int i = 0; i < Screen.width; i++)
-        // {
-        //    for (int j = 0; j < Screen.height; j++)
-        //    {
-        //       Color transparentPxl = new Color(0f, 0f, 0f, 0f);
-        //       renderedLabel.SetPixel(i, j, transparentPxl);
-        //    }
-        // }
-      
       // Set label pixel colors
       for (int i = 0; i < labelX.Count; i++)
       {
@@ -162,17 +140,19 @@ public class RenderLabel : MonoBehaviour
          Color newColor;
             if (labelX[i][1] == 1)
             {
-                newColor = Color.white;
+                  newColor = Color.white;
             }
             else
             {
-                newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+                  newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
             }
             renderedLabel.SetPixel(labelX[i][0], labelY[i][0], newColor);
       }
         
-        // Render the new label colors on renderedLabel.
-        renderedLabel.Apply();
+
+
+      // Render the new label colors on renderedLabel.
+      renderedLabel.Apply();
 
       // Set labelPlaneMaterial's _MainTex to generated label + background
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
@@ -445,7 +425,7 @@ public class RenderLabel : MonoBehaviour
 
       LAB[0] = (float) ((116 * var_Y) - 16);
       LAB[1] = (float) (500 * (var_X - var_Y));
-      LAB[3] = (float) (200 * (var_Y - var_Z));
+      LAB[2] = (float) (200 * (var_Y - var_Z)); // Not sure why this was originally LAB[3]
 
       return LAB;
    } 
@@ -508,6 +488,7 @@ public class RenderLabel : MonoBehaviour
 
       // Color RGB = new Color((float)var_R * 255, (float)var_G * 255, (float)var_B * 255);
       Color RGB = new Color((float)var_R, (float)var_G, (float)var_B);
+
       return RGB;
    }
 

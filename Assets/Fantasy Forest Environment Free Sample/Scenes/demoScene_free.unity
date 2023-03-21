@@ -472,7 +472,7 @@ MonoBehaviour:
   transparentLayer: {fileID: 2800000, guid: 4890b843303c04344b372b2515e01c0d, type: 3}
   labelPlaneMaterial: {fileID: 0}
   addOutline: 0
-  selectedMethod: 0
+  selectedMethod: 1
 --- !u!114 &899757749
 MonoBehaviour:
   m_ObjectHideFlags: 0
