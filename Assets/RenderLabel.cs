@@ -19,8 +19,7 @@ public class RenderLabel : MonoBehaviour
    public Texture2D label;
    public Texture2D transparentLayer;
 
-   private List<List<int>> labelX = new List<List<int>>();
-   private List<List<int>> labelY = new List<List<int>>();
+   private List<(int, int, bool)> labelCoords = new List<(int, int, bool)>();  // (x, y, isEdge)
    public Material labelPlaneMaterial;
 
    
@@ -38,7 +37,6 @@ public class RenderLabel : MonoBehaviour
       assignColors[contrastMethods.Palette] = AssignColor_usingPalette;
       assignColors[contrastMethods.HSV] = AssignColor_usingHSV;
       assignColors[contrastMethods.LAB] = AssignColor_usingCIELAB;
-      selectedMethod = contrastMethods.Palette;
 
       ScreenshotCamera = gameObject.GetComponent<Camera>(); 
       
@@ -54,13 +52,8 @@ public class RenderLabel : MonoBehaviour
          {
                if (label.GetPixel(i,j) == Color.white)
                {
-                  int is_edge = 0;
-                  if (addOutline && (label.GetPixel(i + 1, j)[0] == 0 || label.GetPixel(i, j + 1)[0] == 0 || label.GetPixel(i - 1, j)[0] == 0 || label.GetPixel(i, j - 1)[0] == 0))
-                    {
-                        is_edge = 1;
-                    }
-                  labelX.Add(new List<int> { i, is_edge });
-                  labelY.Add(new List<int> { j, is_edge });
+                  bool is_edge = label.GetPixel(i + 1, j)[0] == 0 || label.GetPixel(i, j + 1)[0] == 0 || label.GetPixel(i - 1, j)[0] == 0 || label.GetPixel(i, j - 1)[0] == 0;
+                  labelCoords.Add((i, j, is_edge));
                }   
          }
       }
@@ -134,19 +127,16 @@ public class RenderLabel : MonoBehaviour
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
       // Set label pixel colors
-      for (int i = 0; i < labelX.Count; i++)
+      for (int i = 0; i < labelCoords.Count; i++)
       {
-         int[] labelPixelCoord = new int[] {labelX[i][0], labelY[i][0]};
-         Color newColor;
-            if (labelX[i][1] == 1)
-            {
-                  newColor = Color.white;
-            }
-            else
-            {
-                  newColor = assignColors[selectedMethod](labelPixelCoord, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
-            }
-            renderedLabel.SetPixel(labelX[i][0], labelY[i][0], newColor);
+         (int labelX, int labelY, bool isEdge) = labelCoords[i];
+         Color newColor = Color.white;
+
+         if (!addOutline || !isEdge)
+         {
+            newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, 4); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+         }
+         renderedLabel.SetPixel(labelX, labelY, newColor);
       }
         
 
@@ -302,7 +292,7 @@ public class RenderLabel : MonoBehaviour
       // V = (float)1.0;
       // labelColor = Color.HSVToRGB(H, S, V);
 
-      //use 1-HSV inverse
+      // //use 1-HSV inverse
       // Color HSV = Color.HSVToRGB(H, S, V);
       // labelColor = new Color((float)1.0 - HSV[0],(float)1.0 - HSV[1], (float)1.0 - HSV[2]);
 
@@ -340,6 +330,8 @@ public class RenderLabel : MonoBehaviour
       if (50 < L && L <= 25) {
          newL -= 25;
       }
+
+      bgLAB[0] = newL;
 
       return LAB_TO_RGB(bgLAB); // replace
    }
