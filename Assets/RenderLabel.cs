@@ -172,7 +172,8 @@ public class RenderLabel : MonoBehaviour
       for (int i = 0; i < palette.Length; i++)
       {
          double dist = 0;
-         for (int j = 0; j < neighboringPixelColors.Count; j++){
+         for (int j = 0; j < neighboringPixelColors.Count; j++)
+         {
             dist += CalculateDistance(palette[i], neighboringPixelColors[j]);
          }
          distances.Add(dist);
@@ -359,7 +360,8 @@ public class RenderLabel : MonoBehaviour
    }
 
    // code based of http://www.easyrgb.com/en/math.php
-   public Vector3 RGB_to_LAB(Color RGB) {
+   public Vector3 RGB_to_LAB(Color RGB) 
+   {
       double R = RGB[0];
       double G = RGB[1];
       double B = RGB[2];
@@ -377,18 +379,20 @@ public class RenderLabel : MonoBehaviour
          var_R = Math.Pow(((var_R + 0.055) / 1.055), 2.4);
       else
          var_R = var_R / 12.92;
+
       if (var_G > 0.04045)
          var_G = Math.Pow(((var_G + 0.055) / 1.055), 2.4);
       else
          var_G = var_G / 12.92;
+
       if (var_B > 0.04045)
          var_B = Math.Pow(((var_B + 0.055) / 1.055), 2.4);
       else
          var_B = var_B / 12.92;
 
-      var_R *= 100;
-      var_G *= 100;
-      var_B *= 100;
+      // var_R *= 100;
+      // var_G *= 100;
+      // var_B *= 100;
 
       double X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
       double Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
@@ -403,27 +407,30 @@ public class RenderLabel : MonoBehaviour
       if (var_X > 0.008856)
          var_X = Math.Pow(var_X, 1/3.0);
       else
-         var_X = (7.787 * var_X) + (16 / 116);
+         var_X = (7.787 * var_X) + (16.0 / 116.0);
+
       if (var_Y > 0.008856)
          var_Y = Math.Pow(var_Y, 1/3.0);
       else
-         var_Y = (7.787 * var_Y) + (16 / 116);
+         var_Y = (7.787 * var_Y) + (16.0 / 116.0);
+
       if (var_Z > 0.008856)
          var_Z = Math.Pow(var_Z, 1/3.0);
       else
-         var_Z = (7.787 * var_Z) + (16 / 116);
+         var_Z = (7.787 * var_Z) + (16.0 / 116.0);
 
       Vector3 LAB = new Vector3();
 
-      LAB[0] = (float) ((116 * var_Y) - 16);
-      LAB[1] = (float) (500 * (var_X - var_Y));
-      LAB[2] = (float) (200 * (var_Y - var_Z)); // Not sure why this was originally LAB[3]
+      LAB[0] = (float) ((116.0 * var_Y) - 16);
+      LAB[1] = (float) (500.0 * (var_X - var_Y));
+      LAB[2] = (float) (200.0 * (var_Y - var_Z)); // Not sure why this was originally LAB[3]
 
       return LAB;
    } 
 
    // based off of http://www.easyrgb.com/en/math.php
-   public Color LAB_TO_RGB(Vector3 LAB){
+   public Color LAB_TO_RGB(Vector3 LAB)
+   {
       double L = LAB[0];
       double A = LAB[1];
       double B = LAB[2];
@@ -436,20 +443,20 @@ public class RenderLabel : MonoBehaviour
       // first convert LAB to XYZ
       double var_Y = (L + 16.0) / 116.0;
       double var_X = A / 500 + var_Y;
-      double var_Z = var_Y - B / 200;
+      double var_Z = var_Y - B / 200.0;
 
       if (Math.Pow(var_Y, 3)  > 0.008856) 
-         var_Y = Math.Pow(var_Y, 3);
+         var_Y = Math.Pow(var_Y, 3.0);
       else
          var_Y = (var_Y - 16 / 116) / 7.787;
       if (Math.Pow(var_X, 3)  > 0.008856)
-         var_X = Math.Pow(var_X, 3);
+         var_X = Math.Pow(var_X, 3.0);
       else
          var_X = (var_X - 16 / 116) / 7.787;
       if (Math.Pow(var_Z, 3)  > 0.008856) 
-         var_Z = Math.Pow(var_Z, 3);
+         var_Z = Math.Pow(var_Z, 3.0);
       else
-         var_Z = (var_Z - 16 / 116) / 7.787;
+         var_Z = (var_Z - 16.0 / 116.0) / 7.787;
 
       double X = var_X * Xr;
       double Y = var_Y * Yr;
@@ -457,9 +464,9 @@ public class RenderLabel : MonoBehaviour
 
       // now convert XYZ to RGB
 
-      X /= 100.0;
-      Y /= 100.0;
-      Z /= 100.0;
+      // X /= 100.0;
+      // Y /= 100.0;
+      // Z /= 100.0;
 
       double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
       double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
