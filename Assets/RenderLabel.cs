@@ -144,7 +144,11 @@ public class RenderLabel : MonoBehaviour
       // Render the new label colors on renderedLabel.
       renderedLabel.Apply();
 
+      // float[,] filter = ImageProcessing.boxBlur(3);
+      // Texture2D blurred = ImageProcessing.conv2D(renderedLabel, filter);
+
       // Set labelPlaneMaterial's _MainTex to generated label + background
+      // labelPlaneMaterial.SetTexture("_MainTex", blurred);
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
       
       // Set RenderTexture to null for rendering the next frame
