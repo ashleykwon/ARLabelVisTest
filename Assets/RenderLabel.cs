@@ -114,10 +114,10 @@ public class RenderLabel : MonoBehaviour
 
       // Screenshot is the background without the label
       Texture2D Screenshot = new Texture2D(Screen.width, Screen.height);
+      Screenshot.filterMode = FilterMode.Point;
 
       // Read pixels on the screen into Screenshot. The pixels on the screen should be those from screenTexture
       Screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-      Screenshot.filterMode = FilterMode.Point;
 
       // Read whatever that's in the scene before the labels are added to the renderedLabel texture
       Texture2D renderedLabel = new Texture2D(Screen.width, Screen.height);
@@ -126,7 +126,9 @@ public class RenderLabel : MonoBehaviour
       // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
-      // Set label pixel colors
+      // Set label pixel colors 
+      
+
       for (int i = 0; i < labelCoords.Count; i++)
       {
          (int labelX, int labelY, bool isEdge) = labelCoords[i];
@@ -144,7 +146,7 @@ public class RenderLabel : MonoBehaviour
       // Render the new label colors on renderedLabel.
       renderedLabel.Apply();
 
-      // Set labelPlaneMaterial's _MainTex to generated label + background
+       // Set labelPlaneMaterial's _MainTex to generated label + background
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
       
       // Set RenderTexture to null for rendering the next frame
