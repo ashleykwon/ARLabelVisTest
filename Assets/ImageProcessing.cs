@@ -46,7 +46,7 @@ public class ImageProcessing
       return filter;
    }
 
-   public static float[,] gaussianBlue(int sz, float sigma)
+   public static float[,] gaussianBlur(int sz, float sigma)
    {
       float[,] filter = new float[sz, sz];
       float rescale = (float) Math.Sqrt(2 * Math.PI);
