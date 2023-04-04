@@ -27,6 +27,8 @@ public class RenderLabel : MonoBehaviour
    public enum contrastMethods {Palette, HSV, LAB};
    public bool addOutline;
 
+   public bool addShadow;
+
    public contrastMethods selectedMethod;
 
    public Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>> assignColors;
@@ -127,6 +129,8 @@ public class RenderLabel : MonoBehaviour
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
       // Set label pixel colors
+      Texture2D justText = new Texture2D(renderedLabel.width, renderedLabel.height);
+      Texture2D shadow = new Texture2D(renderedLabel.width, renderedLabel.height);
       for (int i = 0; i < labelCoords.Count; i++)
       {
          (int labelX, int labelY, bool isEdge) = labelCoords[i];
@@ -137,6 +141,8 @@ public class RenderLabel : MonoBehaviour
             newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          }
          renderedLabel.SetPixel(labelX, labelY, newColor);
+         justText.SetPixel(labelX, labelY, newColor);
+         shadow.SetPixel(labelX, labelY, Color.black);
       }
         
 
@@ -144,8 +150,15 @@ public class RenderLabel : MonoBehaviour
       // Render the new label colors on renderedLabel.
       renderedLabel.Apply();
 
-      // float[,] filter = ImageProcessing.gaussianBlur(3, 3);
-      // Texture2D blurred = ImageProcessing.conv2D(renderedLabel, filter);
+      if (addShadow){
+         float[,] filter = ImageProcessing.boxBlur(3);
+         Texture2D blurred = ImageProcessing.conv2D(shadow, filter);
+         Texture2D textAndShadow = ImageProcessing.overlayImages(justText, shadow);
+         renderedLabel = ImageProcessing.overlayImages(textAndShadow, renderedLabel);
+      }
+
+      // 
+      // 
 
       // Set labelPlaneMaterial's _MainTex to generated label + background
       // labelPlaneMaterial.SetTexture("_MainTex", blurred);

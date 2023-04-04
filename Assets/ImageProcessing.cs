@@ -60,4 +60,30 @@ public class ImageProcessing
       }
       return filter;
    }
+
+   public static Texture2D overlayImages(Texture2D topImage, Texture2D bottomImage){
+      Texture2D res = new Texture2D(bottomImage.width, bottomImage.height);
+      for (int x = 0; x < bottomImage.width; x++){
+         for (int y = 0; y < bottomImage.width; y++){
+            Color bottomPixel = bottomImage.GetPixel(x, y);
+            if (x >= topImage.width || y >= topImage.height){
+               res.SetPixel(x, y, bottomPixel);
+               continue;
+            }
+
+            Color topPixel = topImage.GetPixel(x, y);
+            float r = topPixel.r * topPixel.a + bottomPixel.r * (1 - topPixel.a);
+            float g = topPixel.g * topPixel.a + bottomPixel.g * (1 - topPixel.a);
+            float b = topPixel.b * topPixel.a + bottomPixel.b * (1 - topPixel.a);
+            float a = topPixel.a + bottomPixel.a;
+
+            if (a > 1) a = 1;
+            Color resPixel = new Color(r, g, b, a);
+            res.SetPixel(x, y, resPixel);
+      
+         }
+      }
+      res.Apply();
+      return res;
+   }
 }
