@@ -47,14 +47,21 @@ public class RenderLabel : MonoBehaviour
 
       // Set labelPlaneMaterial's initial texture to a transparent layer
       labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
+      // labelPlaneMaterial.SetTexture("_TextMatte", transparentLayer);
 
-      for (int i = 0; i <= label.width; i++)
+      Debug.Log(label.width);
+      
+
+      for (int i = 0; i <= label.width ; i++)
       {
          for (int j = 0; j <= label.height; j++)
          {
-               if (label.GetPixel(i,j) == Color.white)
+               int x = (int)Math.Round(i * (double)label.width / Screen.width);
+               int y = (int)Math.Round(j * (double)label.height /Screen.height);
+
+               if (label.GetPixel(x,y) == Color.white)
                {
-                  bool is_edge = label.GetPixel(i + 1, j)[0] == 0 || label.GetPixel(i, j + 1)[0] == 0 || label.GetPixel(i - 1, j)[0] == 0 || label.GetPixel(i, j - 1)[0] == 0;
+                  bool is_edge = label.GetPixel(x + 1, y)[0] == 0 || label.GetPixel(x, y + 1)[0] == 0 || label.GetPixel(x - 1, y)[0] == 0 || label.GetPixel(x, y - 1)[0] == 0;
                   labelCoords.Add((i, j, is_edge));
                }   
          }
@@ -129,8 +136,7 @@ public class RenderLabel : MonoBehaviour
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
       // Set label pixel colors
-      Texture2D justText = new Texture2D(renderedLabel.width, renderedLabel.height);
-      Texture2D shadow = new Texture2D(renderedLabel.width, renderedLabel.height);
+      Texture2D textMatte = new Texture2D(renderedLabel.width, renderedLabel.height);
       for (int i = 0; i < labelCoords.Count; i++)
       {
          (int labelX, int labelY, bool isEdge) = labelCoords[i];
@@ -141,8 +147,7 @@ public class RenderLabel : MonoBehaviour
             newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          }
          renderedLabel.SetPixel(labelX, labelY, newColor);
-         justText.SetPixel(labelX, labelY, newColor);
-         shadow.SetPixel(labelX, labelY, Color.black);
+         textMatte.SetPixel(labelX, labelY, newColor);
       }
         
 
@@ -150,19 +155,13 @@ public class RenderLabel : MonoBehaviour
       // Render the new label colors on renderedLabel.
       renderedLabel.Apply();
 
-      if (addShadow){
-         float[,] filter = ImageProcessing.boxBlur(3);
-         Texture2D blurred = ImageProcessing.conv2D(shadow, filter);
-         Texture2D textAndShadow = ImageProcessing.overlayImages(justText, shadow);
-         renderedLabel = ImageProcessing.overlayImages(textAndShadow, renderedLabel);
-      }
-
       // 
       // 
 
       // Set labelPlaneMaterial's _MainTex to generated label + background
       // labelPlaneMaterial.SetTexture("_MainTex", blurred);
       labelPlaneMaterial.SetTexture("_MainTex", renderedLabel);
+      // labelPlaneMaterial.SetTexture("_TextMatte", textMatte);
       
       // Set RenderTexture to null for rendering the next frame
       RenderTexture.active = null;
