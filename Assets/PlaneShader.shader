@@ -1,4 +1,4 @@
-Shader "Unlit/NewUnlitShader"
+Shader "Unlit/PlaneShader"
 {
     Properties
     {
@@ -37,7 +37,8 @@ Shader "Unlit/NewUnlitShader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-			bool _UseFilter;
+            float4 _MainTex_TexelSize;
+			   bool _UseFilter;
 
             v2f vert (appdata v)
             {
@@ -51,24 +52,26 @@ Shader "Unlit/NewUnlitShader"
 			fixed4 frag(v2f vdata) : SV_Target
 			{
 				
-				float box_blur[25] = {1, 1, 1, 1, 1,
-										1, 1, 1, 1, 1,
-										1, 1, 1, 1, 1,
-										1, 1, 1, 1, 1,
-										1, 1, 1, 1, 1};
+				// float box_blur[25] = {1, 1, 1, 1, 1,
+				// 						1, 1, 1, 1, 1,
+				// 						1, 1, 1, 1, 1,
+				// 						1, 1, 1, 1, 1,
+				// 						1, 1, 1, 1, 1};
+
+            int blur_size = 5;
 
 				fixed4 col = tex2D(_MainTex, vdata.uv);
 
 				if (_UseFilter == 1) {
 					float4 acc = float4(0, 0, 0, 0);
-					for (int i = 2; i >= -2; i--) {
-						for (int j = 2; j >= -2; j--) {
-							float weight = box_blur[(i + 2) * 5 + (j + 2)];
-							float4 pix = tex2D(_MainTex, float2(vdata.uv.x + j * _MainTex_ST.x, vdata.uv.y + i * _MainTex_ST.y));
+					for (int i = blur_size/2; i >= -blur_size/2; i--) {
+						for (int j = blur_size/2; j >= -blur_size/2; j--) {
+							float weight = 1.0;//box_blur[(i + 2) * 5 + (j + 2)];
+							float4 pix = tex2D(_MainTex, float2(vdata.uv.x + j * _MainTex_TexelSize.x, vdata.uv.y + i * _MainTex_TexelSize.y));
 							acc += pix * weight;
 						}
 					}
-					col = acc / 25.0;
+					col = acc / (blur_size * blur_size);
 				}
 
                 // sample the texture
