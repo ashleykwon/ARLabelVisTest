@@ -3,6 +3,7 @@ Shader "Unlit/NewUnlitShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_UseFilter ("Use Filter", Integer) = 1
     }
     SubShader
     {
@@ -19,6 +20,8 @@ Shader "Unlit/NewUnlitShader"
 
             #include "UnityCG.cginc"
 
+
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -34,6 +37,7 @@ Shader "Unlit/NewUnlitShader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+			bool _UseFilter;
 
             v2f vert (appdata v)
             {
@@ -44,12 +48,32 @@ Shader "Unlit/NewUnlitShader"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
-            {
+			fixed4 frag(v2f vdata) : SV_Target
+			{
+				
+				float box_blur[25] = {1, 1, 1, 1, 1,
+										1, 1, 1, 1, 1,
+										1, 1, 1, 1, 1,
+										1, 1, 1, 1, 1,
+										1, 1, 1, 1, 1};
+
+				fixed4 col = tex2D(_MainTex, vdata.uv);
+
+				if (_UseFilter == 1) {
+					float4 acc = float4(0, 0, 0, 0);
+					for (int i = 2; i >= -2; i--) {
+						for (int j = 2; j >= -2; j--) {
+							float weight = box_blur[(i + 2) * 5 + (j + 2)];
+							float4 pix = tex2D(_MainTex, float2(vdata.uv.x + j * _MainTex_ST.x, vdata.uv.y + i * _MainTex_ST.y));
+							acc += pix * weight;
+						}
+					}
+					col = acc / 25.0;
+				}
+
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
                 // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
+                //UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }
             ENDCG
