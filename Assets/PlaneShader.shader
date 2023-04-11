@@ -3,7 +3,7 @@ Shader "Unlit/PlaneShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-		_UseFilter ("Use Filter", Integer) = 1
+		  _BlurSize ("Blur Size", Integer) = 5
     }
     SubShader
     {
@@ -38,7 +38,7 @@ Shader "Unlit/PlaneShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _MainTex_TexelSize;
-			   bool _UseFilter;
+			   int _BlurSize;
 
             v2f vert (appdata v)
             {
@@ -58,20 +58,20 @@ Shader "Unlit/PlaneShader"
 				// 						1, 1, 1, 1, 1,
 				// 						1, 1, 1, 1, 1};
 
-            int blur_size = 5;
+            // int blur_size = 5;
 
 				fixed4 col = tex2D(_MainTex, vdata.uv);
 
-				if (_UseFilter == 1) {
+				if (_BlurSize > 0) {
 					float4 acc = float4(0, 0, 0, 0);
-					for (int i = blur_size/2; i >= -blur_size/2; i--) {
-						for (int j = blur_size/2; j >= -blur_size/2; j--) {
+					for (int i = _BlurSize/2; i >= -_BlurSize/2; i--) {
+						for (int j = _BlurSize/2; j >= -_BlurSize/2; j--) {
 							float weight = 1.0;//box_blur[(i + 2) * 5 + (j + 2)];
 							float4 pix = tex2D(_MainTex, float2(vdata.uv.x + j * _MainTex_TexelSize.x, vdata.uv.y + i * _MainTex_TexelSize.y));
 							acc += pix * weight;
 						}
 					}
-					col = acc / (blur_size * blur_size);
+					col = acc / (_BlurSize * _BlurSize);
 				}
 
                 // sample the texture
