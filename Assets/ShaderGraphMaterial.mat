@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ShaderGraphMaterial
-  m_Shader: {fileID: 4800000, guid: 4c08305865acd48f5b151b794be3793d, type: 3}
+  m_Shader: {fileID: 4800000, guid: f53ec9cedb35202418add45e73819cfe, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords:
   - _ALPHAPREMULTIPLY_ON
@@ -95,14 +95,14 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.52
     - _GlossyReflections: 0
-    - _KernelSize: 60.2
+    - _KernelSize: 16.5
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ShadowMultiplier: 1.64
-    - _ShadowScale: 1.0098
-    - _Sigma: 44.7
+    - _ShadowMultiplier: 2
+    - _ShadowScale: 1.05
+    - _Sigma: 57.8
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 0
     - _SrcBlend: 1
