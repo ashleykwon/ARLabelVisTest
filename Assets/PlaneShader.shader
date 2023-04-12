@@ -4,7 +4,10 @@ Shader "Unlit/PlaneShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _LabelTex ("Texture", 2D) = "white" {}
-		  _BlurSize ("Blur Size", Integer) = 5
+		  _KernelSize ("Blur Kernel Size", Range (0, 100)) = 50
+        _Sigma ("Blur Sigma", Range (0, 100)) = 50
+        _ShadowScale ("Shadow Scale", Range (1.0, 1.05)) = 1.0
+        _ShadowMultiplier ("Shadow Multiplier", Range (0, 2)) = 1.0
     }
     SubShader
     {
@@ -43,7 +46,10 @@ Shader "Unlit/PlaneShader"
 
             float4 _LabelTex_TexelSize;
             float4 _LabelTex_ST;
-			   int _BlurSize;
+			   float _KernelSize;
+            float _Sigma;
+            float _ShadowScale;
+            float _ShadowMultiplier;
 
             float gaussian2D(float x, float y, float sigma){
                float rsq = x * x + y * y;
@@ -69,18 +75,20 @@ Shader "Unlit/PlaneShader"
 
                
                float4 acc = float4(0, 0, 0, 0);
-               for (int i = _BlurSize/2; i >= -_BlurSize/2; i--) {
-                  for (int j = _BlurSize/2; j >= -_BlurSize/2; j--) {
+               for (int i = _KernelSize/2; i >= -_KernelSize/2; i--) {
+                  for (int j = _KernelSize/2; j >= -_KernelSize/2; j--) {
                      float x = vdata.uv.x + j * _LabelTex_TexelSize.x;
                      float y = vdata.uv.y + i * _LabelTex_TexelSize.y;
-                     float weight = gaussian2D(i, j, 20); //1.0 / (_BlurSize * _BlurSize);//box_blur[(i + 2) * 5 + (j + 2)];
-                     float4 pix = tex2D(_LabelTex, float2(x, y));
+                     float2 coords = float2(x, y);
+                     coords = (coords - 0.5) / _ShadowScale + 0.5;
+                     float weight = gaussian2D(i, j, _Sigma);
+                     float4 pix = tex2D(_LabelTex, coords);
                      acc += pix * weight;
                   }
                }
 
                if (textMatte.r == 0){
-                  col *= 1 - acc;
+                  col *= 1 - acc * _ShadowMultiplier;
                }
                
 

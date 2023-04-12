@@ -87,6 +87,7 @@ Material:
     - _BlurSize: 30
     - _UseFilter: 20
     m_Floats:
+    - _BlurSize: 28.1
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -94,10 +95,14 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.52
     - _GlossyReflections: 0
+    - _KernelSize: 60.2
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _ShadowMultiplier: 1.64
+    - _ShadowScale: 1.0098
+    - _Sigma: 44.7
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 0
     - _SrcBlend: 1

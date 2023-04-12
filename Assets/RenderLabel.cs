@@ -27,7 +27,6 @@ public class RenderLabel : MonoBehaviour
    public enum contrastMethods {Palette, HSV, LAB};
    public bool addOutline;
 
-   public bool addShadow;
 
    public contrastMethods selectedMethod;
 
