@@ -45,6 +45,7 @@ Shader "Unlit/SeparableShader"
 			float4 _MainTex_TexelSize;
 
 			float4 _LabelTex_TexelSize;
+			float4 _LabelTex_ST;
 			float _KernelSize;
 			float _Sigma;
 			float _ShadowScale;
@@ -58,7 +59,7 @@ Shader "Unlit/SeparableShader"
 			{
 					v2f o;
 					o.vertex = UnityObjectToClipPos(v.vertex);
-					o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+					o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
 					UNITY_TRANSFER_FOG(o,o.vertex);
 					return o;
 			}
