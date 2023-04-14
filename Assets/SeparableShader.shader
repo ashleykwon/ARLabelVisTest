@@ -8,6 +8,7 @@ Shader "Unlit/SeparableShader"
 		_Sigma("Blur Sigma", Range(0, 100)) = 50
 		_ShadowScale("Shadow Scale", Range(1.0, 1.05)) = 1.0
 		_ShadowMultiplier("Shadow Multiplier", Range(0, 2)) = 1.0
+		_Lamdba("lamdba", Range(0,1)) = 0.5
 	}
 	SubShader
 	{
@@ -49,6 +50,7 @@ Shader "Unlit/SeparableShader"
 			float _KernelSize;
 			float _Sigma;
 			float _ShadowScale;
+			float _Lamdba;
 
 			float gaussian1D(float x, float sigma) {
 				float pi = 3.14159265359;
@@ -126,6 +128,7 @@ Shader "Unlit/SeparableShader"
 				float _Sigma;
 				float _ShadowScale;
 				float _ShadowMultiplier;
+				float _Lamdba;
 
 
 				float gaussian1D(float x, float sigma) {
@@ -150,6 +153,7 @@ Shader "Unlit/SeparableShader"
 				fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
 
 				float4 acc = float4(0, 0, 0, 0);
+
 				for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
 					float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
 					float x = vdata.uv.x;
@@ -160,8 +164,20 @@ Shader "Unlit/SeparableShader"
 					acc += pix * weight;
 				}
 				
+				float dummy = float4(1.0, 1.0, 1.0, 1.0);
+				float x = vdata.uv.x;
+				float y = vdata.uv.y;
+				float2 coords_flip = float2(x, y);
+				coords_flip = (coords_flip - 0.5) / _ShadowScale + 0.5;
+				float4 flip_col = dummy - tex2D(_BlurredLabelTex, coords_flip);
+				flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
+
 				if (textMatte.r == 0) {
 					col *= 1 - acc * _ShadowMultiplier;
+				}
+
+				if(textMatte.r != 0){
+					col = flip_col * _Lamdba;
 				}
 				// sample the texture
 				// apply fog

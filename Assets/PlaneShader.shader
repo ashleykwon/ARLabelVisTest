@@ -95,6 +95,7 @@ Shader "Unlit/PlaneShader"
 			   // sample the texture
 			   // apply fog
 			   //UNITY_APPLY_FOG(i.fogCoord, col);
+
 			   return col;
 			}
 			ENDCG

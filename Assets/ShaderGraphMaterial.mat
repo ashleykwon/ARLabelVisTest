@@ -95,14 +95,15 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.52
     - _GlossyReflections: 0
-    - _KernelSize: 16.5
+    - _KernelSize: 13.2
+    - _Lamdba: 0.605
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _ShadowMultiplier: 2
-    - _ShadowScale: 1.05
-    - _Sigma: 57.8
+    - _ShadowMultiplier: 1.41
+    - _ShadowScale: 1.0264
+    - _Sigma: 62.7
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 0
     - _SrcBlend: 1
