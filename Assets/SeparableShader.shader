@@ -177,7 +177,7 @@ Shader "Unlit/SeparableShader"
 				}
 
 				if(textMatte.r != 0){
-					col = flip_col * _Lamdba;
+					col = flip_col * _Lamdba + acc * (1-_Lamdba);
 				}
 				// sample the texture
 				// apply fog
