@@ -96,7 +96,7 @@ Material:
     - _Glossiness: 0.52
     - _GlossyReflections: 0
     - _KernelSize: 13.2
-    - _Lamdba: 0.605
+    - _Lamdba: 1
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1

@@ -163,22 +163,39 @@ Shader "Unlit/SeparableShader"
 					float4 pix = tex2D(_BlurredLabelTex, coords);
 					acc += pix * weight;
 				}
-				
-				float dummy = float4(1.0, 1.0, 1.0, 1.0);
-				float x = vdata.uv.x;
-				float y = vdata.uv.y;
-				float2 coords_flip = float2(x, y);
-				coords_flip = (coords_flip - 0.5) / _ShadowScale + 0.5;
-				float4 flip_col = dummy - tex2D(_BlurredLabelTex, coords_flip);
-				flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
 
 				if (textMatte.r == 0) {
 					col *= 1 - acc * _ShadowMultiplier;
 				}
 
-				if(textMatte.r != 0){
-					col = flip_col * _Lamdba + acc * (1-_Lamdba);
+				//Yuanbo's method
+				acc = float4(0, 0, 0, 0);
+				for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+					float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
+					float x = vdata.uv.x;
+					float2 coords = float2(x, y);
+					coords = (coords - 0.5) / _ShadowScale + 0.5;
+					float weight = gaussian1D(i, _Sigma);
+					float4 pix = tex2D(_MainTex, coords);
+					acc += pix * weight;
 				}
+
+
+				float dummy = float4(1.0, 1.0, 1.0, 1.0);
+				float x = vdata.uv.x;
+				float y = vdata.uv.y;
+				float2 coords_flip = float2(x, y);
+				coords_flip = (coords_flip - 0.5) / _ShadowScale + 0.5;
+				float4 flip_col = dummy - tex2D(_MainTex, coords_flip);
+				flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
+
+				if(textMatte.r != 0){
+					col = acc* _Lamdba + (1-_Lamdba) * flip_col;
+				}
+
+
+
+
 				// sample the texture
 				// apply fog
 				//UNITY_APPLY_FOG(i.fogCoord, col);
