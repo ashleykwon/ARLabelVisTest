@@ -464,6 +464,33 @@ Shader "Unlit/SeparableShader"
 			
 			return sqrt(hr * hr + vt * vt);
 		}
+
+        float4 interpolate(sampler2D tex, v2f vdata){
+			
+			float4 col = float4(0, 0, 0, 0);
+
+            float x1 = vdata.uv.x + 1 * __MainTex_ST_TexelSize.x;
+            float y1 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
+            float2 coords1 = float2(x1, y1);
+
+            float x2 = vdata.uv.x - 1 * __MainTex_ST_TexelSize.x;
+            float y2 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
+            float2 coords2 = float2(x2, y2);
+
+            float x3 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
+            float y3 = vdata.uv.y + 1 * __MainTex_ST_TexelSize.y;
+            float2 coords3 = float2(x3, y3);
+
+            float x4 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
+            float y4 = vdata.uv.y - 1 * __MainTex_ST_TexelSize.y;
+            float2 coords4 = float2(x4, y4);
+
+            float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 + tex2D(_LastShaderTex, coords2) * 0.25+ 
+            tex2D(_LastShaderTex, coords3) * 0.25+ tex2D(_LastShaderTex, coords4) * 0.25;
+
+            return pix;
+
+        }
 		
 
             fixed4 frag(v2f vdata) : SV_Target
@@ -472,7 +499,12 @@ Shader "Unlit/SeparableShader"
                 float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
                 float4 label_pix = tex2D(_LabelTex, vdata.uv);
 
-                return sobel(_LabelTex, vdata.uv);
+
+                if (sobel(_LabelTex, vdata.uv) != 0){
+                    return interpolate(_LastShaderTex, vdata);
+                }
+
+                return lastshader_pix;
                 }
                 ENDCG
             }
