@@ -169,14 +169,14 @@ Shader "Unlit/SeparableShader"
             Pass
             {
                 CGPROGRAM
+// Upgrade NOTE: excluded shader from DX11, OpenGL ES 2.0 because it uses unsized arrays
+#pragma exclude_renderers d3d11 gles
                 #pragma vertex vert
                 #pragma fragment frag
                 // make fog work
                 #pragma multi_compile_fog
 
                 #include "UnityCG.cginc"
-
-
 
                 struct appdata
                 {
@@ -314,6 +314,7 @@ Shader "Unlit/SeparableShader"
                     return float4(R, G, B, hsv.a);
                 }
 
+
                 fixed4 frag(v2f vdata) : SV_Target
                 {
 
@@ -346,23 +347,58 @@ Shader "Unlit/SeparableShader"
                     float4 pix = tex2D(_BlurredBGTex, coords);
                     bgSample += pix * weight;
                 }
+                
+                // don't apply any changes if background 
+                if (textMatte.r == 0){ 
+                    return col;
+                }
 
-                if (_ColorMethod == 1){
-                    //Yuanbo's method
+                // Palette Method
+                // float4 flip_col = col;
+                if (_ColorMethod == 0)
+                {
+                    /*  palette colors:
+                    float4(0, 0, 0, 1), 
+                    float4(0, 0, 1, 1),
+                    // skip? float(0, 1, 0, 1) 
+                    float4(0, 1, 1, 1),
+                    float4(1, 0, 0, 1),
+                    float4(1, 0, 1, 1),
+                    float4(1, 1, 0, 1),
+                    float4(1, 1, 1, 1)};
+                    */
+                    float maxDistSq = -1;
+                    float4 paletteCol = float4(0, 0, 0, 1);
+                    for (int i = 0; i < 8; i++){
+                        if (i == 2) continue;
+                        // extract first 3 bits of i
+                        float r = i & 1; // mask i
+                        float g = ((i & 2) >> 1); // mask i and shift right
+                        float b = ((i & 4) >> 2); // mask i and shift right
+
+                        float distSq = (bgSample.r - r) * (bgSample.r - r) 
+                                     + (bgSample.g - g) * (bgSample.g - g)
+                                     + (bgSample.b - b) * (bgSample.b - b);
+
+                        if (distSq > maxDistSq){
+                            maxDistSq = distSq;
+                            paletteCol = float4(r, g, b, 1);
+                        }
+                    }
+                    col = paletteCol; 
+                }
+                //Yuanbo's method
+                else if (_ColorMethod == 1) {
+                    
                     float dummy = float4(1.0, 1.0, 1.0, 1.0);
                     float x = vdata.uv.x;
                     float y = vdata.uv.y;
                     float2 coords_flip = float2(x, y);
                     float4 flip_col = dummy - tex2D(_MainTex, coords_flip);
-                    flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
-
-                    if(textMatte.r != 0){
-                        col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
-                    }
+                    col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
                 }
-
                 // HSV inversion
-                else if (_ColorMethod == 2){
+                else if (_ColorMethod == 2) {
                     float4 hsv = RGB2HSV(bgSample);
                     float h = hsv[0];
                     float s = hsv[1];
@@ -376,22 +412,19 @@ Shader "Unlit/SeparableShader"
                     }
 
                     float4 inverted_hsv = float4(h, s, v, hsv.a);
-                    float4 flip_col = HSV2RGB(inverted_hsv);
-                    if(textMatte.r != 0){
-                        col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
-                    }
+                    col = HSV2RGB(inverted_hsv);
                 }
 
 
                 // sample the texture
                 // apply fog
                 //UNITY_APPLY_FOG(i.fogCoord, col);
-                return col;
+                return bgSample * _Lamdba + (1 - _Lamdba) * col;
             }
             ENDCG
         }
+        GrabPass { "_LastShaderTex" } 
 
-                GrabPass { "_LastShaderTex" } 
         Pass 
         {
             CGPROGRAM
@@ -416,7 +449,7 @@ Shader "Unlit/SeparableShader"
 
             sampler2D _MainTex; 
             float4 _MainTex_ST;
-            float4 __MainTex_ST_TexelSize;
+            float4 _MainTex_ST_TexelSize;
 
             sampler2D _LastShaderTex;  
             float4 _LastShaderTex_ST;
@@ -424,9 +457,6 @@ Shader "Unlit/SeparableShader"
             sampler2D _LabelTex; 
             float4 _LabelTex_ST; 
 
-
-
-           
             v2f vert(appdata v)
             {
                     v2f o;
@@ -436,62 +466,64 @@ Shader "Unlit/SeparableShader"
                     return o;
             }
 
-		float sobel (sampler2D tex, float2 uv) {
-			float2 delta = float2(0.0008, 0.0008);
-			
-			float4 hr = float4(0, 0, 0, 0);
-			float4 vt = float4(0, 0, 0, 0);
-			
-			hr += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
-			hr += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  0.0;
-			hr += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) * -1.0;
-			hr += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  2.0;
-			hr += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
-			hr += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) * -2.0;
-			hr += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) *  1.0;
-			hr += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) *  0.0;
-			hr += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
-			
-			vt += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
-			vt += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  2.0;
-			vt += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) *  1.0;
-			vt += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  0.0;
-			vt += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
-			vt += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) *  0.0;
-			vt += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) * -1.0;
-			vt += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) * -2.0;
-			vt += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
-			
-			return sqrt(hr * hr + vt * vt);
-		}
+            float sobel (sampler2D tex, float2 uv) {
+                float2 delta = float2(0.0008, 0.0008);
+                
+                float4 hr = float4(0, 0, 0, 0);
+                float4 vt = float4(0, 0, 0, 0);
+                
+                hr += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
+                hr += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  0.0;
+                hr += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) * -1.0;
+                hr += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  2.0;
+                hr += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
+                hr += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) * -2.0;
+                hr += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) *  1.0;
+                hr += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) *  0.0;
+                hr += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
+                
+                vt += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
+                vt += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  2.0;
+                vt += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) *  1.0;
+                vt += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  0.0;
+                vt += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
+                vt += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) *  0.0;
+                vt += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) * -1.0;
+                vt += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) * -2.0;
+                vt += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
+                
+                return sqrt(hr * hr + vt * vt);
+            }
 
-        float4 interpolate(sampler2D tex, v2f vdata){
-			
-			float4 col = float4(0, 0, 0, 0);
+            float4 interpolate(sampler2D tex, v2f vdata){
+                
+                float4 col = float4(0, 0, 0, 0);
 
-            float x1 = vdata.uv.x + 2 * __MainTex_ST_TexelSize.x;
-            float y1 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
-            float2 coords1 = float2(x1, y1);
+                float x1 = vdata.uv.x + 2 * _MainTex_ST_TexelSize.x;
+                float y1 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
+                float2 coords1 = float2(x1, y1);
 
-            float x2 = vdata.uv.x - 2 * __MainTex_ST_TexelSize.x;
-            float y2 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
-            float2 coords2 = float2(x2, y2);
+                float x2 = vdata.uv.x - 2 * _MainTex_ST_TexelSize.x;
+                float y2 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
+                float2 coords2 = float2(x2, y2);
 
-            float x3 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
-            float y3 = vdata.uv.y + 2 * __MainTex_ST_TexelSize.y;
-            float2 coords3 = float2(x3, y3);
+                float x3 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
+                float y3 = vdata.uv.y + 2 * _MainTex_ST_TexelSize.y;
+                float2 coords3 = float2(x3, y3);
 
-            float x4 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
-            float y4 = vdata.uv.y - 2 * __MainTex_ST_TexelSize.y;
-            float2 coords4 = float2(x4, y4);
+                float x4 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
+                float y4 = vdata.uv.y - 2 * _MainTex_ST_TexelSize.y;
+                float2 coords4 = float2(x4, y4);
 
-            float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 + tex2D(_LastShaderTex, coords2) * 0.25+ 
-            tex2D(_LastShaderTex, coords3) * 0.25+ tex2D(_LastShaderTex, coords4) * 0.25;
+                float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 
+                            + tex2D(_LastShaderTex, coords2) * 0.25
+                            + tex2D(_LastShaderTex, coords3) * 0.25
+                            + tex2D(_LastShaderTex, coords4) * 0.25;
 
-            return pix;
+                return pix;
 
-        }
-		
+            }
+            
 
             fixed4 frag(v2f vdata) : SV_Target
             {
@@ -499,14 +531,13 @@ Shader "Unlit/SeparableShader"
                 float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
                 float4 label_pix = tex2D(_LabelTex, vdata.uv);
 
-
                 if (sobel(_LabelTex, vdata.uv) != 0){
                     return interpolate(_LastShaderTex, vdata);
                 }
 
                 return lastshader_pix;
-                }
-                ENDCG
             }
+            ENDCG
+        }
     }
 }
