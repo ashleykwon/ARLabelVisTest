@@ -136,14 +136,19 @@ public class RenderLabel : MonoBehaviour
 
       // Set label pixel colors
       Texture2D textMatte = new Texture2D(renderedLabel.width, renderedLabel.height);
+      double _lambda = 0.8;
       for (int i = 0; i < labelCoords.Count; i++)
       {
          (int labelX, int labelY, bool isEdge) = labelCoords[i];
          Color newColor = Color.white;
 
-         if (!addOutline || !isEdge)
-         {
-            newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+         // if (!addOutline || !isEdge)
+         // {
+         //    newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+         // }
+
+         if (UnityEngine.Random.Range(0.0f, 1.0f) > _lambda){
+            newColor = new Color(1.0f,0.0f,0.0f);
          }
          renderedLabel.SetPixel(labelX, labelY, newColor);
          textMatte.SetPixel(labelX, labelY, newColor);
