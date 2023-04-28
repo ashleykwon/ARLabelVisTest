@@ -69,28 +69,251 @@ Shader "Unlit/SeparableShader"
                     return o;
             }
 
+                            // color conversion functions based off http://www.easyrgb.com/en/math.php
+                float4 RGB2HSV(float4 rgb){
+                    float R = rgb.r;
+                    float G = rgb.g;
+                    float B = rgb.b;
+                    float var_Min = min(R, min(G, B));    //Min. value of RGB
+                    float var_Max = max(R, max(G, B));    //Max. value of RGB
+                    float del_Max = var_Max - var_Min;             //Delta RGB value
+
+                    float H, S;
+                    float V = var_Max;
+
+                    if (del_Max == 0){//This is a gray, no chroma...
+                        H = 0;
+                        S = 0;
+                    } else {                                  //Chromatic data...
+                        S = del_Max / var_Max;
+
+                        float del_R = (((var_Max - R) / 6) + (del_Max / 2)) / del_Max;
+                        float del_G = (((var_Max - G) / 6) + (del_Max / 2)) / del_Max;
+                        float del_B = (((var_Max - B) / 6) + (del_Max / 2)) / del_Max;
+
+                        if (R == var_Max) 
+                            H = del_B - del_G;
+                        else if (G == var_Max)
+                            H = (1 / 3) + del_R - del_B;
+                        else if (B == var_Max)
+                            H = (2 / 3) + del_G - del_R;
+
+                        if (H < 0) 
+                            H += 1;
+                        if (H > 1)
+                            H -= 1;
+
+                    }
+                    return float4(H, S, V, rgb.a);
+                }
+
+                float4 HSV2RGB(float4 hsv){
+                    float H = hsv[0];
+                    float S = hsv[1];
+                    float V = hsv[2];
+                    float R, G, B;
+                    if (S == 0){ // gray
+                        R = V;
+                        G = V;
+                        B = V;
+                    } else {
+                        float var_h = H * 6;
+                        if (var_h == 6) 
+                            var_h = 0;     //H must be < 1
+
+                        float var_i = (int) var_h; //Or ... var_i = floor(var_h)
+                        float var_1 = V * (1 - S);
+                        float var_2 = V * (1 - S * (var_h - var_i));
+                        float var_3 = V * (1 - S * (1 - (var_h - var_i)));
+
+                        if (var_i == 0) { 
+                            R = V; 
+                            G = var_3;
+                            B = var_1;
+                        } else if (var_i == 1) { 
+                            R = var_2;
+                            G = V;
+                            B = var_1;
+                        } else if (var_i == 2) { 
+                            R = var_1;
+                            G = V;
+                            B = var_3;
+                        } else if (var_i == 3) {
+                            R = var_1;
+                            G = var_2;
+                            B = V;
+                        } else if (var_i == 4) {
+                            R = var_3;
+                            G = var_1;
+                            B = V;
+                        } else { 
+                            R = V;
+                            G = var_1;
+                            B = var_2;
+                        }
+                    }
+
+                    return float4(R, G, B, hsv.a);
+                }
+
+                float4 RGB2LAB(float4 RGB) 
+                {
+                    float R = RGB.r;
+                    float G = RGB.g;
+                    float B = RGB.b;
+
+                    // reference values, D65/2°
+                    float Xr = 95.047;  
+                    float Yr = 100.0;
+                    float Zr = 108.883;
+
+                    float var_R = R; //(R / 255.0);
+                    float var_G = G; //(G / 255.0);
+                    float var_B = B; //(B / 255.0);
+
+                    if (R > 0.04045) 
+                        var_R = pow(((var_R + 0.055) / 1.055), 2.4);
+                    else
+                        var_R = var_R / 12.92;
+
+                    if (var_G > 0.04045)
+                        var_G = pow(((var_G + 0.055) / 1.055), 2.4);
+                    else
+                        var_G = var_G / 12.92;
+
+                    if (var_B > 0.04045)
+                        var_B = pow(((var_B + 0.055) / 1.055), 2.4);
+                    else
+                        var_B = var_B / 12.92;
+
+                    var_R *= 100;
+                    var_G *= 100;
+                    var_B *= 100;
+
+                    float X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+                    float Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+                    float Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+                    // now convert from XYZ to LAB
+
+                    float var_X = X / Xr;
+                    float var_Y = Y / Yr;
+                    float var_Z = Z / Zr;
+
+                    if (var_X > 0.008856)
+                        var_X = pow(var_X, 1/3.0);
+                    else
+                        var_X = (7.787 * var_X) + (16.0 / 116.0);
+
+                    if (var_Y > 0.008856)
+                        var_Y = pow(var_Y, 1/3.0);
+                    else
+                        var_Y = (7.787 * var_Y) + (16.0 / 116.0);
+
+                    if (var_Z > 0.008856)
+                        var_Z = pow(var_Z, 1/3.0);
+                    else
+                        var_Z = (7.787 * var_Z) + (16.0 / 116.0);
+
+
+                    float l = (116.0 * var_Y) - 16;
+                    float a = 500.0 * (var_X - var_Y);
+                    float b = 200.0 * (var_Y - var_Z); // Not sure why this was originally LAB[3]
+
+                    return float4(l, a, b, RGB.a);
+                } 
+
+                float4 LAB2RGB(float4 LAB)
+                {
+                    float L = LAB[0];
+                    float A = LAB[1];
+                    float B = LAB[2];
+
+                    // reference values, D65/2°
+                    float Xr = 95.047;  
+                    float Yr = 100.0;
+                    float Zr = 108.883;
+
+                    // first convert LAB to XYZ
+                    float var_Y = (L + 16.0) / 116.0;
+                    float var_X = A / 500 + var_Y;
+                    float var_Z = var_Y - B / 200.0;
+
+                    if (pow(var_Y, 3)  > 0.008856) 
+                        var_Y = pow(var_Y, 3.0);
+                    else
+                        var_Y = (var_Y - 16 / 116) / 7.787;
+                    if (pow(var_X, 3)  > 0.008856)
+                        var_X = pow(var_X, 3.0);
+                    else
+                        var_X = (var_X - 16 / 116) / 7.787;
+                    if (pow(var_Z, 3)  > 0.008856) 
+                        var_Z = pow(var_Z, 3.0);
+                    else
+                        var_Z = (var_Z - 16.0 / 116.0) / 7.787;
+
+                    float X = var_X * Xr;
+                    float Y = var_Y * Yr;
+                    float Z = var_Z * Zr;
+
+                    // now convert XYZ to RGB
+                    X /= 100.0;
+                    Y /= 100.0;
+                    Z /= 100.0;
+
+                    float var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+                    float var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
+                    float var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
+
+                    if (var_R > 0.0031308) 
+                        var_R = 1.055 * (pow(var_R, (1 / 2.4))) - 0.055;
+                    else
+                        var_R = 12.92 * var_R;
+                    if (var_G > 0.0031308) 
+                        var_G = 1.055 * (pow(var_G, (1 / 2.4))) - 0.055;
+                    else
+                        var_G = 12.92 * var_G;
+                    if (var_B > 0.0031308) 
+                        var_B = 1.055 * (pow(var_B, (1 / 2.4))) - 0.055;
+                    else
+                        var_B = 12.92 * var_B;
+
+                    return float4(var_R, var_G, var_B, LAB.a);
+                }
+
+
+
             fixed4 frag(v2f vdata) : SV_Target
             {
 
-                float4 acc = float4(0, 0, 0, 0);
-                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
-                        float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
-                        float y = vdata.uv.y;
-                        float2 coords = float2(x, y);
-                        coords = (coords - 0.5) / _ShadowScale + 0.5;
-                        float weight = gaussian1D(i, _Sigma);
-                        float4 pix = tex2D(_LabelTex, coords);
-                        acc += pix * weight;
+                float x = vdata.uv.x;
+                float y = vdata.uv.y;
+                float2 coords = float2(x, y);
+
+                fixed4 col = float4(0,0,0,0);
+                float4 bgSample = tex2D(_MainTex, coords);
+                float4 label_col = tex2D(_LabelTex, coords);
+
+                float4 hsv = RGB2HSV(bgSample);
+                float h = hsv[0];
+                float s = hsv[1];
+                float v = hsv[2];
+                h += 0.5;
+                h %= 1.0;
+                if (v > 0.5){
+                    v = 0;
+                } else {
+                    v = 1;
                 }
 
-                // sample the texture
-                // apply fog
-                //UNITY_APPLY_FOG(i.fogCoord, col);
-                                        float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
-                        float y = vdata.uv.y;
-                        float2 coords = float2(x, y);
+                float4 inverted_hsv = float4(h, s, v, hsv.a);
+                col = HSV2RGB(inverted_hsv);
 
-                return tex2D(_MainTex, coords);;
+                if (label_col[0] != 0){
+                    return col;
+                }
+
+                return bgSample;
                 }
                 ENDCG
             }

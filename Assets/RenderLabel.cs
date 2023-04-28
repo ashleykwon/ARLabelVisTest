@@ -147,9 +147,9 @@ public class RenderLabel : MonoBehaviour
          //    newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          // }
 
-         if (UnityEngine.Random.Range(0.0f, 1.0f) > _lambda){
-            newColor = new Color(1.0f,0.0f,0.0f);
-         }
+         // if (UnityEngine.Random.Range(0.0f, 1.0f) > _lambda){
+         //    newColor = new Color(1.0f,0.0f,0.0f);
+         // }
          renderedLabel.SetPixel(labelX, labelY, newColor);
          textMatte.SetPixel(labelX, labelY, newColor);
       }
