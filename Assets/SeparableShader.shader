@@ -394,5 +394,69 @@ Shader "Unlit/SeparableShader"
             }
             ENDCG
         }
+
+                GrabPass { "_LastShaderTex" } 
+        Pass 
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            sampler2D _MainTex; 
+            float4 _MainTex_ST;
+           
+            sampler2D _LastShaderTex;  
+            float4 _LastShaderTex_ST;
+           
+            sampler2D _LabelTex; 
+            float4 _LabelTex_ST; 
+           
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
+                float4 main_pix = tex2D(_MainTex, vdata.uv);
+                float4 label_pix = tex2D(_LabelTex, vdata.uv);
+
+                float4 col = lastshader_pix;
+                //the pixel is in the label
+                if (label_pix.g != 0){
+                    //the pixel is a sample
+                    if (main_pix.g == 0){
+                    col = float4(1,0,0,0);
+                    }
+                }
+
+                return col;
+                }
+                ENDCG
+            }
+
+
     }
 }
