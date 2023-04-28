@@ -69,7 +69,165 @@ Shader "Unlit/SeparableShader"
                     return o;
             }
 
-                            // color conversion functions based off http://www.easyrgb.com/en/math.php
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                float4 acc = float4(0, 0, 0, 0);
+                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                        float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
+                        float y = vdata.uv.y;
+                        float2 coords = float2(x, y);
+                        coords = (coords - 0.5) / _ShadowScale + 0.5;
+                        float weight = gaussian1D(i, _Sigma);
+                        float4 pix = tex2D(_LabelTex, coords);
+                        acc += pix * weight;
+                }
+
+                // sample the texture
+                // apply fog
+                //UNITY_APPLY_FOG(i.fogCoord, col);
+                return acc;
+                }
+                ENDCG
+            }
+
+            GrabPass { "_BlurredLabelTex" }
+
+            Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            sampler2D _MainTex;
+            sampler2D _LabelTex;
+            float4 _MainTex_ST;
+            float4 _MainTex_TexelSize;
+
+            float4 _LabelTex_TexelSize;
+            float4 _LabelTex_ST;
+            float _KernelSize;
+            float _Sigma;
+            float _ShadowScale;
+
+            float gaussian1D(float x, float sigma) {
+                float pi = 3.14159265359;
+                return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+            }
+
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                float4 acc = float4(0, 0, 0, 0);
+                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                        float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                        float y = vdata.uv.y;
+                        float2 coords = float2(x, y);
+                        float weight = gaussian1D(i, _Sigma);
+                        float4 pix = tex2D(_MainTex, coords);
+                        acc += pix * weight;
+                }
+
+                // sample the texture
+                // apply fog
+                //UNITY_APPLY_FOG(i.fogCoord, col);
+                return acc;
+                }
+                ENDCG
+            }
+
+            GrabPass { "_BlurredBGTex" }
+
+            Pass
+            {
+                CGPROGRAM
+                #pragma vertex vert
+                #pragma fragment frag
+                // make fog work
+                #pragma multi_compile_fog
+
+                #include "UnityCG.cginc"
+
+
+
+                struct appdata
+                {
+                    float4 vertex : POSITION;
+                    float2 uv : TEXCOORD0;
+                };
+
+                struct v2f
+                {
+                    float2 uv : TEXCOORD0;
+                    UNITY_FOG_COORDS(1)
+                    float4 vertex : SV_POSITION;
+                };
+
+                sampler2D _MainTex;
+                float4 _MainTex_ST;
+                sampler2D _LabelTex;
+                sampler2D _BlurredLabelTex;
+                float4 _BlurredLabelTex_ST;
+                float4 _BlurredLabelTex_TexelSize;
+
+                sampler2D _BlurredBGTex;
+                float4 _MainTex_TexelSize;
+                float4 _LabelTex_TexelSize;
+                float4 _BlurredBGTex_TexelSize;
+                float _KernelSize;
+                float _Sigma;
+                float _ShadowScale;
+                float _ShadowMultiplier;
+                float _Lamdba;
+                int _EnableShadow;
+                int _EnableLambda;
+                int _ColorMethod;
+
+
+
+                float gaussian1D(float x, float sigma) {
+                    float pi = 3.14159265359;
+                    return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+                }
+
+
+                v2f vert(appdata v)
+                {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _BlurredLabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+                }
+
                 float4 RGB2HSV(float4 rgb){
                     float R = rgb.r;
                     float G = rgb.g;
@@ -156,167 +314,81 @@ Shader "Unlit/SeparableShader"
                     return float4(R, G, B, hsv.a);
                 }
 
-                float4 RGB2LAB(float4 RGB) 
+                fixed4 frag(v2f vdata) : SV_Target
                 {
-                    float R = RGB.r;
-                    float G = RGB.g;
-                    float B = RGB.b;
 
-                    // reference values, D65/2°
-                    float Xr = 95.047;  
-                    float Yr = 100.0;
-                    float Zr = 108.883;
+                fixed4 col = tex2D(_MainTex, vdata.uv);
+                fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
 
-                    float var_R = R; //(R / 255.0);
-                    float var_G = G; //(G / 255.0);
-                    float var_B = B; //(B / 255.0);
+                if (_EnableShadow == 1) {
+                    float4 acc = float4(0, 0, 0, 0);
+                    for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                        float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
+                        float x = vdata.uv.x;
+                        float2 coords = float2(x, y);
+                        coords = (coords - 0.5) / _ShadowScale + 0.5;
+                        float weight = gaussian1D(i, _Sigma);
+                        float4 pix = tex2D(_BlurredLabelTex, coords);
+                        acc += pix * weight;
+                    }
 
-                    if (R > 0.04045) 
-                        var_R = pow(((var_R + 0.055) / 1.055), 2.4);
-                    else
-                        var_R = var_R / 12.92;
+                    if (textMatte.r == 0) {
+                        col *= 1 - acc * _ShadowMultiplier;
+                    }
+                }
 
-                    if (var_G > 0.04045)
-                        var_G = pow(((var_G + 0.055) / 1.055), 2.4);
-                    else
-                        var_G = var_G / 12.92;
+                float4 bgSample = float4(0, 0, 0, 0);
+                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                    float y = vdata.uv.y + i * _BlurredBGTex_TexelSize.y;
+                    float x = vdata.uv.x;
+                    float2 coords = float2(x, y);
+                    float weight = gaussian1D(i, _Sigma);
+                    float4 pix = tex2D(_BlurredBGTex, coords);
+                    bgSample += pix * weight;
+                }
 
-                    if (var_B > 0.04045)
-                        var_B = pow(((var_B + 0.055) / 1.055), 2.4);
-                    else
-                        var_B = var_B / 12.92;
+                if (_ColorMethod == 1){
+                    //Yuanbo's method
+                    float dummy = float4(1.0, 1.0, 1.0, 1.0);
+                    float x = vdata.uv.x;
+                    float y = vdata.uv.y;
+                    float2 coords_flip = float2(x, y);
+                    float4 flip_col = dummy - tex2D(_MainTex, coords_flip);
+                    flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
 
-                    var_R *= 100;
-                    var_G *= 100;
-                    var_B *= 100;
+                    if(textMatte.r != 0){
+                        col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
+                    }
+                }
 
-                    float X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
-                    float Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
-                    float Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+                // HSV inversion
+                else if (_ColorMethod == 2){
+                    float4 hsv = RGB2HSV(bgSample);
+                    float h = hsv[0];
+                    float s = hsv[1];
+                    float v = hsv[2];
+                    h += 0.5;
+                    h %= 1.0;
+                    if (v > 0.5){
+                        v = 0;
+                    } else {
+                        v = 1;
+                    }
 
-                    // now convert from XYZ to LAB
-
-                    float var_X = X / Xr;
-                    float var_Y = Y / Yr;
-                    float var_Z = Z / Zr;
-
-                    if (var_X > 0.008856)
-                        var_X = pow(var_X, 1/3.0);
-                    else
-                        var_X = (7.787 * var_X) + (16.0 / 116.0);
-
-                    if (var_Y > 0.008856)
-                        var_Y = pow(var_Y, 1/3.0);
-                    else
-                        var_Y = (7.787 * var_Y) + (16.0 / 116.0);
-
-                    if (var_Z > 0.008856)
-                        var_Z = pow(var_Z, 1/3.0);
-                    else
-                        var_Z = (7.787 * var_Z) + (16.0 / 116.0);
-
-
-                    float l = (116.0 * var_Y) - 16;
-                    float a = 500.0 * (var_X - var_Y);
-                    float b = 200.0 * (var_Y - var_Z); // Not sure why this was originally LAB[3]
-
-                    return float4(l, a, b, RGB.a);
-                } 
-
-                float4 LAB2RGB(float4 LAB)
-                {
-                    float L = LAB[0];
-                    float A = LAB[1];
-                    float B = LAB[2];
-
-                    // reference values, D65/2°
-                    float Xr = 95.047;  
-                    float Yr = 100.0;
-                    float Zr = 108.883;
-
-                    // first convert LAB to XYZ
-                    float var_Y = (L + 16.0) / 116.0;
-                    float var_X = A / 500 + var_Y;
-                    float var_Z = var_Y - B / 200.0;
-
-                    if (pow(var_Y, 3)  > 0.008856) 
-                        var_Y = pow(var_Y, 3.0);
-                    else
-                        var_Y = (var_Y - 16 / 116) / 7.787;
-                    if (pow(var_X, 3)  > 0.008856)
-                        var_X = pow(var_X, 3.0);
-                    else
-                        var_X = (var_X - 16 / 116) / 7.787;
-                    if (pow(var_Z, 3)  > 0.008856) 
-                        var_Z = pow(var_Z, 3.0);
-                    else
-                        var_Z = (var_Z - 16.0 / 116.0) / 7.787;
-
-                    float X = var_X * Xr;
-                    float Y = var_Y * Yr;
-                    float Z = var_Z * Zr;
-
-                    // now convert XYZ to RGB
-                    X /= 100.0;
-                    Y /= 100.0;
-                    Z /= 100.0;
-
-                    float var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
-                    float var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
-                    float var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
-
-                    if (var_R > 0.0031308) 
-                        var_R = 1.055 * (pow(var_R, (1 / 2.4))) - 0.055;
-                    else
-                        var_R = 12.92 * var_R;
-                    if (var_G > 0.0031308) 
-                        var_G = 1.055 * (pow(var_G, (1 / 2.4))) - 0.055;
-                    else
-                        var_G = 12.92 * var_G;
-                    if (var_B > 0.0031308) 
-                        var_B = 1.055 * (pow(var_B, (1 / 2.4))) - 0.055;
-                    else
-                        var_B = 12.92 * var_B;
-
-                    return float4(var_R, var_G, var_B, LAB.a);
+                    float4 inverted_hsv = float4(h, s, v, hsv.a);
+                    float4 flip_col = HSV2RGB(inverted_hsv);
+                    if(textMatte.r != 0){
+                        col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
+                    }
                 }
 
 
-
-            fixed4 frag(v2f vdata) : SV_Target
-            {
-
-                float x = vdata.uv.x;
-                float y = vdata.uv.y;
-                float2 coords = float2(x, y);
-
-                fixed4 col = float4(0,0,0,0);
-                float4 bgSample = tex2D(_MainTex, coords);
-                float4 label_col = tex2D(_LabelTex, coords);
-
-                float4 hsv = RGB2HSV(bgSample);
-                float h = hsv[0];
-                float s = hsv[1];
-                float v = hsv[2];
-                h += 0.5;
-                h %= 1.0;
-                if (v > 0.5){
-                    v = 0;
-                } else {
-                    v = 1;
-                }
-
-                float4 inverted_hsv = float4(h, s, v, hsv.a);
-                col = HSV2RGB(inverted_hsv);
-
-                if (label_col[0] != 0){
-                    return col;
-                }
-
-                return bgSample;
-                }
-                ENDCG
+                // sample the texture
+                // apply fog
+                //UNITY_APPLY_FOG(i.fogCoord, col);
+                return col;
             }
-
+            ENDCG
+        }
     }
 }
