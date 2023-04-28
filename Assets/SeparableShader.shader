@@ -318,6 +318,7 @@ Shader "Unlit/SeparableShader"
                 {
 
                 fixed4 col = tex2D(_MainTex, vdata.uv);
+                fixed4 samples = tex2D(_MainTex, vdata.uv);
                 fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
 
                 if (_EnableShadow == 1) {
@@ -356,7 +357,7 @@ Shader "Unlit/SeparableShader"
                     float4 flip_col = dummy - tex2D(_MainTex, coords_flip);
                     flip_col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
 
-                    if(textMatte.r != 0){
+                    if(samples.r == 0 && samples.g == 0 && samples.b == 0){
                         col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
                     }
                 }
@@ -377,9 +378,12 @@ Shader "Unlit/SeparableShader"
 
                     float4 inverted_hsv = float4(h, s, v, hsv.a);
                     float4 flip_col = HSV2RGB(inverted_hsv);
-                    if(textMatte.r != 0){
+                    //textMatte.r != 0 -> is label
+                    //_MainTex.r == 1 -> is sample
+                    if(samples.r == 0 && samples.g == 0 && samples.b == 0){
                         col = bgSample* _Lamdba + (1-_Lamdba) * flip_col;
                     }
+                    
                 }
 
 

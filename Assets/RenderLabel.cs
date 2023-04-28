@@ -148,7 +148,7 @@ public class RenderLabel : MonoBehaviour
          // }
 
          if (UnityEngine.Random.Range(0.0f, 1.0f) > _lambda){
-            newColor = new Color(1.0f,0.0f,0.0f);
+            newColor = new Color(0.0f,0.0f,0.0f);
          }
          renderedLabel.SetPixel(labelX, labelY, newColor);
          textMatte.SetPixel(labelX, labelY, newColor);
