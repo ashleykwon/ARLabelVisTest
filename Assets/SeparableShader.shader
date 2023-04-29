@@ -420,7 +420,8 @@ Shader "Unlit/SeparableShader"
 
             sampler2D _MainTex; 
             float4 _MainTex_ST;
-           
+            float4 _MainTex_TexelSize;
+
             sampler2D _LastShaderTex;  
             float4 _LastShaderTex_ST;
            
@@ -436,6 +437,31 @@ Shader "Unlit/SeparableShader"
                     return o;
             }
 
+            int get_num_samples(v2f vdata){
+                int _plateSize = 50;
+                int num_constraints = 0;
+                //get number of constraints in the plate
+                for (int i = _plateSize / 2; i >= -_plateSize / 2; i--) {
+                    for(int j = _plateSize / 2; j >= -_plateSize / 2; j--){
+                    float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                    float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                    float2 coords = float2(x, y);
+
+                    float4 main_sample = tex2D(_MainTex, coords);
+                    float4 label_sample = tex2D(_LabelTex, coords);
+
+                    //the pixel is in the label
+                    if (label_sample.g != 0){
+                    //the pixel is a sample
+                    if (main_sample.g == 0){
+                        num_constraints += 1;
+                        }
+                    }
+                    }
+                }
+                return num_constraints;
+            }
+
             fixed4 frag(v2f vdata) : SV_Target
             {
 
@@ -444,10 +470,17 @@ Shader "Unlit/SeparableShader"
                 float4 label_pix = tex2D(_LabelTex, vdata.uv);
 
                 float4 col = lastshader_pix;
+                int num_samples = get_num_samples(vdata);
+
                 //the pixel is in the label
                 if (label_pix.g != 0){
                     //the pixel is a sample
                     if (main_pix.g == 0){
+                    col = float4(1,0,0,0);
+                    }
+
+                    //we need to interpolate the pixel
+                    if (main_pix.g != 0){
                     col = float4(1,0,0,0);
                     }
                 }
