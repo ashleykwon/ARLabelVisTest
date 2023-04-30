@@ -390,5 +390,123 @@ Shader "Unlit/SeparableShader"
             }
             ENDCG
         }
+
+                GrabPass { "_LastShaderTex" } 
+        Pass 
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            sampler2D _MainTex; 
+            float4 _MainTex_ST;
+            float4 __MainTex_ST_TexelSize;
+
+            sampler2D _LastShaderTex;  
+            float4 _LastShaderTex_ST;
+           
+            sampler2D _LabelTex; 
+            float4 _LabelTex_ST; 
+
+
+
+           
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+		float sobel (sampler2D tex, float2 uv) {
+			float2 delta = float2(0.0008, 0.0008);
+			
+			float4 hr = float4(0, 0, 0, 0);
+			float4 vt = float4(0, 0, 0, 0);
+			
+			hr += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
+			hr += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  0.0;
+			hr += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) * -1.0;
+			hr += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  2.0;
+			hr += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
+			hr += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) * -2.0;
+			hr += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) *  1.0;
+			hr += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) *  0.0;
+			hr += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
+			
+			vt += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
+			vt += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  2.0;
+			vt += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) *  1.0;
+			vt += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  0.0;
+			vt += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
+			vt += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) *  0.0;
+			vt += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) * -1.0;
+			vt += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) * -2.0;
+			vt += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
+			
+			return sqrt(hr * hr + vt * vt);
+		}
+
+        float4 interpolate(sampler2D tex, v2f vdata){
+			
+			float4 col = float4(0, 0, 0, 0);
+
+            float x1 = vdata.uv.x + 2 * __MainTex_ST_TexelSize.x;
+            float y1 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
+            float2 coords1 = float2(x1, y1);
+
+            float x2 = vdata.uv.x - 2 * __MainTex_ST_TexelSize.x;
+            float y2 = vdata.uv.y + 0 * __MainTex_ST_TexelSize.y;
+            float2 coords2 = float2(x2, y2);
+
+            float x3 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
+            float y3 = vdata.uv.y + 2 * __MainTex_ST_TexelSize.y;
+            float2 coords3 = float2(x3, y3);
+
+            float x4 = vdata.uv.x + 0 * __MainTex_ST_TexelSize.x;
+            float y4 = vdata.uv.y - 2 * __MainTex_ST_TexelSize.y;
+            float2 coords4 = float2(x4, y4);
+
+            float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 + tex2D(_LastShaderTex, coords2) * 0.25+ 
+            tex2D(_LastShaderTex, coords3) * 0.25+ tex2D(_LastShaderTex, coords4) * 0.25;
+
+            return pix;
+
+        }
+		
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
+                float4 label_pix = tex2D(_LabelTex, vdata.uv);
+
+
+                if (sobel(_LabelTex, vdata.uv) != 0){
+                    return interpolate(_LastShaderTex, vdata);
+                }
+
+                return lastshader_pix;
+                }
+                ENDCG
+            }
     }
 }
