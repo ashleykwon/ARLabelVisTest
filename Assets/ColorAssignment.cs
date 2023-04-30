@@ -206,7 +206,7 @@ public class ColorAssignment {
       return neighbors;
    }
 
-   // code based of http://www.easyrgb.com/en/math.php
+   // code based off http://www.easyrgb.com/en/math.php
    public static Vector3 RGB_to_LAB(Color RGB) 
    {
       double R = RGB[0];
