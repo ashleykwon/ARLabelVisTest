@@ -31,46 +31,51 @@ public class RenderLabel : MonoBehaviour
    public contrastMethods selectedMethod;
 
    public Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>> assignColors;
+
+   Texture2D Screenshot;
+   Texture2D renderedLabel;
    // Start is called before the first frame update
    void Start()
    {
-      assignColors = new Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>>();
-      assignColors[contrastMethods.Palette] = ColorAssignment.AssignColor_usingPalette;
-      assignColors[contrastMethods.HSV] = ColorAssignment.AssignColor_usingHSV;
-      assignColors[contrastMethods.LAB] = ColorAssignment.AssignColor_usingCIELAB;
+      // assignColors = new Dictionary<contrastMethods, Func<int[], Texture2D, int, Color>>();
+      // assignColors[contrastMethods.Palette] = ColorAssignment.AssignColor_usingPalette;
+      // assignColors[contrastMethods.HSV] = ColorAssignment.AssignColor_usingHSV;
+      // assignColors[contrastMethods.LAB] = ColorAssignment.AssignColor_usingCIELAB;
 
       ScreenshotCamera = gameObject.GetComponent<Camera>(); 
-      
+
+      // initialize screenshot texture
+
       // Access labelPlane's material
       labelPlaneMaterial = labelPlane.GetComponent<MeshRenderer>().sharedMaterial;
 
       // Set labelPlaneMaterial's initial texture to a transparent layer
       labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
-      // labelPlaneMaterial.SetTexture("_TextMatte", transparentLayer);
+      labelPlaneMaterial.SetTexture("_TextMatte", transparentLayer);
 
-      Debug.Log(label.width);
+//       Debug.Log(label.width);
       
 
-      for (int i = 0; i <= label.width ; i++)
-      {
-         for (int j = 0; j <= label.height; j++)
-         {
-               int x = (int)Math.Round(i * (double)label.width / Screen.width);
-               int y = (int)Math.Round(j * (double)label.height /Screen.height);
+//       for (int i = 0; i <= label.width ; i++)
+//       {
+//          for (int j = 0; j <= label.height; j++)
+//          {
+//                int x = (int)Math.Round(i * (double)label.width / Screen.width);
+//                int y = (int)Math.Round(j * (double)label.height /Screen.height);
 
-               if (label.GetPixel(x,y) == Color.white)
-               {
-                  bool is_edge = label.GetPixel(x + 1, y)[0] == 0 || label.GetPixel(x, y + 1)[0] == 0 || label.GetPixel(x - 1, y)[0] == 0 || label.GetPixel(x, y - 1)[0] == 0;
-                  labelCoords.Add((i, j, is_edge));
-               }   
-         }
-      }
+//                if (label.GetPixel(x,y) == Color.white)
+//                {
+//                   bool is_edge = label.GetPixel(x + 1, y)[0] == 0 || label.GetPixel(x, y + 1)[0] == 0 || label.GetPixel(x - 1, y)[0] == 0 || label.GetPixel(x, y - 1)[0] == 0;
+//                   labelCoords.Add((i, j, is_edge));
+//                }   
+//          }
+//       }
    }
 
 
    void Update()
    {
-      // Update labelPlane's position and rotation according to ScreenshotCamera's rotation and position
+    //   Update labelPlane's position and rotation according to ScreenshotCamera's rotation and position
       float newZ = ScreenshotCamera.transform.position[2] + 8.5f; //This 8.5 may vary depending on the distance between the Screenshot camera and the label plane, which should remain consistent
       labelPlane.transform.position = new Vector3(ScreenshotCamera.transform.position.x, ScreenshotCamera.transform.position.y, newZ);
 
@@ -108,7 +113,8 @@ public class RenderLabel : MonoBehaviour
       ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
       
       // Create a new render texture for the current frame
-      RenderTexture screenTexture = new RenderTexture(Screen.width, Screen.height, 16);
+      // RenderTexture screenTexture = new RenderTexture(Screen.width, Screen.height, 16);
+      RenderTexture screenTexture = RenderTexture.GetTemporary(Screen.width, Screen.height, 16);
 
       // screenTexture settings to prevent antialiasing
       screenTexture.autoGenerateMips = false;
@@ -121,33 +127,37 @@ public class RenderLabel : MonoBehaviour
       ScreenshotCamera.Render();
 
       // Screenshot is the background without the label
-      Texture2D Screenshot = new Texture2D(Screen.width, Screen.height);
-
+      if (Screenshot == null){
+         Screenshot = new Texture2D(Screen.width, Screen.height);
+      }
+      
       // Read pixels on the screen into Screenshot. The pixels on the screen should be those from screenTexture
       Screenshot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
       Screenshot.filterMode = FilterMode.Point;
 
       // Read whatever that's in the scene before the labels are added to the renderedLabel texture
-      Texture2D renderedLabel = new Texture2D(Screen.width, Screen.height);
+      if (renderedLabel == null){
+         renderedLabel = new Texture2D(Screen.width, Screen.height);
+      }
       renderedLabel.filterMode = FilterMode.Point;
 
       // Iterate through label pixel locations and change pixel colors. renderedLabel is the texture onto which the screenshot + the label are rendered 
       renderedLabel.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
 
       // Set label pixel colors
-      Texture2D textMatte = new Texture2D(renderedLabel.width, renderedLabel.height);
-      for (int i = 0; i < labelCoords.Count; i++)
-      {
-         (int labelX, int labelY, bool isEdge) = labelCoords[i];
-         Color newColor = Color.white;
+    //   Texture2D textMatte = new Texture2D(renderedLabel.width, renderedLabel.height);
+    //   for (int i = 0; i < labelCoords.Count; i++)
+    //   {
+    //      (int labelX, int labelY, bool isEdge) = labelCoords[i];
+    //      Color newColor = Color.white;
 
-         if (!addOutline || !isEdge)
-         {
-            newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
-         }
-         renderedLabel.SetPixel(labelX, labelY, newColor);
-         textMatte.SetPixel(labelX, labelY, newColor);
-      }
+    //      if (!addOutline || !isEdge)
+    //      {
+    //         newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
+    //      }
+    //      renderedLabel.SetPixel(labelX, labelY, newColor);
+    //      textMatte.SetPixel(labelX, labelY, newColor);
+    //   }
         
 
 
@@ -164,7 +174,8 @@ public class RenderLabel : MonoBehaviour
       
       // Set RenderTexture to null for rendering the next frame
       RenderTexture.active = null;
-
+      RenderTexture.ReleaseTemporary(screenTexture);
+      
       // Save renderedTexture (only for debugging purposes)
       //   byte[] byteArray = Screenshot.EncodeToPNG();
       //   string filename = fileName(Convert.ToInt32(Screenshot.width), Convert.ToInt32(Screenshot.height));
