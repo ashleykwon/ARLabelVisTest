@@ -2,21 +2,32 @@ Shader "Unlit/SeparableShader"
 {
     Properties
     {
+        
+
         _MainTex("Texture", 2D) = "white" {}
-        _LabelTex("Texture", 2D) = "white" {}
+        _LabelTex("Label Image", 2D) = "white" {}
+
+        _ColorMethod("Color Method", Int) = 0
+        _Lamdba("lamdba", Range(0,1)) = 0.5
+
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 50
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
 
+        
+        
+        [MaterialToggle] _EnableShadow("Enable Shadow", Int) = 1
         _ShadowKernelSize("Shadow Blur Kernel Size", Range(0, 100)) = 50
         _ShadowSigma("Shadow Blur Sigma", Range(0, 100)) = 50
         _ShadowScale("Shadow Scale", Range(0.8, 1.05)) = 1.0
-        _ShadowMultiplier("Shadow Multiplier", Range(0, 2)) = 1.0
+        _ShadowMultiplier("Shadow Intensity", Range(0, 2)) = 1.0
 
-        _Lamdba("lamdba", Range(0,1)) = 0.5
-        [MaterialToggle] _EnableShadow("Enable Shadow", Int) = 1
+        
+        
         [MaterialToggle] _EnableOutline("Enable Outline", Int) = 1
-        _ColorMethod("Color Method", Int) = 0
+        
+
+        
     }
     SubShader
     {
