@@ -70,6 +70,7 @@ public class RenderLabel : MonoBehaviour
 //                }   
 //          }
 //       }
+
    }
 
 
@@ -82,6 +83,7 @@ public class RenderLabel : MonoBehaviour
       float newXAngle = ScreenshotCamera.transform.eulerAngles.x;
       float newYAngle = ScreenshotCamera.transform.eulerAngles.y;
       labelPlane.transform.Rotate(newXAngle, newYAngle, ScreenshotCamera.transform.rotation[2]);
+    //   ScreenCapture.CaptureScreenshot("screenshot.png");
 
    }
 

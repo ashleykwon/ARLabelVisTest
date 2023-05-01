@@ -4,12 +4,18 @@ Shader "Unlit/SeparableShader"
     {
         _MainTex("Texture", 2D) = "white" {}
         _LabelTex("Texture", 2D) = "white" {}
-        _KernelSize("Blur Kernel Size", Range(0, 100)) = 50
-        _Sigma("Blur Sigma", Range(0, 100)) = 50
+        _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 50
+        _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
+        _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
+
+        _ShadowKernelSize("Shadow Blur Kernel Size", Range(0, 100)) = 50
+        _ShadowSigma("Shadow Blur Sigma", Range(0, 100)) = 50
         _ShadowScale("Shadow Scale", Range(0.8, 1.05)) = 1.0
         _ShadowMultiplier("Shadow Multiplier", Range(0, 2)) = 1.0
+
         _Lamdba("lamdba", Range(0,1)) = 0.5
         [MaterialToggle] _EnableShadow("Enable Shadow", Int) = 1
+        [MaterialToggle] _EnableOutline("Enable Outline", Int) = 1
         _ColorMethod("Color Method", Int) = 0
     }
     SubShader
@@ -49,8 +55,8 @@ Shader "Unlit/SeparableShader"
 
             float4 _LabelTex_TexelSize;
             float4 _LabelTex_ST;
-            float _KernelSize;
-            float _Sigma;
+            float _ShadowKernelSize;
+            float _ShadowSigma;
             float _ShadowScale;
             float _Lamdba;
             int _EnableShadow;
@@ -73,12 +79,12 @@ Shader "Unlit/SeparableShader"
             {
 
                 float4 acc = float4(0, 0, 0, 0);
-                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
                         float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
                         float y = vdata.uv.y;
                         float2 coords = float2(x, y);
                         coords = (coords - 0.5) / _ShadowScale + 0.5;
-                        float weight = gaussian1D(i, _Sigma);
+                        float weight = gaussian1D(i, _ShadowSigma);
                         float4 pix = tex2D(_LabelTex, coords);
                         acc += pix * weight;
                 }
@@ -125,8 +131,8 @@ Shader "Unlit/SeparableShader"
 
             float4 _LabelTex_TexelSize;
             float4 _LabelTex_ST;
-            float _KernelSize;
-            float _Sigma;
+            float _SampleKernelSize;
+            float _SampleSigma;
             float _ShadowScale;
 
             float gaussian1D(float x, float sigma) {
@@ -147,11 +153,11 @@ Shader "Unlit/SeparableShader"
             {
 
                 float4 acc = float4(0, 0, 0, 0);
-                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
                         float x = vdata.uv.x + i * _MainTex_TexelSize.x;
                         float y = vdata.uv.y;
                         float2 coords = float2(x, y);
-                        float weight = gaussian1D(i, _Sigma);
+                        float weight = gaussian1D(i, _SampleSigma);
                         float4 pix = tex2D(_MainTex, coords);
                         acc += pix * weight;
                 }
@@ -202,22 +208,17 @@ Shader "Unlit/SeparableShader"
                 float4 _MainTex_TexelSize;
                 float4 _LabelTex_TexelSize;
                 float4 _BlurredBGTex_TexelSize;
-                float _KernelSize;
-                float _Sigma;
+                float _SampleKernelSize;
+                float _SampleSigma;
+                float _ShadowKernelSize;
+                float _ShadowSigma;
+                float _SampleBoost;
                 float _ShadowScale;
                 float _ShadowMultiplier;
                 float _Lamdba;
                 int _EnableShadow;
-                int _EnableLambda;
+                int _EnableOutline;
                 int _ColorMethod;
-
-
-
-                float gaussian1D(float x, float sigma) {
-                    float pi = 3.14159265359;
-                    return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
-                }
-
 
                 v2f vert(appdata v)
                 {
@@ -226,6 +227,33 @@ Shader "Unlit/SeparableShader"
                     o.uv = TRANSFORM_TEX(v.uv, _BlurredLabelTex);
                     UNITY_TRANSFER_FOG(o,o.vertex);
                     return o;
+                }
+
+                float gaussian1D(float x, float sigma) {
+                    float pi = 3.14159265359;
+                    return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+                }
+
+                float sobel(sampler2D tex, float2 uv) {
+                    float2 delta = float2(0.0015, 0.0015);
+                    
+                    float4 hr = float4(0, 0, 0, 0);
+                    float4 vt = float4(0, 0, 0, 0);
+
+                    float filter[3][3] = {
+                        {-1, 0, 1},
+                        {-2, 0, 2},
+                        {-1, 0, 1}
+                    };
+
+                    for (int i = -1; i <= 1; i++){
+                        for (int j = -1; j <= 1; j++){
+                            hr += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[i + 1][j + 1];
+                            vt += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[j + 1][i + 1];
+                        }
+                    }
+                    
+                    return sqrt(hr * hr + vt * vt);
                 }
 
                 // color conversion functions based off http://www.easyrgb.com/en/math.php
@@ -437,6 +465,10 @@ Shader "Unlit/SeparableShader"
                     else
                         var_B = 12.92 * var_B;
 
+                    // ensure values are between 0 and 1
+                    var_R = max(min(var_R, 1), 0);
+                    var_G = max(min(var_G, 1), 0);
+                    var_B = max(min(var_B, 1), 0);
                     return float4(var_R, var_G, var_B, LAB.a);
                 }
 
@@ -447,14 +479,15 @@ Shader "Unlit/SeparableShader"
                 fixed4 col = tex2D(_MainTex, vdata.uv);
                 fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
 
+
                 if (_EnableShadow == 1) {
                     float4 acc = float4(0, 0, 0, 0);
-                    for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                    for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
                         float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
                         float x = vdata.uv.x;
                         float2 coords = float2(x, y);
                         coords = (coords - 0.5) / _ShadowScale + 0.5;
-                        float weight = gaussian1D(i, _Sigma);
+                        float weight = gaussian1D(i, _ShadowSigma);
                         float4 pix = tex2D(_BlurredLabelTex, coords);
                         acc += pix * weight;
                     }
@@ -465,14 +498,15 @@ Shader "Unlit/SeparableShader"
                 }
 
                 float4 bgSample = float4(0, 0, 0, 0);
-                for (int i = _KernelSize / 2; i >= -_KernelSize / 2; i--) {
+                for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
                     float y = vdata.uv.y + i * _BlurredBGTex_TexelSize.y;
                     float x = vdata.uv.x;
                     float2 coords = float2(x, y);
-                    float weight = gaussian1D(i, _Sigma);
+                    float weight = gaussian1D(i, _SampleSigma);
                     float4 pix = tex2D(_BlurredBGTex, coords);
                     bgSample += pix * weight;
                 }
+                bgSample *= _SampleBoost;
                 
                 // don't apply any changes if background 
                 if (textMatte[0] == 0){ 
@@ -547,16 +581,35 @@ Shader "Unlit/SeparableShader"
                     float a = lab[1];
                     float b = lab[2];
 
-                    if (l > 50){
-                        l = 0;
+                    if (l > 75 || l < 25){
+                        l = 100 - l;
+                    } else if (l > 50){
+                        l = (100 - l) + 25;
                     } else {
-                        l = 100;
+                        l = (100 - l) - 25;
                     }
 
+                    // l = 100 - l;
+                    // a *= -1;
+                    // b *= -1;
+                    a = 62.1313548;// -81.1856371;
+                    b = -95.50187772;//76.11578826;
+
                     float4 inverted_lab = float4(l, a, b, lab.a);
-                    col = HSV2RGB(inverted_lab);
+                    col = LAB2RGB(inverted_lab);
                 } else {
-                    return float4(0, 0, 0, 0); // invalid color method
+                    return col; //float4(0, 0, 0, 0); // invalid color method
+                }
+
+                if (_EnableOutline == 1){
+                    float edges = sobel(_LabelTex, vdata.uv);
+
+                    if(edges != 0){
+                        if (col.r + col.g + col.b < 0.5){
+                            return float4(1, 1, 1, 1);
+                        } 
+                        return float4(0, 0, 0, 0);
+                    }
                 }
 
 
@@ -572,6 +625,8 @@ Shader "Unlit/SeparableShader"
         Pass 
         {
             CGPROGRAM
+        // Upgrade NOTE: excluded shader from DX11, OpenGL ES 2.0 because it uses unsized arrays
+        #pragma exclude_renderers d3d11 gles
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
@@ -600,6 +655,9 @@ Shader "Unlit/SeparableShader"
            
             sampler2D _LabelTex; 
             float4 _LabelTex_ST; 
+            int _EnableOutline;
+
+            float _ShadowScale;
 
             v2f vert(appdata v)
             {
@@ -611,30 +669,23 @@ Shader "Unlit/SeparableShader"
             }
 
             float sobel (sampler2D tex, float2 uv) {
-                float2 delta = float2(0.0008, 0.0008);
+                float2 delta = float2(0.0015, 0.0015);
                 
                 float4 hr = float4(0, 0, 0, 0);
                 float4 vt = float4(0, 0, 0, 0);
-                
-                hr += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
-                hr += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  0.0;
-                hr += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) * -1.0;
-                hr += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  2.0;
-                hr += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
-                hr += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) * -2.0;
-                hr += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) *  1.0;
-                hr += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) *  0.0;
-                hr += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
-                
-                vt += tex2D(tex, (uv + float2(-1.0, -1.0) * delta)) *  1.0;
-                vt += tex2D(tex, (uv + float2( 0.0, -1.0) * delta)) *  2.0;
-                vt += tex2D(tex, (uv + float2( 1.0, -1.0) * delta)) *  1.0;
-                vt += tex2D(tex, (uv + float2(-1.0,  0.0) * delta)) *  0.0;
-                vt += tex2D(tex, (uv + float2( 0.0,  0.0) * delta)) *  0.0;
-                vt += tex2D(tex, (uv + float2( 1.0,  0.0) * delta)) *  0.0;
-                vt += tex2D(tex, (uv + float2(-1.0,  1.0) * delta)) * -1.0;
-                vt += tex2D(tex, (uv + float2( 0.0,  1.0) * delta)) * -2.0;
-                vt += tex2D(tex, (uv + float2( 1.0,  1.0) * delta)) * -1.0;
+
+                float filter[3][3] = {
+                    {-1, 0, 1},
+                    {-2, 0, 2},
+                    {-1, 0, 1}
+                };
+
+                for (int i = -1; i <= 1; i++){
+                    for (int j = -1; j <= 1; j++){
+                        hr += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[i + 1][j + 1];
+                        vt += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[j + 1][i + 1];
+                    }
+                }
                 
                 return sqrt(hr * hr + vt * vt);
             }
@@ -673,9 +724,14 @@ Shader "Unlit/SeparableShader"
             {
 
                 float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
-                float4 label_pix = tex2D(_LabelTex, vdata.uv);
+                float4 label = tex2D(_LabelTex, vdata.uv);
 
-                if (sobel(_LabelTex, vdata.uv) != 0){
+                float2 coords = vdata.uv;
+                coords = (coords - 0.5) / _ShadowScale + 0.5;
+
+                float edges = sobel(_LabelTex, coords);
+
+                if (edges != 0){
                     return interpolate(_LastShaderTex, vdata);
                 }
 
