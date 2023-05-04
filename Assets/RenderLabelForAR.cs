@@ -92,9 +92,9 @@ public class RenderLabelForAR : MonoBehaviour
       float newZ = player.transform.position[2] + 8.5f; //This 8.5 may vary depending on the distance between the Screenshot camera and the label plane, which should remain consistent
       labelPlane.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, newZ);
 
-      // float newXAngle = player.transform.eulerAngles.x;
-      // float newYAngle = player.transform.eulerAngles.y;
-      // labelPlane.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+      float newXAngle = player.transform.eulerAngles.x;
+      float newYAngle = player.transform.eulerAngles.y;
+      labelPlane.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
 
    }
 

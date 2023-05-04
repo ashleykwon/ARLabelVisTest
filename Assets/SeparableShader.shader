@@ -588,42 +588,42 @@ Shader "Unlit/SeparableShader"
                         col = HSV2RGB(inverted_hsv);
                     }
                 //     // CIELAB inversion
-                //     else if (_ColorMethod == 4){
-                //         float4 lab = RGB2LAB(bgSample);
-                //         float l = lab[0];
-                //         float a = lab[1];
-                //         float b = lab[2];
+                    else if (_ColorMethod == 4){
+                        float4 lab = RGB2LAB(bgSample);
+                        float l = lab[0];
+                        float a = lab[1];
+                        float b = lab[2];
 
-                //         if (l > 75 || l < 25){
-                //             l = 100 - l;
-                //         } else if (l > 50){
-                //             l = (100 - l) + 25;
-                //         } else {
-                //             l = (100 - l) - 25;
-                //         }
+                        if (l > 75 || l < 25){
+                            l = 100 - l;
+                        } else if (l > 50){
+                            l = (100 - l) + 25;
+                        } else {
+                            l = (100 - l) - 25;
+                        }
 
-                //         // l = 100 - l;
-                //         // a *= -1;
-                //         // b *= -1;
-                //         a = 62.1313548;// -81.1856371;
-                //         b = -95.50187772;//76.11578826;
+                        // l = 100 - l;
+                        // a *= -1;
+                        // b *= -1;
+                        a = 62.1313548;// -81.1856371;
+                        b = -95.50187772;//76.11578826;
 
-                //         float4 inverted_lab = float4(l, a, b, lab.a);
-                //         col = LAB2RGB(inverted_lab);
-                //     } else {
-                //         return col; //float4(0, 0, 0, 0); // invalid color method
+                        float4 inverted_lab = float4(l, a, b, lab.a);
+                        col = LAB2RGB(inverted_lab);
+                    } else {
+                        return col; //float4(0, 0, 0, 0); // invalid color method
+                    }
+
+                // if (_EnableOutline == 1){
+                //     float edges = sobel(_LabelTex, vdata.uv);
+
+                //     if(edges != 0){
+                //         if (col.r + col.g + col.b < 0.5){
+                //             return float4(1, 1, 1, 1);
+                //         } 
+                //         return float4(0, 0, 0, 0);
                 //     }
-
-                // // if (_EnableOutline == 1){
-                // //     float edges = sobel(_LabelTex, vdata.uv);
-
-                // //     if(edges != 0){
-                // //         if (col.r + col.g + col.b < 0.5){
-                // //             return float4(1, 1, 1, 1);
-                // //         } 
-                // //         return float4(0, 0, 0, 0);
-                // //     }
-                // // }
+                // }
 
 
                 // // sample the texture
