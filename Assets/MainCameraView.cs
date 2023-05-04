@@ -9,13 +9,13 @@ public class MainCameraView : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+        MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("Label"));
     }
 
     // Update is called once per frame
     void Update()
     {
-        // Block out the layer that contains the label (it's a plane object that has a material + shader)
-        MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("Label"));
+        // Only include the layer that contains the label (it's a plane object that has a material + shader)
+        //MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("Label"));
     }
 }
