@@ -13,7 +13,6 @@ Material:
   m_InvalidKeywords:
   - _ALPHAPREMULTIPLY_ON
   - _ENABLELAMBDA_ON
-  - _ENABLEOUTLINE_ON
   - _ENABLESHADOW_ON
   - _GLOSSYREFLECTIONS_OFF
   - _SPECULARHIGHLIGHTS_OFF
@@ -92,16 +91,17 @@ Material:
     m_Floats:
     - _BlurSize: 28.1
     - _BumpScale: 1
-    - _ColorMethod: 3
+    - _ColorMethod: 2
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
     - _EnableLambda: 1
-    - _EnableOutline: 1
+    - _EnableOutline: 0
     - _EnableShadow: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.52
     - _GlossyReflections: 0
+    - _Interpolation_Amount: 11
     - _KernelSize: 56.1
     - _Lamdba: 0
     - _Metallic: 0
@@ -109,12 +109,12 @@ Material:
     - _OcclusionStrength: 1
     - _OutlineScale: 1
     - _Parallax: 0.02
-    - _SampleBoost: 0
-    - _SampleKernelSize: 20
-    - _SampleSigma: 0.2
-    - _ShadowKernelSize: 74
-    - _ShadowMultiplier: 1.33
-    - _ShadowScale: 0.912
+    - _SampleBoost: 0.26
+    - _SampleKernelSize: 100
+    - _SampleSigma: 100
+    - _ShadowKernelSize: 61
+    - _ShadowMultiplier: 1.56
+    - _ShadowScale: 0.956
     - _ShadowSigma: 28.6
     - _Sigma: 60.9
     - _SmoothnessTextureChannel: 0

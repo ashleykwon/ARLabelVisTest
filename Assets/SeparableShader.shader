@@ -22,9 +22,10 @@ Shader "Unlit/SeparableShader"
         _ShadowScale("Shadow Scale", Range(0.8, 1.05)) = 1.0
         _ShadowMultiplier("Shadow Intensity", Range(0, 2)) = 1.0
 
-        
+        _EdgeDelta("Edge Delta", Range(15, 30)) = 15
         
         [MaterialToggle] _EnableOutline("Enable Outline", Int) = 1
+        _Interpolation_Amount("Interpolation Amount", Int) = 1
         
 
         
@@ -33,82 +34,6 @@ Shader "Unlit/SeparableShader"
     {
         Tags { "RenderType" = "Opaque" }
         LOD 100
-
-        Pass
-        {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
-
-            #include "UnityCG.cginc"
-
-
-
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
-                float4 vertex : SV_POSITION;
-            };
-
-            sampler2D _MainTex;
-            sampler2D _LabelTex;
-            float4 _MainTex_ST;
-            float4 _MainTex_TexelSize;
-
-            float4 _LabelTex_TexelSize;
-            float4 _LabelTex_ST;
-            float _ShadowKernelSize;
-            float _ShadowSigma;
-            float _ShadowScale;
-            float _Lamdba;
-            int _EnableShadow;
-
-            float gaussian1D(float x, float sigma) {
-                float pi = 3.14159265359;
-                return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
-            }
-
-            v2f vert(appdata v)
-            {
-                    v2f o;
-                    o.vertex = UnityObjectToClipPos(v.vertex);
-                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
-                    UNITY_TRANSFER_FOG(o,o.vertex);
-                    return o;
-            }
-
-            fixed4 frag(v2f vdata) : SV_Target
-            {
-
-                float4 acc = float4(0, 0, 0, 0);
-                for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
-                        float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
-                        float y = vdata.uv.y;
-                        float2 coords = float2(x, y);
-                        coords = (coords - 0.5) / _ShadowScale + 0.5;
-                        float weight = gaussian1D(i, _ShadowSigma);
-                        float4 pix = tex2D(_LabelTex, coords);
-                        acc += pix * weight;
-                }
-
-                // sample the texture
-                // apply fog
-                //UNITY_APPLY_FOG(i.fogCoord, col);
-                return acc;
-                }
-                ENDCG
-            }
-
-            GrabPass { "_BlurredLabelTex" }
 
             Pass
         {
@@ -155,7 +80,7 @@ Shader "Unlit/SeparableShader"
             {
                     v2f o;
                     o.vertex = UnityObjectToClipPos(v.vertex);
-                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                     UNITY_TRANSFER_FOG(o,o.vertex);
                     return o;
             }
@@ -182,6 +107,210 @@ Shader "Unlit/SeparableShader"
             }
 
             GrabPass { "_BlurredBGTex" }
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            sampler2D _LabelTex;
+            float4 _LabelTex_TexelSize;
+            float4 _LabelTex_ST;
+
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                return tex2D(_LabelTex, vdata.uv);
+            }
+            ENDCG
+        }
+        GrabPass { "_LabelPixels" }
+
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+
+            sampler2D _LabelPixels;
+            sampler2D _LabelTex;
+
+            float4 _LabelTex_TexelSize;
+            float4 _LabelTex_ST;
+
+            float4 _LabelPixels_TexelSize;
+            float _ShadowKernelSize;
+            float _ShadowSigma;
+            float _ShadowScale;
+            int _EnableShadow;
+
+            float gaussian1D(float x, float sigma) {
+                float pi = 3.14159265359;
+                return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+            }
+
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+
+                float4 acc = float4(0, 0, 0, 0);
+                for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
+                        float x = vdata.uv.x + i * _LabelPixels_TexelSize.x;
+                        float y = vdata.uv.y;
+                        float2 coords = float2(x, y);
+                        coords = (coords - 0.5) / _ShadowScale + 0.5;
+                        float weight = gaussian1D(i, _ShadowSigma);
+                        float4 pix = tex2D(_LabelTex, coords);
+                        acc += pix * weight;
+                }
+
+                // sample the texture
+                // apply fog
+                //UNITY_APPLY_FOG(i.fogCoord, col);
+                return acc;
+                }
+                ENDCG
+            }
+
+            GrabPass { "_BlurredLabelTex" }
+
+            Pass
+        { // get outline of label with sobel filter
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            // make fog work
+            #pragma multi_compile_fog
+
+            #include "UnityCG.cginc"
+
+
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
+            
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+            sampler2D _LabelTex;
+            float4 _LabelTex_TexelSize;
+            float4 _LabelTex_ST;
+
+            sampler2D _LabelPixels;
+            float4 _LabelPixels_ST;
+            float _EdgeDelta;
+
+
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
+
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+                float2 delta = float2(_EdgeDelta, _EdgeDelta) / 10000;
+                
+                float4 hr = float4(0, 0, 0, 0);
+                float4 vt = float4(0, 0, 0, 0);
+
+                float filter[3][3] = {
+                    {-1, 0, 1},
+                    {-2, 0, 2},
+                    {-1, 0, 1}
+                };
+
+                for (int i = -1; i <= 1; i++){
+                    for (int j = -1; j <= 1; j++){
+                        hr += tex2D(_LabelTex, (vdata.uv + float2(i, j) * delta)) *  filter[i + 1][j + 1];
+                        vt += tex2D(_LabelTex, (vdata.uv + float2(i, j) * delta)) *  filter[j + 1][i + 1];
+                    }
+                }
+                
+                float val = sqrt(hr * hr + vt * vt);
+
+                // sample the texture
+                // apply fog
+                //UNITY_APPLY_FOG(i.fogCoord, col);
+                return fixed4(val, val, val, 1);
+            }
+            ENDCG
+        }
+
+            GrabPass { "_LabelEdges" }
 
             Pass
             {
@@ -210,14 +339,14 @@ Shader "Unlit/SeparableShader"
 
                 sampler2D _MainTex;
                 float4 _MainTex_ST;
-                sampler2D _LabelTex;
+                sampler2D _LabelPixels;
                 sampler2D _BlurredLabelTex;
                 float4 _BlurredLabelTex_ST;
                 float4 _BlurredLabelTex_TexelSize;
 
                 sampler2D _BlurredBGTex;
                 float4 _MainTex_TexelSize;
-                float4 _LabelTex_TexelSize;
+                float4 _LabelPixels_TexelSize;
                 float4 _BlurredBGTex_TexelSize;
                 float _SampleKernelSize;
                 float _SampleSigma;
@@ -231,11 +360,14 @@ Shader "Unlit/SeparableShader"
                 int _EnableOutline;
                 int _ColorMethod;
 
+                sampler2D _LabelEdges;
+                float4 _LabelEdges_TexelSize;
+
                 v2f vert(appdata v)
                 {
                     v2f o;
                     o.vertex = UnityObjectToClipPos(v.vertex);
-                    o.uv = TRANSFORM_TEX(v.uv, _BlurredLabelTex);
+                    o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                     UNITY_TRANSFER_FOG(o,o.vertex);
                     return o;
                 }
@@ -245,27 +377,6 @@ Shader "Unlit/SeparableShader"
                     return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
                 }
 
-                float sobel(sampler2D tex, float2 uv) {
-                    float2 delta = float2(0.0015, 0.0015);
-                    
-                    float4 hr = float4(0, 0, 0, 0);
-                    float4 vt = float4(0, 0, 0, 0);
-
-                    float filter[3][3] = {
-                        {-1, 0, 1},
-                        {-2, 0, 2},
-                        {-1, 0, 1}
-                    };
-
-                    for (int i = -1; i <= 1; i++){
-                        for (int j = -1; j <= 1; j++){
-                            hr += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[i + 1][j + 1];
-                            vt += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[j + 1][i + 1];
-                        }
-                    }
-                    
-                    return sqrt(hr * hr + vt * vt);
-                }
 
                 // color conversion functions based off http://www.easyrgb.com/en/math.php
                 float4 RGB2HSV(float4 rgb){
@@ -488,8 +599,7 @@ Shader "Unlit/SeparableShader"
                 {
 
                 fixed4 col = tex2D(_MainTex, vdata.uv);
-                fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
-
+                fixed4 textMatte = tex2D(_LabelPixels, vdata.uv);
 
                 if (_EnableShadow == 1) {
                     float4 acc = float4(0, 0, 0, 0);
@@ -497,7 +607,9 @@ Shader "Unlit/SeparableShader"
                         float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
                         float x = vdata.uv.x;
                         float2 coords = float2(x, y);
-                        coords = (coords - 0.5) / _ShadowScale + 0.5;
+                        float2 conversion = _MainTex_TexelSize / _BlurredLabelTex_TexelSize;
+                        conversion.y *= -1;
+                        // coords = (coords - 0.5) / conversion + 0.5;
                         float weight = gaussian1D(i, _ShadowSigma);
                         float4 pix = tex2D(_BlurredLabelTex, coords);
                         acc += pix * weight;
@@ -612,10 +724,10 @@ Shader "Unlit/SeparableShader"
                     return col; //float4(0, 0, 0, 0); // invalid color method
                 }
 
-                if (_EnableOutline == 1){
-                    float edges = sobel(_LabelTex, vdata.uv);
-
-                    if(edges != 0){
+                if (_EnableOutline == 1){                    
+                    float4 edges = tex2D(_LabelEdges, vdata.uv);
+                    
+                    if(edges.r != 0){
                         if (col.r + col.g + col.b < 0.5){
                             return float4(1, 1, 1, 1);
                         } 
@@ -670,63 +782,53 @@ Shader "Unlit/SeparableShader"
 
             float _ShadowScale;
 
+            int _Interpolation_Amount;
+
             v2f vert(appdata v)
             {
                     v2f o;
                     o.vertex = UnityObjectToClipPos(v.vertex);
-                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                     UNITY_TRANSFER_FOG(o,o.vertex);
                     return o;
             }
 
-            float sobel (sampler2D tex, float2 uv) {
-                float2 delta = float2(0.0015, 0.0015);
-                
-                float4 hr = float4(0, 0, 0, 0);
-                float4 vt = float4(0, 0, 0, 0);
-
-                float filter[3][3] = {
-                    {-1, 0, 1},
-                    {-2, 0, 2},
-                    {-1, 0, 1}
-                };
-
-                for (int i = -1; i <= 1; i++){
-                    for (int j = -1; j <= 1; j++){
-                        hr += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[i + 1][j + 1];
-                        vt += tex2D(tex, (uv + float2(i, j) * delta)) *  filter[j + 1][i + 1];
-                    }
-                }
-                
-                return sqrt(hr * hr + vt * vt);
-            }
-
-            float4 interpolate(sampler2D tex, v2f vdata){
+            float4 interpolate(sampler2D tex, v2f vdata, int blur_size){
                 
                 float4 col = float4(0, 0, 0, 0);
 
-                float x1 = vdata.uv.x + 2 * _MainTex_ST_TexelSize.x;
-                float y1 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
-                float2 coords1 = float2(x1, y1);
+                for (int i = -blur_size/2; i <= blur_size/2; i++) {
+                    int j = 0;
+                    // for (int j = -blur_size/2; j <= blur_size/2; j++) {
+                        float x = vdata.uv.x + i * _MainTex_ST_TexelSize.x;
+                        float y = vdata.uv.y + j * _MainTex_ST_TexelSize.y;
+                        float2 coords = float2(x, y);
+                        col += tex2D(_LastShaderTex, coords) / (blur_size * blur_size);
+                    // }
+                }
 
-                float x2 = vdata.uv.x - 2 * _MainTex_ST_TexelSize.x;
-                float y2 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
-                float2 coords2 = float2(x2, y2);
+                // float x1 = vdata.uv.x + 2 * _MainTex_ST_TexelSize.x;
+                // float y1 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
+                // float2 coords1 = float2(x1, y1);
 
-                float x3 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
-                float y3 = vdata.uv.y + 2 * _MainTex_ST_TexelSize.y;
-                float2 coords3 = float2(x3, y3);
+                // float x2 = vdata.uv.x - 2 * _MainTex_ST_TexelSize.x;
+                // float y2 = vdata.uv.y + 0 * _MainTex_ST_TexelSize.y;
+                // float2 coords2 = float2(x2, y2);
 
-                float x4 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
-                float y4 = vdata.uv.y - 2 * _MainTex_ST_TexelSize.y;
-                float2 coords4 = float2(x4, y4);
+                // float x3 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
+                // float y3 = vdata.uv.y + 2 * _MainTex_ST_TexelSize.y;
+                // float2 coords3 = float2(x3, y3);
 
-                float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 
-                            + tex2D(_LastShaderTex, coords2) * 0.25
-                            + tex2D(_LastShaderTex, coords3) * 0.25
-                            + tex2D(_LastShaderTex, coords4) * 0.25;
+                // float x4 = vdata.uv.x + 0 * _MainTex_ST_TexelSize.x;
+                // float y4 = vdata.uv.y - 2 * _MainTex_ST_TexelSize.y;
+                // float2 coords4 = float2(x4, y4);
 
-                return pix;
+                // float4 pix = tex2D(_LastShaderTex, coords1) * 0.25 
+                //             + tex2D(_LastShaderTex, coords2) * 0.25
+                //             + tex2D(_LastShaderTex, coords3) * 0.25
+                //             + tex2D(_LastShaderTex, coords4) * 0.25;
+
+                return col;
 
             }
             
@@ -734,19 +836,19 @@ Shader "Unlit/SeparableShader"
             fixed4 frag(v2f vdata) : SV_Target
             {
 
-                float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
+                float4 col = tex2D(_LastShaderTex, vdata.uv);
                 float4 label = tex2D(_LabelTex, vdata.uv);
 
-                float2 coords = vdata.uv;
-                coords = (coords - 0.5) / _ShadowScale + 0.5;
+                // float2 coords = vdata.uv;
+                // coords = (coords - 0.5) / _ShadowScale + 0.5;
 
-                float edges = sobel(_LabelTex, coords);
+                // float edges = sobel(_LabelTex, coords);
 
-                if (edges != 0){
-                    return interpolate(_LastShaderTex, vdata);
+                if (label.r != 0){
+                    // col = interpolate(_LastShaderTex, vdata, 3);
                 }
 
-                return lastshader_pix;
+                return col;
             }
             ENDCG
         }
