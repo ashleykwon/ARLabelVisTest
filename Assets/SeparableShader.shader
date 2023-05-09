@@ -111,78 +111,80 @@ Shader "Unlit/SeparableShader"
 
         //     GrabPass { "_BlurredLabelTex" }
 
-        //     Pass
-        // {
-        //     CGPROGRAM
-        //     #pragma vertex vert
-        //     #pragma fragment frag
-        //     // make fog work
-        //     #pragma multi_compile_fog
+             Pass
+         {
+             CGPROGRAM
+             #pragma vertex vert
+             #pragma fragment frag
+             // make fog work
+             #pragma multi_compile_fog
 
-        //     #include "UnityCG.cginc"
+             #include "UnityCG.cginc"
 
 
 
-        //     struct appdata
-        //     {
-        //         float4 vertex : POSITION;
-        //         float2 uv : TEXCOORD0;
-        //     };
+             struct appdata
+             {
+                 float4 vertex : POSITION;
+                 float2 uv : TEXCOORD0;
+             };
 
-        //     struct v2f
-        //     {
-        //         float2 uv : TEXCOORD0;
-        //         UNITY_FOG_COORDS(1)
-        //         float4 vertex : SV_POSITION;
-        //     };
+             struct v2f
+             {
+                 float2 uv : TEXCOORD0;
+                 UNITY_FOG_COORDS(1)
+                 float4 vertex : SV_POSITION;
+             };
 
-        //     sampler2D _MainTex;
-        //     sampler2D _LabelTex;
-        //     float4 _MainTex_ST;
-        //     float4 _MainTex_TexelSize;
+             sampler2D _MainTex;
+             sampler2D _LabelTex;
+             float4 _MainTex_ST;
+             float4 _MainTex_TexelSize;
 
-        //     float4 _LabelTex_TexelSize;
-        //     float4 _LabelTex_ST;
-        //     float _SampleKernelSize;
-        //     float _SampleSigma;
-        //     float _ShadowScale;
+             float4 _LabelTex_TexelSize;
+             float4 _LabelTex_ST;
+             float _SampleKernelSize;
+             float _SampleSigma;
+             float _ShadowScale;
 
-        //     float gaussian1D(float x, float sigma) {
-        //         float pi = 3.14159265359;
-        //         return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
-        //     }
+             /*float gaussian1d(float x, float sigma) {
+                 float pi = 3.14159265359;
+                 return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+             }*/
 
-        //     v2f vert(appdata v)
-        //     {
-        //             v2f o;
-        //             o.vertex = UnityObjectToClipPos(v.vertex);
-        //             o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
-        //             UNITY_TRANSFER_FOG(o,o.vertex);
-        //             return o;
-        //     }
+             v2f vert(appdata v)
+             {
+                     v2f o;
+                     o.vertex = UnityObjectToClipPos(v.vertex);
+                     o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                     UNITY_TRANSFER_FOG(o,o.vertex);
+                     return o;
+             }
 
-        //     fixed4 frag(v2f vdata) : SV_Target
-        //     {
+             fixed4 frag(v2f vdata) : SV_Target
+             {
 
-        //         float4 acc = float4(0, 0, 0, 0);
-        //         for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
-        //                 float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-        //                 float y = vdata.uv.y;
-        //                 float2 coords = float2(x, y);
-        //                 float weight = gaussian1D(i, _SampleSigma);
-        //                 float4 pix = tex2D(_MainTex, coords);
-        //                 acc += pix * weight;
-        //         }
+                 float4 acc = float4(0, 0, 0, 0);
+                 for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
+                         float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                         float y = vdata.uv.y;
+                         float2 coords = float2(x, y);
+						 float pi = 3.14159265359;
+						 float weight = 1 / sqrt(2 * pi* _SampleSigma)* exp(-(i * i) / (2 * _SampleSigma));
+                         // float weight = gaussian1D(i, _SampleSigma);
+                         float4 pix = tex2D(_MainTex, coords);
+                         acc += pix * weight;
+                 }
 
-        //         // sample the texture
-        //         // apply fog
-        //         //UNITY_APPLY_FOG(i.fogCoord, col);
-        //         return acc;
-        //     }
-        //     ENDCG
-        // }
+                 // sample the texture
+                 // apply fog
+                 //UNITY_APPLY_FOG(i.fogCoord, col);
+                 return acc;
+             }
+             ENDCG
+         }
 
-        //     GrabPass { "_BlurredBGTex" }
+             GrabPass { "_BlurredBGTex" }
 
             Pass
             {
@@ -217,7 +219,7 @@ Shader "Unlit/SeparableShader"
                 // float4 _BlurredLabelTex_ST;
                 // float4 _BlurredLabelTex_TexelSize;
 
-                // sampler2D _BlurredBGTex;
+                sampler2D _BlurredBGTex;
                 float4 _MainTex_TexelSize;
                 float4 _LabelTex_TexelSize;
                 float4 _BlurredBGTex_TexelSize;
@@ -512,11 +514,11 @@ Shader "Unlit/SeparableShader"
 
                     float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
                     for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
-                        float y = vdata.uv.y + i * _MainTex_TexelSize.y;
+                        float y = vdata.uv.y + i * _BlurredBGTex_TexelSize.y;
                         float x = vdata.uv.x;
                         float2 coords = float2(x, y);
                         float weight = gaussian1D(i, _SampleSigma);
-                        float4 pix = tex2D(_MainTex, coords);
+                        float4 pix = tex2D(_BlurredBGTex, coords);
                         bgSample += pix * weight;
                     }
                     bgSample *= _SampleBoost;
@@ -567,7 +569,7 @@ Shader "Unlit/SeparableShader"
                         float x = vdata.uv.x;
                         float y = vdata.uv.y;
                         float2 coords_flip = float2(x, y);
-                        float4 flip_col = dummy - tex2D(_MainTex, coords_flip);
+						float4 flip_col = dummy - bgSample;//tex2D(_MainTex, coords_flip);
                         col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
                     }
                     // HSV inversion
@@ -615,7 +617,7 @@ Shader "Unlit/SeparableShader"
                     //     return col; //float4(0, 0, 0, 0); // invalid color method
                     // }
 
-                //if (_EnableOutline == 1){
+                if (_EnableOutline == 1){
                     // Applying sobel filter
                     float2 delta = float2(0.0015, 0.0015);
                     
@@ -645,7 +647,7 @@ Shader "Unlit/SeparableShader"
                         } 
                         col = float4(0, 0, 0, 0);
                     }
-                //}
+                }
 
 
                 // // sample the texture
