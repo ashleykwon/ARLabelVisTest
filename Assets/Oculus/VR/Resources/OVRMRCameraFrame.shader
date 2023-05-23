@@ -9,6 +9,7 @@
 		_ChromaToleranceA("ChromaToleranceA", Range(0.0,50.0)) = 20.0
 		_ChromaToleranceB("ChromaToleranceB", Range(0.0,50.0)) = 15.0
 		_ChromaShadows("ChromaShadows", Range(0.0,1.0)) = 0.02
+		// _LabelTex("Label Image", 2D) = "white" {}
 	}
 	SubShader
 	{
@@ -43,6 +44,8 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			sampler2D _MaskTex;
+			sampler2D _LabelTex;
+			float4 _LabelTex_ST;
 
 			float4 _TextureDimension;		// (w, h, 1/w, 1/h)
 
@@ -91,6 +94,10 @@
 				{
 					discard;
 				}
+				
+				
+
+
 				return col;
 			}
 			ENDCG

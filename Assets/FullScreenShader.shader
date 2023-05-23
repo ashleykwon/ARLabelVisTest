@@ -4,6 +4,7 @@ Shader "Unlit/FullScreenShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _LabelTex("Label Image", 2D) = "white" {}
+        _CurrentFrameTex("CurrentFrameTex", 2D) = "white" {}
 
     }
     SubShader
@@ -38,6 +39,8 @@ Shader "Unlit/FullScreenShader"
             float4 _MainTex_ST;
             sampler2D _LabelTex;
             float4 _LabelTex_ST;
+            sampler2D _CurrentFrameTex;
+            float4 _CurrentFrameTex_ST;
 
             v2f vert (appdata v)
             {
@@ -48,24 +51,33 @@ Shader "Unlit/FullScreenShader"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag (v2f vdata) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
-                fixed4 textMatte = tex2D(_LabelTex, i.uv);
+                fixed4 col = tex2D(_MainTex, vdata.uv);
+                fixed4 textMatte = tex2D(_LabelTex, vdata.uv);
 
-                //turn col gray
+                //turn col blue
                 float blue = col.b;
 
-                if (textMatte[0] != 0)
+                // col = float4(0, 0, blue, 1);
+
+          
+                if (textMatte[3] != 0) // is a label pixel
                 {
+                    //col = tex2D(_MainTex, vdata.uv);
                     col = float4(0, 0, blue, 1);
+                }
+
+                else
+                {
+                    col = tex2D(_CurrentFrameTex, vdata.uv);
                 }
 
                 
 
                 // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
+                //UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
 
 

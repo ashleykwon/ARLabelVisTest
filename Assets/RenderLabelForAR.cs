@@ -51,6 +51,10 @@ public class RenderLabelForAR : MonoBehaviour
       // Access labelPlane's material
       labelPlaneMaterial = labelPlane.GetComponent<MeshRenderer>().sharedMaterial;
 
+      // Reverse Mesh
+      Mesh mesh = labelPlane.GetComponent<MeshFilter>().mesh;
+      mesh.triangles = mesh.triangles.Reverse().ToArray();
+
       // Set labelPlaneMaterial's initial texture to a transparent layer
       labelPlaneMaterial.SetTexture("_MainTex", transparentLayer);
 
@@ -89,12 +93,12 @@ public class RenderLabelForAR : MonoBehaviour
    void Update()
    {
       // Update labelPlane's position and rotation according to ScreenshotCamera's rotation and position
-      float newZ = player.transform.position[2] + 12f; //This 8.5 may vary depending on the distance between the Screenshot camera and the label plane, which should remain consistent
-      labelPlane.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, newZ);
+      // float newZ = player.transform.position[2] + 12f; //This 8.5 may vary depending on the distance between the Screenshot camera and the label plane, which should remain consistent
+      // labelPlane.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, newZ);
 
-      float newXAngle = player.transform.eulerAngles.x;
-      float newYAngle = player.transform.eulerAngles.y;
-      labelPlane.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+      // float newXAngle = player.transform.eulerAngles.x;
+      // float newYAngle = player.transform.eulerAngles.y;
+      // labelPlane.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
 
    }
 

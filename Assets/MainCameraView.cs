@@ -9,6 +9,7 @@ public class MainCameraView : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Only show the sphere that contains the label
         MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("Label"));
     }
 
