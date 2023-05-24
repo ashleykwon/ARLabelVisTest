@@ -16007,7 +16007,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackground_Start_mEA8FFE6B1D
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&GameObject_GetComponent_TisMeshRenderer_t4B7747212F0B88244BB7790C61AE124BFC15BAAE_m7FF948365C38BC39333D82B235A7C4EAD219960D_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27_il2cpp_TypeInfo_var);
@@ -16016,8 +16015,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackground_Start_mEA8FFE6B1D
 	}
 	int32_t V_0 = 0;
 	{
-		// int cubemapSize = 128;
-		V_0 = ((int32_t)128);
+		// int cubemapSize = 512; // this can change for a better resolution
+		V_0 = ((int32_t)512);
 		// labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_LabelCubeMap", cubemapLabel);
 		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_0 = __this->___labelSphere_5;
 		NullCheck(L_0);
@@ -16059,10 +16058,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackground_Start_mEA8FFE6B1D
 		L_12 = GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6(L_11, GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
 		__this->___ScreenshotCamera_4 = L_12;
 		Il2CppCodeGenWriteBarrier((void**)(&__this->___ScreenshotCamera_4), (void*)L_12);
-		// Debug.Log(ScreenshotCamera);
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_13 = __this->___ScreenshotCamera_4;
-		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
-		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(L_13, NULL);
 		// }
 		return;
 	}
@@ -16190,7 +16185,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackground_LateUpdate_m375F8
 		// RenderTexture.active = renderTexture;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_43 = __this->___renderTexture_10;
 		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB(L_43, NULL);
-		// ScreenshotCamera.RenderToCubemap(renderTexture, 63); // this line causes flickering (maybe) by reading and writing into the same buffer
+		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_44 = __this->___ScreenshotCamera_4;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_45 = __this->___renderTexture_10;
 		NullCheck(L_44);

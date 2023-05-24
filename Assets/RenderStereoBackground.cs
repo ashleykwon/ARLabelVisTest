@@ -18,7 +18,7 @@ public class RenderStereoBackground : MonoBehaviour
     void Start()
     {
 
-        int cubemapSize = 128; // this can change for a better resolution
+        int cubemapSize = 512; // this can change for a better resolution
         
         labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_LabelCubeMap", cubemapLabel);
 
