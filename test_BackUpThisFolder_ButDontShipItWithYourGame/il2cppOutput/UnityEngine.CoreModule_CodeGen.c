@@ -2147,8 +2147,8 @@ extern void Camera_get_allCamerasCount_m7B9CAA9E8F2BC5587942A4CCBF4D6CA1FFD01BDC
 extern void Camera_GetAllCameras_m55D302710121EEBC17D2F6EE4AE975C37ECC53F4 (void);
 // 0x00000464 System.Boolean UnityEngine.Camera::RenderToCubemapImpl(UnityEngine.Texture,System.Int32)
 extern void Camera_RenderToCubemapImpl_m1EF42250CB17C6FBD5C7F5E35FFAC9BCEDCCEBB5 (void);
-// 0x00000465 System.Boolean UnityEngine.Camera::RenderToCubemap(UnityEngine.Cubemap)
-extern void Camera_RenderToCubemap_m4AA388238EA7B96D29F66A0ED04425E3223310AD (void);
+// 0x00000465 System.Boolean UnityEngine.Camera::RenderToCubemap(UnityEngine.RenderTexture,System.Int32)
+extern void Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24 (void);
 // 0x00000466 System.Void UnityEngine.Camera::Render()
 extern void Camera_Render_m6089001EB6710DA9A21C87185D65922F13A24509 (void);
 // 0x00000467 System.Void UnityEngine.Camera::FireOnPreCull(UnityEngine.Camera)
@@ -6884,7 +6884,7 @@ static Il2CppMethodPointer s_methodPointers[3004] =
 	Camera_get_allCamerasCount_m7B9CAA9E8F2BC5587942A4CCBF4D6CA1FFD01BDC,
 	Camera_GetAllCameras_m55D302710121EEBC17D2F6EE4AE975C37ECC53F4,
 	Camera_RenderToCubemapImpl_m1EF42250CB17C6FBD5C7F5E35FFAC9BCEDCCEBB5,
-	Camera_RenderToCubemap_m4AA388238EA7B96D29F66A0ED04425E3223310AD,
+	Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24,
 	Camera_Render_m6089001EB6710DA9A21C87185D65922F13A24509,
 	Camera_FireOnPreCull_mE55D48DC9F94241A79F59C53FCEC0E6B81FB2CA6,
 	Camera_FireOnPreRender_m543170A0D796CFF44B97DAC68C2208F061143ADA,
@@ -10936,7 +10936,7 @@ static const int32_t s_InvokerIndices[3004] =
 	9653,
 	9247,
 	1926,
-	3840,
+	1926,
 	6550,
 	9529,
 	9529,

@@ -10,19 +10,30 @@ public class RenderStereoBackground : MonoBehaviour
     public Cubemap cubemapBackground;
     public Cubemap cubemapLabel;
     public GameObject player;
+    public Material labelSphereMaterial;
+    RenderTexture renderTexture;
 
   
     // Start is called before the first frame update
     void Start()
     {
-        // Render to all 6 faces on cubemap
-        // UpdateCubemap(63);
-        labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_LabelCubeMap", cubemapLabel);
+
+        int cubemapSize = 128; // this can change for a better resolution
         
+        labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_LabelCubeMap", cubemapLabel);
+
+        labelSphereMaterial = labelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+
+        // Define cube-shaped render texture for cubemap
+        renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
+        renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
+        
+        // Access the screenshot camera
+        ScreenshotCamera = gameObject.GetComponent<Camera>(); 
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         // Block out the layer that contains the label (it's a plane object that has a material + shader)
         ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
@@ -35,7 +46,13 @@ public class RenderStereoBackground : MonoBehaviour
         labelSphere.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
 
         // Take a screenshot and render it to a cubemap
-        ScreenshotCamera.RenderToCubemap(cubemapBackground);
+        labelSphereMaterial.SetTexture("_CubeMap", renderTexture);
         
+        ScreenshotCamera.targetTexture = renderTexture;
+        RenderTexture.active = renderTexture;
+        
+        ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
+        RenderTexture.active = null;
+
     }
 }

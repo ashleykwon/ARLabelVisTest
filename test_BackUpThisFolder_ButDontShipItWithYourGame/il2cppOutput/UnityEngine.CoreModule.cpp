@@ -30042,22 +30042,23 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Camera_RenderToCubemapImpl_m1EF42250CB17
 	bool icallRetVal = _il2cpp_icall_func(__this, ___tex0, ___faceMask1);
 	return icallRetVal;
 }
-// System.Boolean UnityEngine.Camera::RenderToCubemap(UnityEngine.Cubemap)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Camera_RenderToCubemap_m4AA388238EA7B96D29F66A0ED04425E3223310AD (Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* __this, Cubemap_t4F2DFF70696A5CB5C1695DF8947CC60D718C4A1C* ___cubemap0, const RuntimeMethod* method) 
+// System.Boolean UnityEngine.Camera::RenderToCubemap(UnityEngine.RenderTexture,System.Int32)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24 (Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* __this, RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___cubemap0, int32_t ___faceMask1, const RuntimeMethod* method) 
 {
 	bool V_0 = false;
 	{
-		Cubemap_t4F2DFF70696A5CB5C1695DF8947CC60D718C4A1C* L_0 = ___cubemap0;
-		bool L_1;
-		L_1 = Camera_RenderToCubemapImpl_m1EF42250CB17C6FBD5C7F5E35FFAC9BCEDCCEBB5(__this, L_0, ((int32_t)63), NULL);
-		V_0 = L_1;
-		goto IL_000d;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_0 = ___cubemap0;
+		int32_t L_1 = ___faceMask1;
+		bool L_2;
+		L_2 = Camera_RenderToCubemapImpl_m1EF42250CB17C6FBD5C7F5E35FFAC9BCEDCCEBB5(__this, L_0, L_1, NULL);
+		V_0 = L_2;
+		goto IL_000c;
 	}
 
-IL_000d:
+IL_000c:
 	{
-		bool L_2 = V_0;
-		return L_2;
+		bool L_3 = V_0;
+		return L_3;
 	}
 }
 // System.Void UnityEngine.Camera::Render()
