@@ -28402,6 +28402,12 @@ struct MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4  : public MonoBehavi
 	Rigidbody_t268697F5A994213ED97393309870968BC1C7393C* ___player_4;
 	// System.Single MovePlayer::speed
 	float ___speed_5;
+	// UnityEngine.GameObject MovePlayer::labelSphere
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___labelSphere_6;
+	// System.Int32 MovePlayer::CurrentColorAssignmentAlgo
+	int32_t ___CurrentColorAssignmentAlgo_7;
+	// UnityEngine.Material MovePlayer::labelSphereMaterial
+	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_8;
 };
 
 // MoviePlayerSample
