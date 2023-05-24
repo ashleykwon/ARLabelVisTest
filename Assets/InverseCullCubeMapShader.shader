@@ -1,5 +1,5 @@
 Shader "Unlit/InverseCullCubeMapShader"
-{
+{// Copied from https://stackoverflow.com/questions/40834272/how-to-apply-cubemap-to-inverse-of-a-sphere-in-unity-3d and modified
     Properties
     {
         _CubeMap( "Cube Map", Cube ) = "white" {}
