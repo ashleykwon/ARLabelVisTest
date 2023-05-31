@@ -439,77 +439,56 @@ Shader "Unlit/SeparableShader"
                     return o;
             }
 
-            int get_num_constraints(v2f vdata){
-                int _plateSize = 50;
-                int num_constraints = 0;
-                //get number of constraints in the plate
-                for (int i = _plateSize / 2; i >= -_plateSize / 2; i--) {
-                    for(int j = _plateSize / 2; j >= -_plateSize / 2; j--){
-                    float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-                    float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-                    float2 coords = float2(x, y);
-
-                    float4 main_sample = tex2D(_MainTex, coords);
-                    float4 label_sample = tex2D(_LabelTex, coords);
-
-                    //the pixel is in the label
-                    if (label_sample.g != 0){
-                    //the pixel is a sample
-                    if (main_sample.g == 0){
-                        num_constraints += 1;
-                        }
-                    }
-                    }
-                }
-                return num_constraints;
-            }
-
-            float radialBasis(float r){
-                if(r == 0.0){
-                    return r;
-                }
-                return r*r*log(r);
-            }
-
             fixed4 frag(v2f vdata) : SV_Target
             {
-
+                //result from function f
                 float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
+
+                //determine if the pixel is a sample pixel
                 float4 main_pix = tex2D(_MainTex, vdata.uv);
+
+                //determine if the pixel is in the label
                 float4 label_pix = tex2D(_LabelTex, vdata.uv);
-
-                int available_constraints = get_num_constraints(vdata);
-                int num_rows = available_constraints + 3 + 1;
-                int num_constraints = 20;
-                int _plateSize = 50;
-
-                //solve
-                float3 result = float3(0,0,0);
-                for (int i = _plateSize / 2; i >= -_plateSize / 2; i--) {
-                    for(int j = _plateSize / 2; j >= -_plateSize / 2; j--){
-                        float dist = sqrt(i*i + j*j) * _MainTex_TexelSize.x;
-                        float rb = radialBasis(dist);
-
-
-                    }
-                }
-
-
 
                 float4 col = lastshader_pix;
                 //the pixel is in the label
                 if (label_pix.g != 0){
                     //the pixel is a sample
                     if (main_pix.g == 0){
-                    col = float4(1,0,0,0);
+                    col = lastshader_pix;
                     }
 
                     //we need to interpolate the pixel
-                    if (main_pix.g != 0){
-                    col = float4(1,0,0,0);
-                    }
+                    int _neighborhoodSize= 10;
+                    float4 top = 0;
+                    float4 bot = 0;
+
+                    for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+                        for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+                        float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                        float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                        float2 coords = float2(x, y);
+
+                        float4 main_sample = tex2D(_MainTex, coords);
+                        float4 label_sample = tex2D(_LabelTex, coords);
+
+
+                        if (label_sample.g != 0){
+                            if (main_sample.g == 0){
+                                col = lastshader_pix;
+
+                            // float dist = float(i*i) + float(j*j);
+                            // top += label_sample / dist;
+                            // bot += 1.0 / dist;
+                            }
+                        }
+                    
+                }
                 }
 
+                col = lastshader_pix;
+
+                }
                 return col;
                 }
                 ENDCG
