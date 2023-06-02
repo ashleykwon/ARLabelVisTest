@@ -564,103 +564,102 @@ Shader "Unlit/SeparableShader"
             ENDCG
         }
 
-//                         GrabPass { "_LastShaderTex" } 
-//         Pass 
-//         {
-//             CGPROGRAM
-// // Upgrade NOTE: excluded shader from DX11 because it uses wrong array syntax (type[size] name)
-// #pragma exclude_renderers d3d11
-//             #pragma vertex vert
-//             #pragma fragment frag
-//             #include "UnityCG.cginc"
+                        GrabPass { "_LastShaderTex" } 
+        Pass 
+        {
+            CGPROGRAM
+// Upgrade NOTE: excluded shader from DX11 because it uses wrong array syntax (type[size] name)
+#pragma exclude_renderers d3d11
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
 
 
 
-//             struct appdata
-//             {
-//                 float4 vertex : POSITION;
-//                 float2 uv : TEXCOORD0;
-//             };
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-//             struct v2f
-//             {
-//                 float2 uv : TEXCOORD0;
-//                 UNITY_FOG_COORDS(1)
-//                 float4 vertex : SV_POSITION;
-//             };
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
+                float4 vertex : SV_POSITION;
+            };
 
-//             sampler2D _MainTex; 
-//             float4 _MainTex_ST;
-//             float4 _MainTex_TexelSize;
+            sampler2D _MainTex; 
+            float4 _MainTex_ST;
+            float4 _MainTex_TexelSize;
 
-//             sampler2D _LastShaderTex;  
-//             float4 _LastShaderTex_ST;
+            sampler2D _LastShaderTex;  
+            float4 _LastShaderTex_ST;
            
-//             sampler2D _LabelTex; 
-//             float4 _LabelTex_ST; 
+            sampler2D _LabelTex; 
+            float4 _LabelTex_ST; 
            
-//             v2f vert(appdata v)
-//             {
-//                     v2f o;
-//                     o.vertex = UnityObjectToClipPos(v.vertex);
-//                     o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
-//                     UNITY_TRANSFER_FOG(o,o.vertex);
-//                     return o;
-//             }
+            v2f vert(appdata v)
+            {
+                    v2f o;
+                    o.vertex = UnityObjectToClipPos(v.vertex);
+                    o.uv = TRANSFORM_TEX(v.uv, _LabelTex);
+                    UNITY_TRANSFER_FOG(o,o.vertex);
+                    return o;
+            }
 
-//             fixed4 frag(v2f vdata) : SV_Target
-//             {
-//                 //result from function f
-//                 float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
+            fixed4 frag(v2f vdata) : SV_Target
+            {
+                //result from function f
+                float4 lastshader_pix = tex2D(_LastShaderTex, vdata.uv);
 
-//                 //determine if the pixel is a sample pixel
-//                 float4 main_pix = tex2D(_MainTex, vdata.uv);
+                //determine if the pixel is a sample pixel
+                float4 main_pix = tex2D(_MainTex, vdata.uv);
 
-//                 //determine if the pixel is in the label
-//                 float4 label_pix = tex2D(_LabelTex, vdata.uv);
+                //determine if the pixel is in the label
+                float4 label_pix = tex2D(_LabelTex, vdata.uv);
 
-//                 float4 col = lastshader_pix;
-//                 //the pixel is in the label
-//                 if (label_pix.g != 0){
-//                     //the pixel is a sample
-//                     if (main_pix.g == 0){
-//                     col = lastshader_pix;
-//                     }
+                float4 col = lastshader_pix;
+                //the pixel is in the label
+                if (label_pix.g != 0){
+                    //the pixel is not a sample
+                    if (main_pix.g != 0){
+                    col = lastshader_pix;
 
-//                     //we need to interpolate the pixel
-//                     int _neighborhoodSize= 10;
-//                     float4 top = 0;
-//                     float4 bot = 0;
+                    //we need to interpolate the pixel
+                    int _neighborhoodSize= 10;
+                    float4 top = 0;
+                    float4 bot = 0;
 
-//                     for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
-//                         for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
-//                         float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-//                         float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-//                         float2 coords = float2(x, y);
+                    for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+                        for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+                        float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                        float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                        float2 coords = float2(x, y);
 
-//                         float4 main_sample = tex2D(_MainTex, coords);
-//                         float4 label_sample = tex2D(_LabelTex, coords);
-//                         float4 lastShader_sample = tex2D(_LastShaderTex, coords);
+                        float4 main_sample = tex2D(_MainTex, coords);
+                        float4 label_sample = tex2D(_LabelTex, coords);
+                        float4 lastShader_sample = tex2D(_LastShaderTex, coords);
 
 
-//                         if (label_sample.g != 0){
-//                             if (main_sample.g == 0){
-//                             float dist = float(i*i) + float(j*j);
-//                             top += lastShader_sample / dist;
-//                             bot += 1.0 / dist;
-//                             }
-//                         }
+                        if (label_sample.g != 0){
+                            if (main_sample.g == 0){
+                            float dist = float(i*i) + float(j*j);
+                            top += lastShader_sample / dist;
+                            bot += 1.0 / dist;
+                            }
+                        }
                     
-//                 }
-//                 }
+                }
+                }
 
-//                 col = top / bot;
-
-//                 }
-//                 return col;
-//                 }
-//                 ENDCG
-//             }
+                col = top / bot;
+                }
+                }
+                return col;
+                }
+                ENDCG
+            }
 
 
 
