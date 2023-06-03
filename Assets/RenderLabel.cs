@@ -98,6 +98,10 @@ public class RenderLabel : MonoBehaviour
                            width, height,
                            System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
    }
+
+   double hash(int x, int y, int offset){
+      return (((x*y + offset)*(x*y + offset)) % 100 )* 0.01;
+   }
  
 
      // Extract frames from ScreenshotCamera and generate label colors based on the frames
@@ -136,7 +140,8 @@ public class RenderLabel : MonoBehaviour
 
       // Set label pixel colors
       Texture2D textMatte = new Texture2D(renderedLabel.width, renderedLabel.height);
-      double _lambda = 0.8;
+      double _lambda = 0.2;
+      double offset = 100.0;
       for (int i = 0; i < labelCoords.Count; i++)
       {
          (int labelX, int labelY, bool isEdge) = labelCoords[i];
@@ -146,8 +151,12 @@ public class RenderLabel : MonoBehaviour
          // {
          //    newColor = assignColors[selectedMethod](new int[] {labelX, labelY}, Screenshot, neighborhoodSize); // Modify this line to use a different color assignment model, 4 is the neighborhood size from which background pixels are sampled. This can change 
          // }
+         
+         double rand = (labelX + labelY + offset) * labelX * labelY %100 * 0.01;
+         Debug.Log("rand" + rand);
+         // rand = UnityEngine.Random.Range(0.0f, 1.0f);
 
-         if (UnityEngine.Random.Range(0.0f, 1.0f) > _lambda){
+         if (rand <= _lambda){
             newColor = new Color(0.0f,0.0f,0.0f);
          }
          renderedLabel.SetPixel(labelX, labelY, newColor);

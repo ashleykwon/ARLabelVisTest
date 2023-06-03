@@ -624,7 +624,7 @@ Shader "Unlit/SeparableShader"
                 if (label_pix.g != 0){
                     //the pixel is not a sample
                     if (main_pix.g != 0){
-                    col = lastshader_pix;
+                    col = float4(0,0,0,0);
 
                     //we need to interpolate the pixel
                     int _neighborhoodSize= 10;
@@ -644,7 +644,7 @@ Shader "Unlit/SeparableShader"
 
                         if (label_sample.g != 0){
                             if (main_sample.g == 0){
-                            float dist = float(i*i) + float(j*j);
+                            float dist = float(i*i) + float(j*j) +1 ;
                             top += lastShader_sample / dist;
                             bot += 1.0 / dist;
                             }
@@ -652,8 +652,8 @@ Shader "Unlit/SeparableShader"
                     
                 }
                 }
+                    col = top / bot;
 
-                col = top / bot;
                 }
                 }
                 return col;
