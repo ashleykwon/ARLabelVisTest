@@ -283,15 +283,15 @@ Shader "Unlit/InverseCullCubeMapShader"
             fixed4 frag( v2f vdata ) : SV_Target 
             {
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*(1,1,-1)); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
 
                 float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
                 for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) 
                 {
                     float y = vdata.uv.y + i * _MainTex_TexelSize.y;
                     float x = vdata.uv.x;
-                    float z = vdata.uv.z;
-                    float3 coords = float3(x, y, z);  // check if this line is correct
+                    float z = vdata.uv.z; // check if this line is correct. It should be, because labelSphere.GetComponent<MeshFilter>().mesh.vertices returns an array of Vector3s
+                    float3 coords = float3(x, y, z);  
                     float weight = gaussian1D(i, _SampleSigma);
                     float4 pix = texCUBE(_CubeMap, coords); 
                     bgSample += pix * weight;
@@ -336,7 +336,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                     //Yuanbo's method
                     else if (_ColorMethod == 2) 
                     {
-                        
                         float dummy = float4(1.0, 1.0, 1.0, 1.0);
                         float x = vdata.uv.x;
                         float y = vdata.uv.y;

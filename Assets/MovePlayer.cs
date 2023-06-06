@@ -33,7 +33,7 @@ public class MovePlayer : MonoBehaviour
         float triggerRight = OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger);
 
         // Change color assignment algorithm on trigger
-        if (triggerRight > 0.9f)
+        if (triggerRight > 0.5f)
         {
             CurrentColorAssignmentAlgo += 1;
             if (CurrentColorAssignmentAlgo > 4)

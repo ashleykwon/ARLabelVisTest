@@ -10101,8 +10101,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MovePlayer_Update_mB2024089C129F95C3A8C7
 		// float triggerRight = OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger);
 		float L_30;
 		L_30 = OVRInput_Get_m012EDBD26DA72A28E233C6067036C4DB52ECB515(2, ((int32_t)-2147483648LL), NULL);
-		// if (triggerRight > 0.9f)
-		if ((!(((float)L_30) > ((float)(0.899999976f)))))
+		// if (triggerRight > 0.5f)
+		if ((!(((float)L_30) > ((float)(0.5f)))))
 		{
 			goto IL_00e1;
 		}
