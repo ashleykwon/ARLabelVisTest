@@ -7,7 +7,7 @@ public class MovePlayer : MonoBehaviour
 {
     public Rigidbody player;
     public float speed;
-    public GameObject labelSphere;
+    public GameObject BackgroundAndLabelSphere;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     Material labelSphereMaterial; // Doesn't need to be specified at Start
 
@@ -15,7 +15,7 @@ public class MovePlayer : MonoBehaviour
     void Start()
     {
         CurrentColorAssignmentAlgo = 1;
-        labelSphereMaterial = labelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+        labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
     }
 
@@ -35,13 +35,13 @@ public class MovePlayer : MonoBehaviour
         // Change color assignment algorithm on trigger
         if (triggerRight > 0.5f)
         {
+            Debug.Log("Right joystick triggered");
             CurrentColorAssignmentAlgo += 1;
             if (CurrentColorAssignmentAlgo > 4)
             {
                 CurrentColorAssignmentAlgo = 1;
             }
             ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
-
         }
     }
 

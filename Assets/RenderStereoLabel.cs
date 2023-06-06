@@ -28,8 +28,8 @@ public class RenderStereoLabel : MonoBehaviour
         // Define cube-shaped render texture for cubemap
         // renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
-        renderTexture.height = cubemapSize;
-        renderTexture.width = cubemapSize;
+        // renderTexture.height = cubemapSize;
+        // renderTexture.width = cubemapSize;
 
         // Set the label map to be the render texture of the label screenshot camera
         labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_CubeMap", renderTexture);
@@ -38,6 +38,7 @@ public class RenderStereoLabel : MonoBehaviour
        
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
+
     }
 
     void Update()
@@ -46,11 +47,11 @@ public class RenderStereoLabel : MonoBehaviour
         ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
 
         // Move and rotate the sphere with the player
-        // backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+        //ScreenshotCamera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
 
-        // float newXAngle = player.transform.eulerAngles.x;
-        // float newYAngle = player.transform.eulerAngles.y;
-        // backgroundAndLabelSphere.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+        // // float newXAngle = player.transform.eulerAngles.x;
+        // // float newYAngle = player.transform.eulerAngles.y;
+        // ScreenshotCamera.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
     }
 
     // Update is called once per frame

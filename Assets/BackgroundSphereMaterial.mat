@@ -79,7 +79,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SampleBoost: 1
-    - _SampleKernelSize: 15
+    - _SampleKernelSize: 0
     - _SampleSigma: 50
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

@@ -283,7 +283,8 @@ Shader "Unlit/InverseCullCubeMapShader"
             fixed4 frag( v2f vdata ) : SV_Target 
             {
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*(1,1,-1)); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+                float3 rotationVec = float3(-1.0,-1.0,-1.0);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
 
                 float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
                 for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) 

@@ -30,8 +30,8 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
 
-        cubemapLabel.height = cubemapSize;
-        cubemapLabel.width = cubemapSize;
+        // cubemapLabel.height = cubemapSize;
+        // cubemapLabel.width = cubemapSize;
        
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -47,16 +47,15 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
 
         // Move and rotate the sphere with the player
         backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-
-        // float newXAngle = player.transform.eulerAngles.x;
-        // float newYAngle = player.transform.eulerAngles.y;
+        
+        // // float newXAngle = player.transform.eulerAngles.x;
+        // // float newYAngle = player.transform.eulerAngles.y;
         // backgroundAndLabelSphere.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
     }
 
     // Update is called once per frame
     void LateUpdate()
-    {
-        
+    {     
         // Take a screenshot and render it to a cubemap
         
         backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
