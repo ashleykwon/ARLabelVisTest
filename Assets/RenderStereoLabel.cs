@@ -21,9 +21,7 @@ public class RenderStereoLabel : MonoBehaviour
     void Start()
     {
 
-        int cubemapSize = 1024; // this can change for a better resolution
-        
-        
+        //int cubemapSize = 1024; // this can change for a better resolution            
 
         // Define cube-shaped render texture for cubemap
         // renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
@@ -35,6 +33,7 @@ public class RenderStereoLabel : MonoBehaviour
         labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_CubeMap", renderTexture);
 
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+
        
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -51,20 +50,17 @@ public class RenderStereoLabel : MonoBehaviour
 
         // // float newXAngle = player.transform.eulerAngles.x;
         // // float newYAngle = player.transform.eulerAngles.y;
-        // ScreenshotCamera.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+        //ScreenshotCamera.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
         // Take a screenshot and render it to a cubemap
-        
-        
         ScreenshotCamera.targetTexture = renderTexture;
         RenderTexture.active = renderTexture;
         
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
-        // ScreenshotCamera.RenderToCubemap(cubemapTest, 63);
 
         // backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture);
 

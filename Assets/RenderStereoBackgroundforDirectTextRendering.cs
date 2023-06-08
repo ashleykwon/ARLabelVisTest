@@ -9,7 +9,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     public Camera LabelScreenshotCamera;
     public GameObject backgroundAndLabelSphere;
     // public Cubemap cubemapBackground;
-    public RenderTexture cubemapLabel; // From left eye camera
+    public RenderTexture cubemapLabel; // From render texture from left eye camera (the one that screenshots label + background)
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture renderTexture;
@@ -36,7 +36,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
 
-        Debug.Log(LabelScreenshotCamera.targetTexture);
+        //Debug.Log(LabelScreenshotCamera.targetTexture);
     }
 
     void Update()
@@ -59,7 +59,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         // Take a screenshot and render it to a cubemap
         
         backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
-        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", cubemapLabel); //Somehow this cubemapLabel is completely black
+        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", cubemapLabel); //Somehow this cubemapLabel doesn't update well
         
         ScreenshotCamera.targetTexture = renderTexture;
         RenderTexture.active = renderTexture;

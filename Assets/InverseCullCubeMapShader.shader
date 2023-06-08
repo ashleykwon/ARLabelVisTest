@@ -42,8 +42,7 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 v2f o;
                 o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
-
+                o.uv = v.vertex.xyz * half3(1,1,1);
                 return o;
             }
 
@@ -283,8 +282,9 @@ Shader "Unlit/InverseCullCubeMapShader"
             fixed4 frag( v2f vdata ) : SV_Target 
             {
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                float3 rotationVec = float3(-1.0,-1.0,-1.0);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+                float3 rotationVec = float3(-1,-1,-1);
+                //float3 translationVec = float3(-1, 0, 0);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
 
                 float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
                 for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) 
