@@ -44,6 +44,7 @@ Shader "Unlit/LabelBackgroundShader"
             {
                 // sample the texture
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
+                col = float4(0, 0, 0, 0);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
