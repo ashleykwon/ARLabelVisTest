@@ -5,7 +5,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         _CubeMap( "Cube Map", Cube ) = "white" {}
         _LabelCubeMap( "LabelCubeMap", Cube ) = "white" {}
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 15
-        _ColorMethod("Color Method", Int) = 1
+        _ColorMethod("Color Method", Int) = 3
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
     }
@@ -42,7 +42,8 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 v2f o;
                 o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz * half3(1,1,1);
+                o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
+
                 return o;
             }
 
@@ -282,9 +283,15 @@ Shader "Unlit/InverseCullCubeMapShader"
             fixed4 frag( v2f vdata ) : SV_Target 
             {
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                float3 rotationVec = float3(-1,-1,-1);
-                //float3 translationVec = float3(-1, 0, 0);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
+                float3 rotationVec = float3(-1.0,-1.0,-1.0);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+
+                float offset = 78;
+
+                float sample_x = (vdata.uv.x+1) * 100;
+                float sample_y = (vdata.uv.y+1) * 100;
+
+                float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
 
                 float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
                 for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) 
@@ -300,6 +307,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                 bgSample *= _SampleBoost;
 
                 
+                _ColorMethod = 3;
+                float _sampled_pixels = 0.5;
+
                 if (labelTex[3] != 0) // is a label pixel
                 {
                     if (_ColorMethod == 1)
@@ -360,7 +370,10 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
 
                         float4 inverted_hsv = float4(h, s, v, hsv.a);
-                        col = HSV2RGB(inverted_hsv);
+
+                        if (hash < _sampled_pixels){
+                            col = HSV2RGB(inverted_hsv);
+                        }
                     }
                     // CIELAB inversion
                     else if (_ColorMethod == 4)
@@ -388,9 +401,61 @@ Shader "Unlit/InverseCullCubeMapShader"
                         col = LAB2RGB(inverted_lab);
                     } 
                 }
+
                 return col;
             }
             ENDCG
         }
+
+        //If I do a grabpass, everything fails
+        // GrabPass { "_LastShaderTex" } 
+        // Pass 
+        // {
+        //     CGPROGRAM
+        //     #pragma vertex vert
+        //     #pragma fragment frag
+        //     #include "UnityCG.cginc"
+
+        //     // Initialize variables        
+        //     samplerCUBE _CubeMap;
+        //     samplerCUBE _LabelCubeMap;
+        //     samplerCUBE _LastShaderTex;  
+
+        //     float _SampleKernelSize;
+        //     int _ColorMethod;
+        //     float4 _MainTex_TexelSize;
+        //     float _SampleSigma;
+        //     float _SampleBoost;
+        
+        //     struct v2f 
+        //     {
+        //         float4 pos : SV_Position;
+        //         half3 uv : TEXCOORD0;
+        //     };
+        
+        //     v2f vert( appdata_img v )
+        //     {
+
+        //         v2f o;
+        //         o.pos = UnityObjectToClipPos( v.vertex );
+        //         o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
+
+        //         return o;
+        //     }
+
+        //                 // Color assignment
+        //     fixed4 frag( v2f vdata ) : SV_Target 
+        //     {
+        //         fixed4 col = texCUBE(_CubeMap, vdata.uv);
+        //         float3 rotationVec = float3(-1.0,-1.0,-1.0);
+        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+
+
+        //         return labelTex;
+        //     }
+
+        //     ENDCG
+        
+        // }
     }
 }
