@@ -412,8 +412,8 @@ Shader "Unlit/InverseCullCubeMapShader"
         GrabPass { "_LastShaderTex" } 
         Pass 
         {
-            Cull Back
 
+            Cull Front
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -455,6 +455,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
 
                 float4 col  = last_shader;
+                col = float4(1,0,0,0);
                 float sample_x = (vdata.uv.x+1) * 100;
                 float sample_y = (vdata.uv.y+1) * 100;
                 float offset = 78;
@@ -462,14 +463,11 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float _sampled_prob = 0.2;
 
                 //find pixels that is in the label
-                // if (labelTex.g != 0){
-                //     if (hash > _sampled_prob){
-                //     col = float4(0,1,0,0);
-                //     }else{
-                //     col = float4(1,0,0,0);
-
-                //     }
-                // }
+                if (labelTex.g != 0){
+                    if (hash > _sampled_prob){
+                    col = float4(0,1,0,0);
+                    }
+                }
                 return col;
             }
 
