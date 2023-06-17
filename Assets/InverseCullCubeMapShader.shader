@@ -308,7 +308,7 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 
                 _ColorMethod = 3;
-                float _sampled_pixels = 0.5;
+                float _sampled_prob = 0.2;
 
                 if (labelTex[3] != 0) // is a label pixel
                 {
@@ -371,7 +371,7 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                         float4 inverted_hsv = float4(h, s, v, hsv.a);
 
-                        if (hash < _sampled_pixels){
+                        if (hash < _sampled_prob){
                             col = HSV2RGB(inverted_hsv);
                         }
                     }
@@ -408,54 +408,73 @@ Shader "Unlit/InverseCullCubeMapShader"
         }
 
         //If I do a grabpass, everything fails
-        // GrabPass { "_LastShaderTex" } 
-        // Pass 
-        // {
-        //     CGPROGRAM
-        //     #pragma vertex vert
-        //     #pragma fragment frag
-        //     #include "UnityCG.cginc"
-
-        //     // Initialize variables        
-        //     samplerCUBE _CubeMap;
-        //     samplerCUBE _LabelCubeMap;
-        //     samplerCUBE _LastShaderTex;  
-
-        //     float _SampleKernelSize;
-        //     int _ColorMethod;
-        //     float4 _MainTex_TexelSize;
-        //     float _SampleSigma;
-        //     float _SampleBoost;
         
-        //     struct v2f 
-        //     {
-        //         float4 pos : SV_Position;
-        //         half3 uv : TEXCOORD0;
-        //     };
+        GrabPass { "_LastShaderTex" } 
+        Pass 
+        {
+            Cull Front
+
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+
+            // Initialize variables        
+            samplerCUBE _CubeMap;
+            samplerCUBE _LabelCubeMap;
+            samplerCUBE _LastShaderTex;  
+
+            float _SampleKernelSize;
+            int _ColorMethod;
+            float4 _MainTex_TexelSize;
+            float _SampleSigma;
+            float _SampleBoost;
         
-        //     v2f vert( appdata_img v )
-        //     {
-
-        //         v2f o;
-        //         o.pos = UnityObjectToClipPos( v.vertex );
-        //         o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
-
-        //         return o;
-        //     }
-
-        //                 // Color assignment
-        //     fixed4 frag( v2f vdata ) : SV_Target 
-        //     {
-        //         fixed4 col = texCUBE(_CubeMap, vdata.uv);
-        //         float3 rotationVec = float3(-1.0,-1.0,-1.0);
-        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
-
-
-        //         return labelTex;
-        //     }
-
-        //     ENDCG
+            struct v2f 
+            {
+                float4 pos : SV_Position;
+                half3 uv : TEXCOORD0;
+            };
         
-        // }
+            v2f vert( appdata_img v )
+            {
+
+                v2f o;
+                o.pos = UnityObjectToClipPos( v.vertex );
+                o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
+
+                return o;
+            }
+
+            //Color assignment
+            fixed4 frag( v2f vdata ) : SV_Target 
+            {
+                fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
+                float3 rotationVec = float3(-1.0,-1.0,-1.0);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv*rotationVec);
+
+                float4 col  = last_shader;
+                float sample_x = (vdata.uv.x+1) * 100;
+                float sample_y = (vdata.uv.y+1) * 100;
+                float offset = 78;
+                float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
+                float _sampled_prob = 0.2;
+
+                //find pixels that is in the label
+                if (labelTex.g != 0){
+                    if (hash > _sampled_prob){
+                    col = float4(0,1,0,0);
+                    }else{
+                    col = float4(1,0,0,0);
+
+                    }
+                }
+                return col;
+            }
+
+            ENDCG
+        
+        }
     }
 }
