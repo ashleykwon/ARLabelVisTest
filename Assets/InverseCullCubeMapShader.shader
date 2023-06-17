@@ -15,7 +15,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         {
             Tags { "DisableBatching" = "True" }
 
-            Cull Front
+            Cull Off
 
             CGPROGRAM
             #pragma vertex vert
@@ -278,79 +278,44 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
             }
 
-
-            // Color assignment
-            fixed4 frag( v2f vdata ) : SV_Target 
-            {
-                fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                float3 rotationVec = float3(-1.0,-1.0,-1.0);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
-
-                float offset = 78;
-
-                float sample_x = (vdata.uv.x+1) * 100;
-                float sample_y = (vdata.uv.y+1) * 100;
-
-                float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
-
-                float4 bgSample = float4(0, 0, 0, 0); // Background pixel sampling
-                for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) 
+            float4 function_f (int method, float4 bgSample){
+                float4 col = float4(0,0,0,0);
+                if (_ColorMethod == 1)
                 {
-                    float y = vdata.uv.y + i * _MainTex_TexelSize.y;
-                    float x = vdata.uv.x;
-                    float z = vdata.uv.z; // check if this line is correct. It should be, because labelSphere.GetComponent<MeshFilter>().mesh.vertices returns an array of Vector3s
-                    float3 coords = float3(x, y, z);  
-                    float weight = gaussian1D(i, _SampleSigma);
-                    float4 pix = texCUBE(_CubeMap, coords); 
-                    bgSample += pix * weight;
-                }
-                bgSample *= _SampleBoost;
+                    /*  palette colors:
+                    float4(0, 0, 0, 1), 
+                    float4(0, 0, 1, 1),
+                    // skip? float(0, 1, 0, 1) 
+                    float4(0, 1, 1, 1),
+                    float4(1, 0, 0, 1),
+                    float4(1, 0, 1, 1),
+                    float4(1, 1, 0, 1),
+                    float4(1, 1, 1, 1)};
+                    */
+                    float maxDistSq = -1;
+                    float4 paletteCol = float4(0, 0, 0, 1);
+                    for (int i = 0; i < 8; i++){
+                        if (i == 2) continue;
+                        // extract first 3 bits of i
+                        float r = i & 1; // mask i
+                        float g = ((i & 2) >> 1); // mask i and shift right
+                        float b = ((i & 4) >> 2); // mask i and shift right
 
-                
-                _ColorMethod = 3;
-                float _sampled_prob = 0.2;
+                        float distSq = (bgSample.r - r) * (bgSample.r - r) 
+                                    + (bgSample.g - g) * (bgSample.g - g)
+                                    + (bgSample.b - b) * (bgSample.b - b);
 
-                if (labelTex[3] != 0) // is a label pixel
-                {
-                    if (_ColorMethod == 1)
-                    {
-                        /*  palette colors:
-                        float4(0, 0, 0, 1), 
-                        float4(0, 0, 1, 1),
-                        // skip? float(0, 1, 0, 1) 
-                        float4(0, 1, 1, 1),
-                        float4(1, 0, 0, 1),
-                        float4(1, 0, 1, 1),
-                        float4(1, 1, 0, 1),
-                        float4(1, 1, 1, 1)};
-                        */
-                        float maxDistSq = -1;
-                        float4 paletteCol = float4(0, 0, 0, 1);
-                        for (int i = 0; i < 8; i++){
-                            if (i == 2) continue;
-                            // extract first 3 bits of i
-                            float r = i & 1; // mask i
-                            float g = ((i & 2) >> 1); // mask i and shift right
-                            float b = ((i & 4) >> 2); // mask i and shift right
-
-                            float distSq = (bgSample.r - r) * (bgSample.r - r) 
-                                        + (bgSample.g - g) * (bgSample.g - g)
-                                        + (bgSample.b - b) * (bgSample.b - b);
-
-                            if (distSq > maxDistSq){
-                                maxDistSq = distSq;
-                                paletteCol = float4(r, g, b, 1);
-                            }
+                        if (distSq > maxDistSq){
+                            maxDistSq = distSq;
+                            paletteCol = float4(r, g, b, 1);
                         }
-                        col = paletteCol; 
                     }
-                    //Yuanbo's method
+                    col = paletteCol; 
+                }
+                //Yuanbo's method
                     else if (_ColorMethod == 2) 
                     {
                         float dummy = float4(1.0, 1.0, 1.0, 1.0);
-                        float x = vdata.uv.x;
-                        float y = vdata.uv.y;
-                        float2 coords_flip = float2(x, y);
                         float4 flip_col = dummy - bgSample;//tex2D(_MainTex, coords_flip);
                         col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
                     }
@@ -370,10 +335,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
 
                         float4 inverted_hsv = float4(h, s, v, hsv.a);
-
-                        if (hash < _sampled_prob){
-                            col = HSV2RGB(inverted_hsv);
-                        }
+                        col = HSV2RGB(inverted_hsv);
                     }
                     // CIELAB inversion
                     else if (_ColorMethod == 4)
@@ -400,79 +362,173 @@ Shader "Unlit/InverseCullCubeMapShader"
                         float4 inverted_lab = float4(l, a, b, lab.a);
                         col = LAB2RGB(inverted_lab);
                     } 
-                }
-
-                return col;
-            }
-            ENDCG
-        }
-
-        //If I do a grabpass, everything fails
-        
-        GrabPass { "_LastShaderTex" } 
-        Pass 
-        {
-
-            Cull Front
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-
-            // Initialize variables        
-            samplerCUBE _CubeMap;
-            samplerCUBE _LabelCubeMap;
-            samplerCUBE _LastShaderTex;  
-
-            float _SampleKernelSize;
-            int _ColorMethod;
-            float4 _MainTex_TexelSize;
-            float _SampleSigma;
-            float _SampleBoost;
-        
-            struct v2f 
-            {
-                float4 pos : SV_Position;
-                half3 uv : TEXCOORD0;
-            };
-        
-            v2f vert( appdata_img v )
-            {
-
-                v2f o;
-                o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
-
-                return o;
+                    return col;
             }
 
-            //Color assignment
+            float hash(float sample_x, float sample_y, float offset){
+                return (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
+
+            }
+
+            // Color assignment
             fixed4 frag( v2f vdata ) : SV_Target 
             {
-                fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
+                fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
-                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
 
-                float4 col  = last_shader;
-                col = float4(1,0,0,0);
+                float offset = 78;
+
                 float sample_x = (vdata.uv.x+1) * 100;
                 float sample_y = (vdata.uv.y+1) * 100;
-                float offset = 78;
-                float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
-                float _sampled_prob = 0.2;
 
-                //find pixels that is in the label
-                if (labelTex.g != 0){
-                    if (hash > _sampled_prob){
-                    col = float4(0,1,0,0);
+                float isSample = hash(sample_x, sample_y, offset);
+
+                float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
+
+                _ColorMethod = 3;
+                float _sampled_prob = 0.2;
+                int _neighborhoodSize= 5;
+
+                if (labelTex[3] != 0) // is a label pixel
+                {
+                    //this is a sampled pixel
+                    if(isSample < _sampled_prob){
+                        col = function_f(_ColorMethod, bgSample);
+                    }else{
+                        //this is a unsampled pixel
+                        float top_r = 0.001;
+                        float top_g = 0.001;
+                        float top_b = 0.001;
+                        float top_a = 0.001;
+                        float bot= 0.001;
+
+                        //go through its neighbors
+                        for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+                        for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+                            float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                            float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                                if (hash(x, y, offset)){
+                                    half3 coords = half3(x, y, vdata.uv.z);
+                                    float4 sample_col = texCUBE(_CubeMap, coords); 
+                                    float4 f_sample_col = function_f(_ColorMethod, bgSample);
+                                    float dist = float(i*i) + float(j*j) +1 ;
+
+                                    top_r += f_sample_col[0] / dist;
+                                    top_g += f_sample_col[1] / dist;
+                                    top_b += f_sample_col[2] / dist;
+                                    top_a += f_sample_col[3] / dist;
+                                    bot += 1.0 / dist;
+                                }   
+                        }
+                        }
+
+                        if (top_r != 0.001){
+                            top_r = top_r / bot;
+                            top_g = top_g / bot;
+                            top_b = top_b / bot;
+                            top_a = top_a / bot;
+                            col = float4(top_r,top_g,top_b,top_a);
+                        }else{
+                            //if we are so unlucky that no sample presents in the neighborhood
+                           col = function_f(_ColorMethod, bgSample);
+                        }
                     }
                 }
+
                 return col;
             }
-
             ENDCG
-        
         }
+
+        
+        // GrabPass { "_LastShaderTex" } 
+        // Pass 
+        // {
+
+        //     Cull Front
+        //     CGPROGRAM
+        //     #pragma vertex vert
+        //     #pragma fragment frag
+        //     #include "UnityCG.cginc"
+
+        //     // Initialize variables        
+        //     samplerCUBE _CubeMap;
+        //     samplerCUBE _LabelCubeMap;
+        //     samplerCUBE _LastShaderTex;  
+        //     // sampler2D _LastShaderTex;  
+
+        //     float _SampleKernelSize;
+        //     int _ColorMethod;
+        //     float4 _MainTex_TexelSize;
+        //     float _SampleSigma;
+        //     float _SampleBoost;
+        
+        //     struct v2f 
+        //     {
+        //         float4 pos : SV_Position;
+        //         half3 uv : TEXCOORD0;
+        //     };
+        
+        //     v2f vert( appdata_img v )
+        //     {
+
+        //         v2f o;
+        //         o.pos = UnityObjectToClipPos( v.vertex );
+        //         o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
+
+        //         return o;
+        //     }
+
+            
+
+        //     //Color assignment
+        //     fixed4 frag( v2f vdata ) : SV_Target 
+        //     {
+        //         fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
+        //         float3 rotationVec = float3(-1.0,-1.0,-1.0);
+        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+        //         fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
+
+        //         // fixed4 last_shader = tex2D(_LastShaderTex, float2(vdata.uv.x, vdata.uv.y));
+
+        //         fixed4 col  = last_shader;
+        //         // col = float4(1,0,0,0);
+        //         float sample_x = (vdata.uv.x+1) * 100;
+        //         float sample_y = (vdata.uv.y+1) * 100;
+        //         float offset = 78;
+        //         float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
+        //         float _sampled_prob = 0.2;
+        //         int _neighborhoodSize= 10;
+
+        //         //the pixel is in the label
+        //         // if (labelTex.g != 0){
+        //         //     //the pixel is unsampled
+        //         //     if (hash > _sampled_prob){
+        //         //         float4 top = 1.0;
+        //         //         float4 bot = 1.0;
+        //         //     for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+        //         //         for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+        //         //         float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+        //         //         float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+        //         //         half3 coords = half3(x, y, vdata.uv.z);
+
+        //         //         fixed4 lastShader_sample = texCUBE(_LastShaderTex, vdata.uv);
+        //         //         float dist = float(i*i) + float(j*j) +1 ;
+        //         //         top += lastShader_sample / dist;
+        //         //         bot += 1.0 / dist;
+        //         //         }
+        //         //     }
+        //         //     col = top / bot;
+        //         //     }
+        //         // }
+
+
+        //         return col;
+        //     }
+
+        //     ENDCG
+        
+        // }
     }
 }
