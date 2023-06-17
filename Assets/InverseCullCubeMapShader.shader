@@ -412,7 +412,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         GrabPass { "_LastShaderTex" } 
         Pass 
         {
-            Cull Front
+            Cull Back
 
             CGPROGRAM
             #pragma vertex vert
@@ -452,7 +452,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
-                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv*rotationVec);
+                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
 
                 float4 col  = last_shader;
                 float sample_x = (vdata.uv.x+1) * 100;
@@ -462,14 +462,14 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float _sampled_prob = 0.2;
 
                 //find pixels that is in the label
-                if (labelTex.g != 0){
-                    if (hash > _sampled_prob){
-                    col = float4(0,1,0,0);
-                    }else{
-                    col = float4(1,0,0,0);
+                // if (labelTex.g != 0){
+                //     if (hash > _sampled_prob){
+                //     col = float4(0,1,0,0);
+                //     }else{
+                //     col = float4(1,0,0,0);
 
-                    }
-                }
+                //     }
+                // }
                 return col;
             }
 
