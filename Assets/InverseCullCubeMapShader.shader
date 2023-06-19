@@ -8,14 +8,19 @@ Shader "Unlit/InverseCullCubeMapShader"
         _ColorMethod("Color Method", Int) = 3
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
+        _UseInterpolation("UseInterpolation", Int) = 0
     }
     SubShader
     {
+        // Tags { "RenderType"="Opaque" } // Doesn't work, although this is supposed to make a material double-sided in unlit shader
+        // LOD 100 
+        // Cull off
+
         Pass 
         {
             Tags { "DisableBatching" = "True" }
-
-            Cull Off
+            // LOD 200
+            Cull Front
 
             CGPROGRAM
             #pragma vertex vert
@@ -30,6 +35,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             float4 _MainTex_TexelSize;
             float _SampleSigma;
             float _SampleBoost;
+            int _UseInterpolation;
         
             struct v2f 
             {
@@ -445,8 +451,9 @@ Shader "Unlit/InverseCullCubeMapShader"
         // GrabPass { "_LastShaderTex" } 
         // Pass 
         // {
+        //     // LOD 100
+        //     // Cull Back// Edit this line
 
-        //     Cull Front
         //     CGPROGRAM
         //     #pragma vertex vert
         //     #pragma fragment frag
@@ -502,26 +509,26 @@ Shader "Unlit/InverseCullCubeMapShader"
         //         int _neighborhoodSize= 10;
 
         //         //the pixel is in the label
-        //         // if (labelTex.g != 0){
-        //         //     //the pixel is unsampled
-        //         //     if (hash > _sampled_prob){
-        //         //         float4 top = 1.0;
-        //         //         float4 bot = 1.0;
-        //         //     for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
-        //         //         for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
-        //         //         float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-        //         //         float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-        //         //         half3 coords = half3(x, y, vdata.uv.z);
+        //         if (labelTex.g != 0){
+        //             //the pixel is unsampled
+        //             if (hash > _sampled_prob){
+        //                 float4 top = 1.0;
+        //                 float4 bot = 1.0;
+        //             for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+        //                 for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+        //                 float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+        //                 float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+        //                 half3 coords = half3(x, y, vdata.uv.z);
 
-        //         //         fixed4 lastShader_sample = texCUBE(_LastShaderTex, vdata.uv);
-        //         //         float dist = float(i*i) + float(j*j) +1 ;
-        //         //         top += lastShader_sample / dist;
-        //         //         bot += 1.0 / dist;
-        //         //         }
-        //         //     }
-        //         //     col = top / bot;
-        //         //     }
-        //         // }
+        //                 fixed4 lastShader_sample = texCUBE(_LastShaderTex, vdata.uv);
+        //                 float dist = float(i*i) + float(j*j) +1 ;
+        //                 top += lastShader_sample / dist;
+        //                 bot += 1.0 / dist;
+        //                 }
+        //             }
+        //             col = top / bot;
+        //             }
+        //         }
 
 
         //         return col;

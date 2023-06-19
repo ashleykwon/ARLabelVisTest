@@ -16295,7 +16295,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		s_Il2CppMethodInitialized = true;
 	}
 	{
-		// backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", LabelScreenshotCamera.targetTexture); // Try extracting cubemapLabel directly from UICamera  // Even without this line, the duplicate label problem occurs
+		// backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", LabelScreenshotCamera.targetTexture); // Extract render texture directly from UICamera, which renders the white label and the black background
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_0 = __this->___backgroundAndLabelSphereMaterial_9;
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_1 = __this->___LabelScreenshotCamera_5;
 		NullCheck(L_1);
@@ -16359,7 +16359,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 	{
 		// int cubemapSize = 1024; // this can change for a better resolution
 		V_0 = ((int32_t)1024);
-		// renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16); // Adding this line prevents double-rendering
+		// renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
 		int32_t L_0 = V_0;
 		int32_t L_1 = V_0;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_2 = (RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27*)il2cpp_codegen_object_new(RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27_il2cpp_TypeInfo_var);
