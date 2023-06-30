@@ -2,7 +2,7 @@ Shader "Unlit/InverseCullCubeMapShader"
 {// Copied from https://stackoverflow.com/questions/40834272/how-to-apply-cubemap-to-inverse-of-a-sphere-in-unity-3d and modified
     Properties
     {
-        _CubeMap( "Cube Map", Cube ) = "white" {}
+        _CubeMap( "Cube Map (RGBA)", Cube ) = "white" {}
         _LabelCubeMap( "LabelCubeMap", Cube ) = "white" {}
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 15
         _ColorMethod("Color Method", Int) = 3
@@ -12,19 +12,26 @@ Shader "Unlit/InverseCullCubeMapShader"
     }
     SubShader
     {
-        // Tags { "RenderType"="Opaque" } // Doesn't work, although this is supposed to make a material double-sided in unlit shader
+        // To be able to apply transparency to the sphere
+        Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
+        ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
+        LOD 100
+
+        // Tags { "Queue"="Transparent" } // Doesn't work, although this is supposed to make a material double-sided in unlit shader
         // LOD 100 
-        // Cull off
+        // Cull Off
 
         Pass 
         {
             Tags { "DisableBatching" = "True" }
             // LOD 200
-            Cull Front
+            // Cull Off
 
             CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            #pragma vertex vert alpha
+            #pragma fragment frag alpha
             #include "UnityCG.cginc"
 
             // Initialize variables        
@@ -381,7 +388,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             {
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
 
                 float offset = 78;
 
@@ -448,94 +455,66 @@ Shader "Unlit/InverseCullCubeMapShader"
         }
 
         
-        // GrabPass { "_LastShaderTex" } 
-        // Pass 
-        // {
-        //     // LOD 100
-        //     // Cull Back// Edit this line
+        GrabPass { "_LastShaderTex" } // Cull Back by default in Oculus
+        Pass 
+        {
+            // LOD 100
+            // Cull Off// Edit this line
+            // Cull Front
 
-        //     CGPROGRAM
-        //     #pragma vertex vert
-        //     #pragma fragment frag
-        //     #include "UnityCG.cginc"
+            CGPROGRAM
+            #pragma vertex vert alpha
+            #pragma fragment frag alpha
+            #include "UnityCG.cginc"
 
-        //     // Initialize variables        
-        //     samplerCUBE _CubeMap;
-        //     samplerCUBE _LabelCubeMap;
-        //     samplerCUBE _LastShaderTex;  
-        //     // sampler2D _LastShaderTex;  
+            // Initialize variables        
+            samplerCUBE _CubeMap;
+            samplerCUBE _LabelCubeMap;
+            samplerCUBE _LastShaderTex;  
+            // sampler2D _LastShaderTex;  
 
-        //     float _SampleKernelSize;
-        //     int _ColorMethod;
-        //     float4 _MainTex_TexelSize;
-        //     float _SampleSigma;
-        //     float _SampleBoost;
+            float _SampleKernelSize;
+            int _ColorMethod;
+            float4 _MainTex_TexelSize;
+            float _SampleSigma;
+            float _SampleBoost;
         
-        //     struct v2f 
-        //     {
-        //         float4 pos : SV_Position;
-        //         half3 uv : TEXCOORD0;
-        //     };
+            struct v2f 
+            {
+                float4 pos : SV_Position;
+                half3 uv : TEXCOORD0;
+            };
         
-        //     v2f vert( appdata_img v )
-        //     {
+            v2f vert( appdata_img v )
+            {
 
-        //         v2f o;
-        //         o.pos = UnityObjectToClipPos( v.vertex );
-        //         o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
+                v2f o;
+                o.pos = UnityObjectToClipPos( v.vertex );
+                o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
 
-        //         return o;
-        //     }
+                return o;
+            }
 
             
 
-        //     //Color assignment
-        //     fixed4 frag( v2f vdata ) : SV_Target 
-        //     {
-        //         fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
-        //         float3 rotationVec = float3(-1.0,-1.0,-1.0);
-        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete *(1,1,-1) in non-direct rendering (the one that uses the png file) version
-        //         fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
+            //Color assignment
+            fixed4 frag( v2f vdata ) : SV_Target 
+            {
+                fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
+                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv);
+                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
 
-        //         // fixed4 last_shader = tex2D(_LastShaderTex, float2(vdata.uv.x, vdata.uv.y));
+                // fixed4 col  = cubemap_sample; // Changed this to cubemap_sample, instead of last_shader
+                //If we change col  = cubemap_sample, it will just get what we have in the very beginning. 
+                //we need to use last_shader here, where we have assigned pixel colors.
 
-        //         fixed4 col  = last_shader;
-        //         // col = float4(1,0,0,0);
-        //         float sample_x = (vdata.uv.x+1) * 100;
-        //         float sample_y = (vdata.uv.y+1) * 100;
-        //         float offset = 78;
-        //         float hash = (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
-        //         float _sampled_prob = 0.2;
-        //         int _neighborhoodSize= 10;
+                fixed4 col  = last_shader; 
 
-        //         //the pixel is in the label
-        //         if (labelTex.g != 0){
-        //             //the pixel is unsampled
-        //             if (hash > _sampled_prob){
-        //                 float4 top = 1.0;
-        //                 float4 bot = 1.0;
-        //             for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
-        //                 for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
-        //                 float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-        //                 float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-        //                 half3 coords = half3(x, y, vdata.uv.z);
+                return col;
+            }
 
-        //                 fixed4 lastShader_sample = texCUBE(_LastShaderTex, vdata.uv);
-        //                 float dist = float(i*i) + float(j*j) +1 ;
-        //                 top += lastShader_sample / dist;
-        //                 bot += 1.0 / dist;
-        //                 }
-        //             }
-        //             col = top / bot;
-        //             }
-        //         }
-
-
-        //         return col;
-        //     }
-
-        //     ENDCG
+            ENDCG
         
-        // }
+        }
     }
 }
