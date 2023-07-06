@@ -455,66 +455,66 @@ Shader "Unlit/InverseCullCubeMapShader"
         }
 
         
-        GrabPass { "_LastShaderTex" } // Cull Back by default in Oculus
-        Pass 
-        {
-            // LOD 100
-            // Cull Off// Edit this line
-            // Cull Front
+        // GrabPass { "_LastShaderTex" } // Cull Back by default in Oculus
+        // Pass 
+        // {
+        //     // LOD 100
+        //     // Cull Off// Edit this line
+        //     // Cull Front
 
-            CGPROGRAM
-            #pragma vertex vert alpha
-            #pragma fragment frag alpha
-            #include "UnityCG.cginc"
+        //     CGPROGRAM
+        //     #pragma vertex vert alpha
+        //     #pragma fragment frag alpha
+        //     #include "UnityCG.cginc"
 
-            // Initialize variables        
-            samplerCUBE _CubeMap;
-            samplerCUBE _LabelCubeMap;
-            samplerCUBE _LastShaderTex;  
-            // sampler2D _LastShaderTex;  
+        //     // Initialize variables        
+        //     samplerCUBE _CubeMap;
+        //     samplerCUBE _LabelCubeMap;
+        //     samplerCUBE _LastShaderTex;  
+        //     // sampler2D _LastShaderTex;  
 
-            float _SampleKernelSize;
-            int _ColorMethod;
-            float4 _MainTex_TexelSize;
-            float _SampleSigma;
-            float _SampleBoost;
+        //     float _SampleKernelSize;
+        //     int _ColorMethod;
+        //     float4 _MainTex_TexelSize;
+        //     float _SampleSigma;
+        //     float _SampleBoost;
         
-            struct v2f 
-            {
-                float4 pos : SV_Position;
-                half3 uv : TEXCOORD0;
-            };
+        //     struct v2f 
+        //     {
+        //         float4 pos : SV_Position;
+        //         half3 uv : TEXCOORD0;
+        //     };
         
-            v2f vert( appdata_img v )
-            {
+        //     v2f vert( appdata_img v )
+        //     {
 
-                v2f o;
-                o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
+        //         v2f o;
+        //         o.pos = UnityObjectToClipPos( v.vertex );
+        //         o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
 
-                return o;
-            }
+        //         return o;
+        //     }
 
             
 
-            //Color assignment
-            fixed4 frag( v2f vdata ) : SV_Target 
-            {
-                fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
-                fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv);
-                fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
+        //     //Color assignment
+        //     fixed4 frag( v2f vdata ) : SV_Target 
+        //     {
+        //         fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
+        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv);
+        //         fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
 
-                // fixed4 col  = cubemap_sample; // Changed this to cubemap_sample, instead of last_shader
-                //If we change col  = cubemap_sample, it will just get what we have in the very beginning. 
-                //we need to use last_shader here, where we have assigned pixel colors.
+        //         // fixed4 col  = cubemap_sample; // Changed this to cubemap_sample, instead of last_shader
+        //         //If we change col  = cubemap_sample, it will just get what we have in the very beginning. 
+        //         //we need to use last_shader here, where we have assigned pixel colors.
 
-                fixed4 col  = last_shader; 
+        //         fixed4 col  = last_shader; 
 
-                return col;
-            }
+        //         return col;
+        //     }
 
-            ENDCG
+        //     ENDCG
         
-        }
+        // }
     }
 }
