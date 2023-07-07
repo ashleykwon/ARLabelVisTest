@@ -9,6 +9,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
         _UseInterpolation("UseInterpolation", Int) = 0
+        _EnableOutline("Enable Outline", Int) = 1
     }
     SubShader
     {
@@ -19,15 +20,11 @@ Shader "Unlit/InverseCullCubeMapShader"
         Cull Off
         LOD 100
 
-        // Tags { "Queue"="Transparent" } // Doesn't work, although this is supposed to make a material double-sided in unlit shader
-        // LOD 100 
-        // Cull Off
 
         Pass 
         {
             Tags { "DisableBatching" = "True" }
-            // LOD 200
-            // Cull Off
+
 
             CGPROGRAM
             #pragma vertex vert alpha
@@ -43,6 +40,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _SampleSigma;
             float _SampleBoost;
             int _UseInterpolation;
+            int _EnableOutline;
         
             struct v2f 
             {
@@ -383,6 +381,9 @@ Shader "Unlit/InverseCullCubeMapShader"
 
             }
 
+
+            
+
             // Color assignment
             fixed4 frag( v2f vdata ) : SV_Target 
             {
@@ -399,7 +400,7 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
 
-                _ColorMethod = 3;
+                // _ColorMethod = 3;
                 float _sampled_prob = 0.2;
                 int _neighborhoodSize= 5;
 
@@ -433,7 +434,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                                     top_a += f_sample_col[3] / dist;
                                     bot += 1.0 / dist;
                                 }   
-                        }
+                            }
                         }
 
                         if (top_r != 0.001){
@@ -445,6 +446,44 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }else{
                             //if we are so unlucky that no sample presents in the neighborhood
                            col = function_f(_ColorMethod, bgSample);
+                        }
+                       
+                    }
+ 
+                    // Apply outline if selected
+                    if (_EnableOutline == 1)
+                    {
+                        // Applying sobel filter
+                        float2 delta = float2(0.0015, 0.0015);
+                        
+                        float4 hr = float4(0, 0, 0, 0);
+                        float4 vt = float4(0, 0, 0, 0);
+
+                        float filter[3][3] = {
+                            {-1, 0, 1},
+                            {-2, 0, 2},
+                            {-1, 0, 1}
+                        };
+
+                        for (int i = -1; i <= 1; i++){
+                            for (int j = -1; j <= 1; j++){
+                                float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
+                                float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
+
+                                hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
+                                vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
+                            }
+                        }
+
+
+                        float edges =  sqrt(hr * hr + vt * vt);
+                        // sobel(_LabelTex, vdata.uv);
+
+                        if(edges != 0){ //Outline the edges
+                            if (col.r + col.g + col.b < 0.5){
+                                col = float4(1, 1, 1, 1); // White outline if low grayscale value
+                            } 
+                            col = float4(0, 0, 0, 1); // black outline if high grayscale value
                         }
                     }
                 }
