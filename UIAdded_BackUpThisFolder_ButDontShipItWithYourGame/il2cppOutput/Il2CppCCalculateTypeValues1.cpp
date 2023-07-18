@@ -22829,6 +22829,8 @@ struct RenderStereoBackgroundforDirectTextRendering_tBFBA5C48A0E6915D1DB3D79897F
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_9;
 	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture
 	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_10;
+	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture2
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture2_11;
 };
 
 // RenderStereoLabel

@@ -12,6 +12,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture renderTexture;
+    RenderTexture renderTexture2;
 
   
     // Start is called before the first frame update
@@ -24,6 +25,13 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         // Define a cube-shaped render texture for the background
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
+
+         // To prevent antialiasing
+        renderTexture.autoGenerateMips = false;
+        renderTexture.useMipMap = false;
+        renderTexture.filterMode = FilterMode.Point;
+
+
 
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -47,14 +55,10 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     void LateUpdate()
     {     
         // Take a screenshot and render it to a cubemap
-        // Set the label texture (white label + black background) in the shader attached to backgroundAndLabelSphereMaterial
-
-        // Remove anti-aliasing -> These completely remove the rendered label and billboard
-        // LabelScreenshotCamera.targetTexture.autoGenerateMips = false; 
-        // LabelScreenshotCamera.targetTexture.filterMode = FilterMode.Point;
-
-        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", LabelScreenshotCamera.targetTexture); // Extract render texture directly from UICamera, which renders the white label and the black background 
-        backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", LabelScreenshotCamera.targetTexture);
+       
+        LabelScreenshotCamera.targetTexture = renderTexture2;
+        // backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture2); // Extract render texture directly from UICamera, which renders the white label and the black background 
+        // backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture2);
         // Set the background texture in the shader attached to backgroundAndLabelSphereMaterial
         backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
         

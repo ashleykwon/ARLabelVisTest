@@ -5,6 +5,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         _CubeMap( "Cube Map (RGBA)", Cube ) = "white" {}
         _LabelCubeMap( "LabelCubeMap", Cube ) = "white" {}
         _BillboardCubeMap("BillboardCubeMap", Cube) = "white" {}
+        _ShadowCubeMap("ShadowCubeMap", Cube) = "white" {}
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 15
         _ColorMethod("Color Method", Int) = 3
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
@@ -31,127 +32,6 @@ Shader "Unlit/InverseCullCubeMapShader"
         Cull Off
         LOD 100
 
-        
-        // Pass
-        // {
-        // //    Tags { "RenderType" = "Opaque" }
-        // Tags {"Queue"="Transparent"}
-        //     // Cull Off
-        //     CGPROGRAM
-        //     #pragma vertex vert
-        //     #pragma fragment frag
-        //     // make fog work
-        //     #pragma multi_compile_fog
-
-        //     #include "UnityCG.cginc"
-
-
-            
-        //    struct v2f 
-        //     {
-        //         float4 pos : SV_Position;
-        //         half3 uv : TEXCOORD0;
-        //     };
-        
-        //     v2f vert( appdata_img v )
-        //     {
-
-        //         v2f o;
-        //         o.pos = UnityObjectToClipPos( v.vertex );
-        //         o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
-
-        //         return o;
-        //     }
-
-        //     samplerCUBE _CubeMap;
-        //     samplerCUBE _LabelCubeMap;
-        //     samplerCUBE _BillboardCubeMap;
-        //     float4 _MainTex_ST;
-        //     float4 _MainTex_TexelSize;
-
-        //     float4 _LabelTex_TexelSize;
-        //     float4 _LabelTex_ST;
-        //     float _ShadowKernelSize;
-        //     float _ShadowSigma;
-        //     float _ShadowScale;
-        //     float _Lamdba;
-        //     int _EnableShadow;
-        //     float _ShadowMultiplier;
-
-        //     int _BillboardColorMethod;
-        //     float _BillboardLightnessContrastThreshold;
-
-        //     // float gaussian1D(float x, float sigma) {
-        //     //     float pi = 3.14159265359;
-        //     //     return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
-        //     // }
-        //      float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
-        //     {
-        //         float pi = 3.14159265359;
-        //         return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
-        //         // return 1 / (sigma*sqrt(2 * pi)) * exp(-1*(x * x) / (2 * (sigma*sigma)));
-        //     }
-
-        //     float4 separateBillboardAndLabel(float4 nonBackgroundPixVal, bool label)
-        //     {
-        //         float4 finalPixVal = float4(0,0,0,0);
-        //         if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0) // is a billboard pixel
-        //         {
-        //             if (label == true) //Turn the billboard pixel into a background pixel if the input is a label (label = true)
-        //             {
-        //                 finalPixVal = float4(0,0,0,0);
-        //             }
-        //             else //Leave the pixel value as it is now
-        //             {
-        //                 finalPixVal = float4(0,0,1,1);
-        //             }
-        //         }
-        //         else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0) // is a label pixel
-        //         {
-        //             if (label == true) //Leave the pixel value as it is now
-        //             {
-        //                 finalPixVal = float4(1,1,1,1);
-        //             }
-        //             else //Turn the label pixel into a background pixel if the input is a billboard (label = false)
-        //             {
-        //                 finalPixVal = float4(0,0,0,0);
-        //             }
-        //         }
-        //         return finalPixVal;
-        //     }
-            
-        //     fixed4 frag(v2f vdata) : SV_Target
-        //     {  // Blur the label cube map 
-                
-        //         float3 rotationVec  = float3(-1.0,-1.0,-1.0);
-        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec);
-        //         labelTex = separateBillboardAndLabel(labelTex, true);
-        //         fixed4 backgroundPix = texCUBE(_CubeMap, vdata.uv);
-        //         float4 acc = float4(0, 0, 0, 0);
-        //         for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
-        //             float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
-        //             float y = vdata.uv.y;
-        //             float2 coords = float2(x, y);
-        //             coords = (coords - 0.5) / _ShadowScale + 0.5;
-        //             float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z);
-        //             float weight = gaussian1D(i, _ShadowSigma); 
-        //             float4 pix = texCUBE(_LabelCubeMap, coordswithZ*rotationVec);
-        //             pix = separateBillboardAndLabel(pix, true);
-        //             acc += pix * weight;
-        //         }
-        //         // how do I make the rest of the background transparent???
-        //         if (acc[3] == 0) //not a part of the shadow
-        //         {
-        //             //col = backgroundPix;
-        //             acc = float4(0,0,0,0);
-        //         }
-        //         return acc; // Label shadow on a transparent background (only contains scene outside of the sphere)
-        //     }
-        //     ENDCG
-        // }
-    
-        // GrabPass { "_BlurredLabelTex" }
-
     // Label color assignment + outline + billboard
         Pass 
         {
@@ -170,6 +50,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             samplerCUBE _LabelCubeMap;
             // samplerCUBE _BlurredLabelTex;
             samplerCUBE _BillboardCubeMap;
+            samplerCUBE _ShadowCubeMap;
             float _SampleKernelSize;
             int _ColorMethod;
             float4 _MainTex_TexelSize;
@@ -593,71 +474,38 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
             }
 
-            float findCloserPixelVal(float4 billboardColor, float4 labelColor, float4 antialiased) // from https://en.wikipedia.org/wiki/Cosine_similarity
-            {
-                float billboardCrossProd = 0;
-                float labelCrossProd = 0;
-                float4 returnVal = float4(0,0,0,1);
-
-                float billboardNorm = 0;
-                float labelNorm = 0;
-                float antialiasedNorm = 0;
-
-                for (int i = 0; i < 4; i++)
-                {
-                    billboardCrossProd += billboardColor[i]*antialiased[i];
-                    labelCrossProd += labelColor[i]*antialiased[i];
-
-                    billboardNorm += pow(billboardColor[i], 2);
-                    labelNorm += pow(labelColor[i], 2);
-                    antialiasedNorm += pow(antialiased[i], 2);
-                }
-
-                float billboardSimilarity = billboardCrossProd/(sqrt(billboardNorm)*sqrt(antialiasedNorm));
-                float labelSimilarity = labelCrossProd/(sqrt(labelNorm)*sqrt(antialiasedNorm));
-
-                if (abs(billboardSimilarity) > abs(labelSimilarity))
-                { 
-                    returnVal = billboardColor;
-                }
-                else
-                {
-                    returnVal = labelColor;
-                }
-                
-                return returnVal;
-            }
-
             // For label and billboard separation
-            float4 separateBillboardAndLabel(float4 nonBackgroundPixVal, bool label)
+            float4 separateBillboardLabelShadow(float4 nonBackgroundPixVal, int componentIdx)
             {
                 float4 finalPixVal = float4(0,0,0,0);
-                if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1) // is a billboard pixel
+                if (componentIdx == 0) // should be a label
                 {
-                    if (label == true) //Turn the billboard pixel into a background pixel if the input is a label (label = true)
+                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
+                    {
+                        finalPixVal = float4(1,1,1,1);
+                    }
+                }
+                else if (componentIdx == 1) //should be a billboard
+                {
+                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
                     {
                         finalPixVal = float4(0,0,0,0);
                     }
-                    else //Leave the pixel value as it is now
+                    else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 0 && nonBackgroundPixVal[3] == 1)
+                    { 
+                        finalPixVal = float4(0,0,1,1); // should fill in the shadow part
+                    }
+                    else if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
                     {
                         finalPixVal = float4(0,0,1,1);
                     }
                 }
-                else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1) // is a label pixel
+                else if (componentIdx == 2) // should be a shadow
                 {
-                    if (label == true) //Leave the pixel value as it is now
+                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 0 && nonBackgroundPixVal[3] == 1)
                     {
-                        finalPixVal = float4(1,1,1,1);
+                        finalPixVal = float4(1,0,0,1);
                     }
-                    else //Turn the label pixel into a background pixel if the input is a billboard (label = false)
-                    {
-                        finalPixVal = float4(0,0,0,0);
-                    }
-                }
-                else if (nonBackgroundPixVal[3] != 0) // anti-aliased
-                {
-                    finalPixVal = findCloserPixelVal(float4(0,0,1,1), float4(1,1,1,1), nonBackgroundPixVal);
-                    //finalPixVal = float4(1,0,0,1);
                 }
                 return finalPixVal;
             }
@@ -669,7 +517,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
-                labelTex = separateBillboardAndLabel(labelTex, true);
+                labelTex = separateBillboardLabelShadow(labelTex, 0);
                 float offset = 78;
 
                 float sample_x = (vdata.uv.x+1) * 100;
@@ -683,42 +531,12 @@ Shader "Unlit/InverseCullCubeMapShader"
                 int _neighborhoodSize= 5;
 
                 fixed4 billboardTex = texCUBE(_BillboardCubeMap, vdata.uv*rotationVec);
-                billboardTex = separateBillboardAndLabel(billboardTex, false);
+                billboardTex = separateBillboardLabelShadow(billboardTex, 1);
 
-                // Apply shadow if selected // needs to be debugged.
-                // if (_EnableShadow == 1) 
-                // {
-                //     float4 acc = float4(0, 0, 0, 0);
-                //     for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
-                //         float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
-                //         float x = vdata.uv.x;
-                //         float2 coords = float2(x, y);
-                //         coords = (coords - 0.5) / _ShadowScale + 0.5;
-                //         float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
-                //         float weight = gaussian1D(i, _ShadowSigma); 
-                //         float4 pix = texCUBE(_BlurredLabelTex, coordswithZ*rotationVec);
-                //         // if (pix[0] > 0 && pix[1] > 0 && pix[2] > 0)
-                //         // { 
-                //         acc += pix * weight; // gaussian blur applied along the y axis
-                //         // }
-                //         // else
-                //         // { 
-                //         //     continue;
-                //         // }
-                //     }
+                fixed4 shadowTex = texCUBE(_ShadowCubeMap, vdata.uv*rotationVec);
+                shadowTex = separateBillboardLabelShadow(shadowTex, 2);
 
-                //     // Render shadows only on parts that belong to the background (not label)
-                //     float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
-                //     if (labelTex[3] == 0) // is where the shadow should be
-                //     {   
-
-                //         // float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
-                //         // col = float4(0, 0,0,pix[3]);
-                //         // col = col - col*(pix * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
-                //         //col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
-
-                //     }
-                // }
+                
 
                 // //Label color and outline assignment
                 if (labelTex[3] != 0) // is a label pixel
@@ -793,7 +611,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
 
 
-                        float edges =  sqrt(hr * hr + vt * vt);
+                        float edges =  sqrt(hr * hr + vt * vt)*2;
                         // sobel(_LabelTex, vdata.uv);
 
                         if(edges != 0){ //Outline the edges
@@ -826,8 +644,43 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
                     }
                 }
-                
-                
+
+                // Apply shadow if selected // needs to be debugged.
+                if (_EnableShadow == 1) 
+                {
+                    if (shadowTex[3] == 1)
+                    {
+                        col = float4(0.5, 0.5, 0.5, 1);
+                    }
+                    // float4 acc = float4(0, 0, 0, 0);
+                    // for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
+                    //     float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
+                    //     float x = vdata.uv.x;
+                    //     float2 coords = float2(x, y);
+                    //     coords = (coords - 0.5) / _ShadowScale + 0.5;
+                    //     float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
+                    //     float weight = gaussian1D(i, _ShadowSigma); 
+                    //     float4 pix = texCUBE(_BlurredLabelTex, coordswithZ*rotationVec);
+                    //     // if (pix[0] > 0 && pix[1] > 0 && pix[2] > 0)
+                    //     // { 
+                    //     acc += pix * weight; // gaussian blur applied along the y axis
+                    //     // }
+                    //     // else
+                    //     // { 
+                    //     //     continue;
+                    //     // }
+                    // }
+
+                    // Render shadows only on parts that belong to the background (not label)
+                    // float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
+                    // if (shadowTex[3] == 1) // is where the shadow should be
+                    // {   
+                    //     //col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
+
+                    // }
+                }
+
+                // col = billboardTex;
 
                 return col;
             }

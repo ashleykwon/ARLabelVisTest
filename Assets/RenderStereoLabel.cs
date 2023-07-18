@@ -23,6 +23,11 @@ public class RenderStereoLabel : MonoBehaviour
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16); 
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
 
+        // To prevent antialiasing
+        renderTexture.autoGenerateMips = false;
+        renderTexture.useMipMap = false;
+        renderTexture.filterMode = FilterMode.Point;
+
 
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -48,11 +53,16 @@ public class RenderStereoLabel : MonoBehaviour
     // Update is called once per frame
     void LateUpdate() // This part causes the double-rendering
     {
-        // Take a screenshot (white label + black background) and render it to a cubemap
+        // Take a screenshot (white label + black background + blue billboard) and render it to billboard and label cubemaps (these two maps are initially simialr)
         ScreenshotCamera.targetTexture = renderTexture;
         RenderTexture.active = renderTexture;
         
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
+
+        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background 
+        backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture);
+        backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", renderTexture);
+
 
         RenderTexture.active = null;
     }
