@@ -17,7 +17,6 @@ public class RenderStereoLabel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         int cubemapSize = 1024; // this can change for a better resolution            
 
         // Define a cube-shaped render texture for the white label + black background (default where alpha = 0)

@@ -162,8 +162,8 @@ Shader "Unlit/SeparableShader"
              }
 
              fixed4 frag(v2f vdata) : SV_Target
-             {
-
+             {  
+                
                  float4 acc = float4(0, 0, 0, 0);
                  for (int i = _SampleKernelSize / 2; i >= -_SampleKernelSize / 2; i--) {
                          float x = vdata.uv.x + i * _MainTex_TexelSize.x;

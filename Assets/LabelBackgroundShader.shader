@@ -14,7 +14,7 @@ Shader "Unlit/LabelBackgroundShader"
         {
             Tags { "DisableBatching" = "True" }
 
-            Cull Front
+            Cull Off
 
             CGPROGRAM
             #pragma vertex vert
@@ -47,7 +47,7 @@ Shader "Unlit/LabelBackgroundShader"
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 col = float4(0, 0, 0, 0);
                 // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
+                //UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }
             ENDCG

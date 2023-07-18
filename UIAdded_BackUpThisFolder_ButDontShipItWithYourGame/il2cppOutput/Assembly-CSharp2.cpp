@@ -974,6 +974,7 @@ IL2CPP_EXTERN_C String_t* _stringLiteralD9691C4FD8A1F6B09DB1147CA32B442772FB46A1
 IL2CPP_EXTERN_C String_t* _stringLiteralDA39A3EE5E6B4B0D3255BFEF95601890AFD80709;
 IL2CPP_EXTERN_C String_t* _stringLiteralDC13B4C476B8FC76AE8130BB2A7AFFEB9B0A2035;
 IL2CPP_EXTERN_C String_t* _stringLiteralE166C9564FBDE461738077E3B1B506525EB6ACCC;
+IL2CPP_EXTERN_C String_t* _stringLiteralE24ED559728AD7A774EDA3CDBB59AF8641990AB4;
 IL2CPP_EXTERN_C String_t* _stringLiteralE25E8B811DFCCC95094985C9778CAB13E3B54DC2;
 IL2CPP_EXTERN_C String_t* _stringLiteralE755D2F00264DA21CC8DFE5A4AAB38D717216A63;
 IL2CPP_EXTERN_C String_t* _stringLiteralE95B20A3C0F0224ABEA60EBBCCE0DD745AF47376;
@@ -16292,6 +16293,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral6452CE8ECE279EB3C9F48F27945942EAE7203F01);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralB388A772ABA26A1B4466D3807EBEF088E8A65482);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralE24ED559728AD7A774EDA3CDBB59AF8641990AB4);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
@@ -16303,25 +16305,33 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		L_2 = Camera_get_targetTexture_mC856D7FF8351476068D04E245E4F08F5C56A55BD(L_1, NULL);
 		NullCheck(L_0);
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_0, _stringLiteral6452CE8ECE279EB3C9F48F27945942EAE7203F01, L_2, NULL);
-		// backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
+		// backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", LabelScreenshotCamera.targetTexture);
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_3 = __this->___backgroundAndLabelSphereMaterial_9;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___renderTexture_10;
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_4 = __this->___LabelScreenshotCamera_5;
+		NullCheck(L_4);
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_5;
+		L_5 = Camera_get_targetTexture_mC856D7FF8351476068D04E245E4F08F5C56A55BD(L_4, NULL);
 		NullCheck(L_3);
-		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_3, _stringLiteralB388A772ABA26A1B4466D3807EBEF088E8A65482, L_4, NULL);
-		// ScreenshotCamera.targetTexture = renderTexture;
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_5 = __this->___ScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_10;
-		NullCheck(L_5);
-		Camera_set_targetTexture_mE6C740F21A72DA47FB5B1D31D208710738A836C4(L_5, L_6, NULL);
-		// RenderTexture.active = renderTexture;
+		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_3, _stringLiteralE24ED559728AD7A774EDA3CDBB59AF8641990AB4, L_5, NULL);
+		// backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_6 = __this->___backgroundAndLabelSphereMaterial_9;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_7 = __this->___renderTexture_10;
-		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB(L_7, NULL);
-		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+		NullCheck(L_6);
+		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_6, _stringLiteralB388A772ABA26A1B4466D3807EBEF088E8A65482, L_7, NULL);
+		// ScreenshotCamera.targetTexture = renderTexture;
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_8 = __this->___ScreenshotCamera_4;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_9 = __this->___renderTexture_10;
 		NullCheck(L_8);
-		bool L_10;
-		L_10 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_8, L_9, ((int32_t)63), NULL);
+		Camera_set_targetTexture_mE6C740F21A72DA47FB5B1D31D208710738A836C4(L_8, L_9, NULL);
+		// RenderTexture.active = renderTexture;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_10 = __this->___renderTexture_10;
+		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB(L_10, NULL);
+		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_11 = __this->___ScreenshotCamera_4;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_12 = __this->___renderTexture_10;
+		NullCheck(L_11);
+		bool L_13;
+		L_13 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_11, L_12, ((int32_t)63), NULL);
 		// RenderTexture.active = null;
 		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB((RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27*)NULL, NULL);
 		// }

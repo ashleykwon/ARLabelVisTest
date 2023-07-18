@@ -9,12 +9,15 @@ public class MovePlayer : MonoBehaviour
     public float speed;
     public GameObject BackgroundAndLabelSphere;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
+    int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     Material labelSphereMaterial; // Doesn't need to be specified at Start
+
 
     // Start is called before the first frame update
     void Start()
     {
         CurrentColorAssignmentAlgo = 1;
+        CurrentBillboardColorAssignmentAlgo = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
     }
@@ -31,6 +34,9 @@ public class MovePlayer : MonoBehaviour
         player.position = new Vector3(player.position.x, 0, player.position.z);
 
         float triggerRight = OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger);
+        bool AButtonPressed =  OVRInput.Get(OVRInput.Button.One);
+        bool BButtonPressed =  OVRInput.Get(OVRInput.Button.Two);
+
 
         // Change color assignment algorithm on trigger
         if (triggerRight > 0.5f)
@@ -42,6 +48,40 @@ public class MovePlayer : MonoBehaviour
                 CurrentColorAssignmentAlgo = 1;
             }
             ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
+        }
+
+        if (AButtonPressed)
+        {
+            Debug.Log("A button pressed");
+            int currentInt = labelSphereMaterial.GetInt("_EnableOutline");
+            if (currentInt == 0)
+            {
+                labelSphereMaterial.SetInt("_EnableOutline", 1);
+            }
+            else if (currentInt == 1)
+            {
+                labelSphereMaterial.SetInt("_EnableOutline", 0);
+            }  
+        }
+
+        if (BButtonPressed)
+        {
+            Debug.Log("B button pressed");
+            // int currentInt = labelSphereMaterial.GetInt("_EnableShadow");
+            // if (currentInt == 0)
+            // {
+            //     labelSphereMaterial.SetInt("_EnableShadow", 1);
+            // }
+            // else if (currentInt == 1)
+            // {
+            //     labelSphereMaterial.SetInt("_EnableShadow", 0);
+            // }
+            CurrentBillboardColorAssignmentAlgo += 1;
+            if (CurrentBillboardColorAssignmentAlgo > 2)
+            {
+                CurrentBillboardColorAssignmentAlgo = 0;
+            }
+            labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
         }
     }
 

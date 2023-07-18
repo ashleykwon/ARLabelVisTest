@@ -4,12 +4,23 @@ Shader "Unlit/InverseCullCubeMapShader"
     {
         _CubeMap( "Cube Map (RGBA)", Cube ) = "white" {}
         _LabelCubeMap( "LabelCubeMap", Cube ) = "white" {}
+        _BillboardCubeMap("BillboardCubeMap", Cube) = "white" {}
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 15
         _ColorMethod("Color Method", Int) = 3
         _SampleSigma("Sample Blur Sigma", Range(0, 100)) = 50
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
         _UseInterpolation("UseInterpolation", Int) = 0
-        _EnableOutline("Enable Outline", Int) = 1
+
+        _EnableOutline("Enable Outline", Int) = 0
+
+        _EnableShadow("Enable Shadow", Int) = 0
+        _ShadowKernelSize("Shadow Blur Kernel Size", Range(0, 200)) = 28
+        _ShadowSigma("Shadow Blur Sigma", Range(0, 100)) = 80
+        _ShadowScale("Shadow Scale", Range(0.8, 1.05)) = 1.0
+        _ShadowMultiplier("Shadow Intensity", Range(0, 2)) = 0.1
+
+        _BillboardColorMethod("Billboard Color Method", Int) = 1
+        _BillboardLightnessContrastThreshold("Billboard lightness contrast threshold", Range(0,1)) = 0.5
     }
     SubShader
     {
@@ -20,10 +31,133 @@ Shader "Unlit/InverseCullCubeMapShader"
         Cull Off
         LOD 100
 
+        
+        // Pass
+        // {
+        // //    Tags { "RenderType" = "Opaque" }
+        // Tags {"Queue"="Transparent"}
+        //     // Cull Off
+        //     CGPROGRAM
+        //     #pragma vertex vert
+        //     #pragma fragment frag
+        //     // make fog work
+        //     #pragma multi_compile_fog
 
+        //     #include "UnityCG.cginc"
+
+
+            
+        //    struct v2f 
+        //     {
+        //         float4 pos : SV_Position;
+        //         half3 uv : TEXCOORD0;
+        //     };
+        
+        //     v2f vert( appdata_img v )
+        //     {
+
+        //         v2f o;
+        //         o.pos = UnityObjectToClipPos( v.vertex );
+        //         o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
+
+        //         return o;
+        //     }
+
+        //     samplerCUBE _CubeMap;
+        //     samplerCUBE _LabelCubeMap;
+        //     samplerCUBE _BillboardCubeMap;
+        //     float4 _MainTex_ST;
+        //     float4 _MainTex_TexelSize;
+
+        //     float4 _LabelTex_TexelSize;
+        //     float4 _LabelTex_ST;
+        //     float _ShadowKernelSize;
+        //     float _ShadowSigma;
+        //     float _ShadowScale;
+        //     float _Lamdba;
+        //     int _EnableShadow;
+        //     float _ShadowMultiplier;
+
+        //     int _BillboardColorMethod;
+        //     float _BillboardLightnessContrastThreshold;
+
+        //     // float gaussian1D(float x, float sigma) {
+        //     //     float pi = 3.14159265359;
+        //     //     return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+        //     // }
+        //      float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
+        //     {
+        //         float pi = 3.14159265359;
+        //         return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+        //         // return 1 / (sigma*sqrt(2 * pi)) * exp(-1*(x * x) / (2 * (sigma*sigma)));
+        //     }
+
+        //     float4 separateBillboardAndLabel(float4 nonBackgroundPixVal, bool label)
+        //     {
+        //         float4 finalPixVal = float4(0,0,0,0);
+        //         if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0) // is a billboard pixel
+        //         {
+        //             if (label == true) //Turn the billboard pixel into a background pixel if the input is a label (label = true)
+        //             {
+        //                 finalPixVal = float4(0,0,0,0);
+        //             }
+        //             else //Leave the pixel value as it is now
+        //             {
+        //                 finalPixVal = float4(0,0,1,1);
+        //             }
+        //         }
+        //         else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0) // is a label pixel
+        //         {
+        //             if (label == true) //Leave the pixel value as it is now
+        //             {
+        //                 finalPixVal = float4(1,1,1,1);
+        //             }
+        //             else //Turn the label pixel into a background pixel if the input is a billboard (label = false)
+        //             {
+        //                 finalPixVal = float4(0,0,0,0);
+        //             }
+        //         }
+        //         return finalPixVal;
+        //     }
+            
+        //     fixed4 frag(v2f vdata) : SV_Target
+        //     {  // Blur the label cube map 
+                
+        //         float3 rotationVec  = float3(-1.0,-1.0,-1.0);
+        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec);
+        //         labelTex = separateBillboardAndLabel(labelTex, true);
+        //         fixed4 backgroundPix = texCUBE(_CubeMap, vdata.uv);
+        //         float4 acc = float4(0, 0, 0, 0);
+        //         for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
+        //             float x = vdata.uv.x + i * _LabelTex_TexelSize.x;
+        //             float y = vdata.uv.y;
+        //             float2 coords = float2(x, y);
+        //             coords = (coords - 0.5) / _ShadowScale + 0.5;
+        //             float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z);
+        //             float weight = gaussian1D(i, _ShadowSigma); 
+        //             float4 pix = texCUBE(_LabelCubeMap, coordswithZ*rotationVec);
+        //             pix = separateBillboardAndLabel(pix, true);
+        //             acc += pix * weight;
+        //         }
+        //         // how do I make the rest of the background transparent???
+        //         if (acc[3] == 0) //not a part of the shadow
+        //         {
+        //             //col = backgroundPix;
+        //             acc = float4(0,0,0,0);
+        //         }
+        //         return acc; // Label shadow on a transparent background (only contains scene outside of the sphere)
+        //     }
+        //     ENDCG
+        // }
+    
+        // GrabPass { "_BlurredLabelTex" }
+
+    // Label color assignment + outline + billboard
         Pass 
         {
-            Tags { "DisableBatching" = "True" }
+            // Cull off
+            // Tags { "DisableBatching" = "True" }
+            Tags {"Queue"="Transparent"}
 
 
             CGPROGRAM
@@ -34,13 +168,29 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Initialize variables        
             samplerCUBE _CubeMap;
             samplerCUBE _LabelCubeMap;
+            // samplerCUBE _BlurredLabelTex;
+            samplerCUBE _BillboardCubeMap;
             float _SampleKernelSize;
             int _ColorMethod;
             float4 _MainTex_TexelSize;
             float _SampleSigma;
             float _SampleBoost;
             int _UseInterpolation;
+
+            // Outline-related variables
             int _EnableOutline;
+
+            // Shadow-related variables
+            int _EnableShadow;
+            static float _ShadowKernelSize;
+            float _ShadowSigma;
+            float _ShadowScale;
+            float _ShadowMultiplier;
+            float4 _BlurredLabelTex_TexelSize;
+
+            // Billboard-related variables
+            int _BillboardColorMethod;
+            float _BillboardLightnessContrastThreshold;
         
             struct v2f 
             {
@@ -282,11 +432,73 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return float4(var_R, var_G, var_B, LAB.a);
             }
 
+            float4 RGB2HSL(float4 rgb) // based on https://en.wikipedia.org/wiki/HSL_and_HSV
+            {
+                float4 HSL = float4(0,0,0,rgb.a);
+                float4 HSV = RGB2HSV(rgb);
+                HSL[0] = HSV[0];
+                HSL[2] = 1/2*min(min(rgb[0], rgb[1]), rgb[2]) + 1/2*max(max(rgb[0], rgb[1]), rgb[2]);
+                if (HSL[2] != 0 && HSL[2] != 1)
+                { 
+                    HSL[1] = (HSV[2] - HSL[2])/min(HSL[2], 1-HSL[2]);
+                } 
+                return HSL;
+            }
 
-            float gaussian1D(float x, float sigma) 
+            float4 HSL2RGB(float4 HSL)
+            {
+                float4 RGBintermediate = float4(0,0,0,HSL[3]);
+                float4 RGBfinal = float4(0,0,0,HSL[3]);
+
+                float chroma = (1 - abs(2*HSL[2]-1))*HSL[1];
+                float HPrime = HSL[0]/60;
+                float x = chroma*(1 - abs(HPrime%2 - 1));
+
+                if (HPrime >= 0 && HPrime < 1)
+                {
+                    RGBintermediate[0] = chroma;
+                    RGBintermediate[1] = x;
+                }
+                else if (HPrime >= 1 && HPrime < 2)
+                {
+                    RGBintermediate[0] = x;
+                    RGBintermediate[1] = chroma;
+                }
+                else if (HPrime >= 2 && HPrime < 3)
+                {
+                    RGBintermediate[1] = chroma;
+                    RGBintermediate[2] = x;
+                }
+                else if (HPrime >= 3 && HPrime < 4)
+                {
+                    RGBintermediate[1] = x;
+                    RGBintermediate[2] = chroma;
+                }
+                else if (HPrime >= 4 && HPrime > 5)
+                {
+                    RGBintermediate[0] = x;
+                    RGBintermediate[2] = chroma;
+                }
+                else if (HPrime >= 5 && HPrime > 6)
+                {
+                    RGBintermediate[0] = chroma;
+                    RGBintermediate[2] = x;
+                }
+
+                float m = HSL[2] - chroma/2;
+                RGBfinal[0] = RGBintermediate[0] + m;
+                RGBfinal[1] = RGBintermediate[1] + m;
+                RGBfinal[2] = RGBintermediate[2] + m;
+
+                return RGBfinal;
+            }
+
+
+            float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
             {
                 float pi = 3.14159265359;
                 return 1 / sqrt(2 * pi * sigma) * exp(-(x * x) / (2 * sigma));
+                // return 1 / (sigma*sqrt(2 * pi)) * exp(-1*(x * x) / (2 * (sigma*sigma)));
             }
 
             float4 function_f (int method, float4 bgSample){
@@ -376,13 +588,80 @@ Shader "Unlit/InverseCullCubeMapShader"
                     return col;
             }
 
+            // For interpolation
             float hash(float sample_x, float sample_y, float offset){
                 return (sample_x + sample_y + offset) * sample_x * (sample_y)  % 10;
-
             }
 
+            float findCloserPixelVal(float4 billboardColor, float4 labelColor, float4 antialiased) // from https://en.wikipedia.org/wiki/Cosine_similarity
+            {
+                float billboardCrossProd = 0;
+                float labelCrossProd = 0;
+                float4 returnVal = float4(0,0,0,1);
 
-            
+                float billboardNorm = 0;
+                float labelNorm = 0;
+                float antialiasedNorm = 0;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    billboardCrossProd += billboardColor[i]*antialiased[i];
+                    labelCrossProd += labelColor[i]*antialiased[i];
+
+                    billboardNorm += pow(billboardColor[i], 2);
+                    labelNorm += pow(labelColor[i], 2);
+                    antialiasedNorm += pow(antialiased[i], 2);
+                }
+
+                float billboardSimilarity = billboardCrossProd/(sqrt(billboardNorm)*sqrt(antialiasedNorm));
+                float labelSimilarity = labelCrossProd/(sqrt(labelNorm)*sqrt(antialiasedNorm));
+
+                if (abs(billboardSimilarity) > abs(labelSimilarity))
+                { 
+                    returnVal = billboardColor;
+                }
+                else
+                {
+                    returnVal = labelColor;
+                }
+                
+                return returnVal;
+            }
+
+            // For label and billboard separation
+            float4 separateBillboardAndLabel(float4 nonBackgroundPixVal, bool label)
+            {
+                float4 finalPixVal = float4(0,0,0,0);
+                if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1) // is a billboard pixel
+                {
+                    if (label == true) //Turn the billboard pixel into a background pixel if the input is a label (label = true)
+                    {
+                        finalPixVal = float4(0,0,0,0);
+                    }
+                    else //Leave the pixel value as it is now
+                    {
+                        finalPixVal = float4(0,0,1,1);
+                    }
+                }
+                else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1) // is a label pixel
+                {
+                    if (label == true) //Leave the pixel value as it is now
+                    {
+                        finalPixVal = float4(1,1,1,1);
+                    }
+                    else //Turn the label pixel into a background pixel if the input is a billboard (label = false)
+                    {
+                        finalPixVal = float4(0,0,0,0);
+                    }
+                }
+                else if (nonBackgroundPixVal[3] != 0) // anti-aliased
+                {
+                    finalPixVal = findCloserPixelVal(float4(0,0,1,1), float4(1,1,1,1), nonBackgroundPixVal);
+                    //finalPixVal = float4(1,0,0,1);
+                }
+                return finalPixVal;
+            }
+
 
             // Color assignment
             fixed4 frag( v2f vdata ) : SV_Target 
@@ -390,7 +669,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
-
+                labelTex = separateBillboardAndLabel(labelTex, true);
                 float offset = 78;
 
                 float sample_x = (vdata.uv.x+1) * 100;
@@ -400,10 +679,48 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
 
-                // _ColorMethod = 3;
                 float _sampled_prob = 0.2;
                 int _neighborhoodSize= 5;
 
+                fixed4 billboardTex = texCUBE(_BillboardCubeMap, vdata.uv*rotationVec);
+                billboardTex = separateBillboardAndLabel(billboardTex, false);
+
+                // Apply shadow if selected // needs to be debugged.
+                // if (_EnableShadow == 1) 
+                // {
+                //     float4 acc = float4(0, 0, 0, 0);
+                //     for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
+                //         float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
+                //         float x = vdata.uv.x;
+                //         float2 coords = float2(x, y);
+                //         coords = (coords - 0.5) / _ShadowScale + 0.5;
+                //         float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
+                //         float weight = gaussian1D(i, _ShadowSigma); 
+                //         float4 pix = texCUBE(_BlurredLabelTex, coordswithZ*rotationVec);
+                //         // if (pix[0] > 0 && pix[1] > 0 && pix[2] > 0)
+                //         // { 
+                //         acc += pix * weight; // gaussian blur applied along the y axis
+                //         // }
+                //         // else
+                //         // { 
+                //         //     continue;
+                //         // }
+                //     }
+
+                //     // Render shadows only on parts that belong to the background (not label)
+                //     float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
+                //     if (labelTex[3] == 0) // is where the shadow should be
+                //     {   
+
+                //         // float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
+                //         // col = float4(0, 0,0,pix[3]);
+                //         // col = col - col*(pix * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
+                //         //col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
+
+                //     }
+                // }
+
+                // //Label color and outline assignment
                 if (labelTex[3] != 0) // is a label pixel
                 {
                     //this is a sampled pixel
@@ -488,72 +805,34 @@ Shader "Unlit/InverseCullCubeMapShader"
                     }
                 }
 
+
+                // Render billboard if _BillboardColorMethod != 0
+                if (billboardTex[3] != 0)
+                {
+                    if (_BillboardColorMethod == 1)
+                    {
+                        col = float4(0,0,1,1);
+                    }
+                    else if (_BillboardColorMethod == 2) // the method from the paper by Grasset et al.
+                    {
+                        float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
+                        float4 backgroundSum = bgSample; // this should be the sum of all background pixels
+                        float4 billboardHSL = RGB2HSL(defaultBillboardColor);
+                        float4 backgroundHSL = RGB2HSL(backgroundSum);
+                        if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold)
+                        {
+                            billboardHSL[2] = 1 - backgroundHSL[2];
+                            col = HSL2RGB(billboardHSL);
+                        }
+                    }
+                }
+                
+                
+
                 return col;
             }
             ENDCG
         }
 
-        
-        // GrabPass { "_LastShaderTex" } // Cull Back by default in Oculus
-        // Pass 
-        // {
-        //     // LOD 100
-        //     // Cull Off// Edit this line
-        //     // Cull Front
-
-        //     CGPROGRAM
-        //     #pragma vertex vert alpha
-        //     #pragma fragment frag alpha
-        //     #include "UnityCG.cginc"
-
-        //     // Initialize variables        
-        //     samplerCUBE _CubeMap;
-        //     samplerCUBE _LabelCubeMap;
-        //     samplerCUBE _LastShaderTex;  
-        //     // sampler2D _LastShaderTex;  
-
-        //     float _SampleKernelSize;
-        //     int _ColorMethod;
-        //     float4 _MainTex_TexelSize;
-        //     float _SampleSigma;
-        //     float _SampleBoost;
-        
-        //     struct v2f 
-        //     {
-        //         float4 pos : SV_Position;
-        //         half3 uv : TEXCOORD0;
-        //     };
-        
-        //     v2f vert( appdata_img v )
-        //     {
-
-        //         v2f o;
-        //         o.pos = UnityObjectToClipPos( v.vertex );
-        //         o.uv = v.vertex.xyz; // mirror so cubemap projects as expected
-
-        //         return o;
-        //     }
-
-            
-
-        //     //Color assignment
-        //     fixed4 frag( v2f vdata ) : SV_Target 
-        //     {
-        //         fixed4 cubemap_sample = texCUBE(_CubeMap, vdata.uv);
-        //         fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv);
-        //         fixed4 last_shader = texCUBE(_LastShaderTex, vdata.uv);
-
-        //         // fixed4 col  = cubemap_sample; // Changed this to cubemap_sample, instead of last_shader
-        //         //If we change col  = cubemap_sample, it will just get what we have in the very beginning. 
-        //         //we need to use last_shader here, where we have assigned pixel colors.
-
-        //         fixed4 col  = last_shader; 
-
-        //         return col;
-        //     }
-
-        //     ENDCG
-        
-        // }
     }
 }
