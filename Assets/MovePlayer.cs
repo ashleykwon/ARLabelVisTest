@@ -33,17 +33,19 @@ public class MovePlayer : MonoBehaviour
         player.position += (transform.right * joystickAxis.x + transform.forward * joystickAxis.y) * Time.deltaTime * speed;
         player.position = new Vector3(player.position.x, 0, player.position.z);
 
-        bool AButtonPressed =  OVRInput.GetDown(OVRInput.Button.One);
-        bool BButtonPressed =  OVRInput.GetDown(OVRInput.Button.Two);
+        bool AButtonPressed = OVRInput.GetDown(OVRInput.RawButton.A);
+        bool BButtonPressed = OVRInput.GetDown(OVRInput.RawButton.B);
+        bool YButtonPressed = OVRInput.GetDown(OVRInput.RawButton.Y);
+        bool XButtonPressed = OVRInput.GetDown(OVRInput.RawButton.X);
 
-        float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
-        float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
+        // float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
+        // float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
 
 
 
-        if (triggerLeft > 0.3f) // Change color assignment algorithm on left trigger
+        if (XButtonPressed) // Change color assignment algorithm on left trigger
         {
-            Debug.Log("Left trigger pressed");
+            Debug.Log("X button pressed");
             CurrentColorAssignmentAlgo += 1;
             if (CurrentColorAssignmentAlgo > 4)
             {
@@ -52,9 +54,9 @@ public class MovePlayer : MonoBehaviour
             ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
         }
 
-        if (triggerRight > 0.3f) // Change billboard color assignment on right trigger 
+        if (YButtonPressed) // Change billboard color assignment on right trigger 
         {
-            Debug.Log("Right trigger pressed");
+            Debug.Log("Y button pressed");
             CurrentBillboardColorAssignmentAlgo += 1;
             if (CurrentBillboardColorAssignmentAlgo > 2)
             {
