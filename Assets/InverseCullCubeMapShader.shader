@@ -382,6 +382,20 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // return 1 / (sigma*sqrt(2 * pi)) * exp(-1*(x * x) / (2 * (sigma*sigma)));
             }
 
+            float4 local_pixel_sum(float neighborhoodSize, v2f vdata){
+                float4 sum = float4(0,0,0,0);
+                 for (int i = neighborhoodSize / 2; i >= -neighborhoodSize / 2; i--) {
+                        for(int j = neighborhoodSize / 2; j >= -neighborhoodSize / 2; j--){
+                            float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                            float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                            half3 coords = half3(x, y, vdata.uv.z);
+                            sum += texCUBE(_CubeMap, coords); 
+                            }
+                        }
+
+                return sum;
+            }
+
             float4 function_f (int method, float4 bgSample){
                 float4 col = float4(0,0,0,0);
                 if (_ColorMethod == 1)
@@ -635,6 +649,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                     {
                         float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
                         float4 backgroundSum = bgSample; // this should be the sum of all background pixels
+
+                        float neighborhoodSize = 10;
+                        float4 local_backgroundSum = local_pixel_sum(neighborhoodSize, vdata);
                         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
                         float4 backgroundHSL = RGB2HSL(backgroundSum);
                         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold)
