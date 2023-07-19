@@ -33,8 +33,8 @@ public class MovePlayer : MonoBehaviour
         player.position += (transform.right * joystickAxis.x + transform.forward * joystickAxis.y) * Time.deltaTime * speed;
         player.position = new Vector3(player.position.x, 0, player.position.z);
 
-        bool AButtonPressed =  OVRInput.Get(OVRInput.Button.One);
-        bool BButtonPressed =  OVRInput.Get(OVRInput.Button.Two);
+        bool AButtonPressed =  OVRInput.GetDown(OVRInput.Button.One);
+        bool BButtonPressed =  OVRInput.GetDown(OVRInput.Button.Two);
 
         float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);

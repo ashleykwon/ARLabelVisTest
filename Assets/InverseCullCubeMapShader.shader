@@ -668,7 +668,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 {
                     if (shadowTex[3] == 1)
                     {
-                        col = float4(0.3, 0.3, 0.3, 0.5);
+                        col = float4(0.1, 0.1, 0.1, 0.8);
                     }
                     // float4 acc = float4(0, 0, 0, 0);
                     // for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
