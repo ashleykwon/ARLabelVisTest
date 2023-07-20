@@ -59,7 +59,7 @@ public class RenderStereoLabel : MonoBehaviour
         
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
 
-        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background 
+        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
         backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture);
         backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", renderTexture);
 

@@ -33,15 +33,19 @@ public class MovePlayer : MonoBehaviour
         player.position += (transform.right * joystickAxis.x + transform.forward * joystickAxis.y) * Time.deltaTime * speed;
         player.position = new Vector3(player.position.x, 0, player.position.z);
 
-        float triggerRight = OVRInput.Get(OVRInput.RawAxis1D.RIndexTrigger);
-        bool AButtonPressed =  OVRInput.Get(OVRInput.Button.One);
-        bool BButtonPressed =  OVRInput.Get(OVRInput.Button.Two);
+        bool AButtonPressed = OVRInput.GetDown(OVRInput.RawButton.A);
+        bool BButtonPressed = OVRInput.GetDown(OVRInput.RawButton.B);
+        bool YButtonPressed = OVRInput.GetDown(OVRInput.RawButton.Y);
+        bool XButtonPressed = OVRInput.GetDown(OVRInput.RawButton.X);
+
+        // float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
+        // float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
 
 
-        // Change color assignment algorithm on trigger
-        if (triggerRight > 0.5f)
+
+        if (XButtonPressed) // Change color assignment algorithm on left trigger
         {
-            Debug.Log("Right joystick triggered");
+            Debug.Log("X button pressed");
             CurrentColorAssignmentAlgo += 1;
             if (CurrentColorAssignmentAlgo > 4)
             {
@@ -50,7 +54,18 @@ public class MovePlayer : MonoBehaviour
             ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
         }
 
-        if (AButtonPressed)
+        if (YButtonPressed) // Change billboard color assignment on right trigger 
+        {
+            Debug.Log("Y button pressed");
+            CurrentBillboardColorAssignmentAlgo += 1;
+            if (CurrentBillboardColorAssignmentAlgo > 2)
+            {
+                CurrentBillboardColorAssignmentAlgo = 0;
+            }
+            labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
+        }
+
+        if (AButtonPressed) // Toggle outline
         {
             Debug.Log("A button pressed");
             int currentInt = labelSphereMaterial.GetInt("_EnableOutline");
@@ -64,24 +79,18 @@ public class MovePlayer : MonoBehaviour
             }  
         }
 
-        if (BButtonPressed)
+        if (BButtonPressed) // Toggle shadow
         {
             Debug.Log("B button pressed");
-            // int currentInt = labelSphereMaterial.GetInt("_EnableShadow");
-            // if (currentInt == 0)
-            // {
-            //     labelSphereMaterial.SetInt("_EnableShadow", 1);
-            // }
-            // else if (currentInt == 1)
-            // {
-            //     labelSphereMaterial.SetInt("_EnableShadow", 0);
-            // }
-            CurrentBillboardColorAssignmentAlgo += 1;
-            if (CurrentBillboardColorAssignmentAlgo > 2)
+            int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
+            if (shadowEnabled == 0)
             {
-                CurrentBillboardColorAssignmentAlgo = 0;
+                labelSphereMaterial.SetInt("_EnableShadow", 1);
             }
-            labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
+            else
+            {
+                labelSphereMaterial.SetInt("_EnableShadow", 0);
+            }            
         }
     }
 

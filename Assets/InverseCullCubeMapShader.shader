@@ -505,7 +505,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     {
                         finalPixVal = float4(0,0,0,0);
                     }
-                    else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 0 && nonBackgroundPixVal[3] == 1)
+                    else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0)
                     { 
                         finalPixVal = float4(0,0,1,1); // should fill in the shadow part
                     }
@@ -516,9 +516,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                 }
                 else if (componentIdx == 2) // should be a shadow
                 {
-                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 0 && nonBackgroundPixVal[3] == 1)
+                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
                     {
-                        finalPixVal = float4(1,0,0,1);
+                        finalPixVal = float4(1,0,1,1);
                     }
                 }
                 return finalPixVal;
@@ -625,7 +625,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
 
 
-                        float edges =  sqrt(hr * hr + vt * vt)*2;
+                        float edges =  sqrt(hr * hr + vt * vt);
                         // sobel(_LabelTex, vdata.uv);
 
                         if(edges != 0){ //Outline the edges
@@ -641,20 +641,21 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // Render billboard if _BillboardColorMethod != 0
                 if (billboardTex[3] != 0)
                 {
-                    if (_BillboardColorMethod == 1)
+                    if (_BillboardColorMethod == 1) // blue billboard
                     {
                         col = float4(0,0,1,1);
                     }
-                    else if (_BillboardColorMethod == 2) // the method from the paper by Grasset et al.
+                    else if (_BillboardColorMethod == 2) // referenced from the paper by Grasset et al.
                     {
                         float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
-                        float4 backgroundSum = bgSample; // this should be the sum of all background pixels
-
-                        float neighborhoodSize = 10;
+                        
+                        float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10
                         float4 local_backgroundSum = local_pixel_sum(neighborhoodSize, vdata);
+                        float4 local_backgroundAvg = local_backgroundSum/pow(neighborhoodSize, 2);
+
                         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
-                        float4 backgroundHSL = RGB2HSL(backgroundSum);
-                        if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold)
+                        float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
+                        if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
                         {
                             billboardHSL[2] = 1 - backgroundHSL[2];
                             col = HSL2RGB(billboardHSL);
@@ -667,7 +668,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 {
                     if (shadowTex[3] == 1)
                     {
-                        col = float4(0.5, 0.5, 0.5, 1);
+                        col = float4(0.1, 0.1, 0.1, 0.8);
                     }
                     // float4 acc = float4(0, 0, 0, 0);
                     // for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
