@@ -12,7 +12,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         _SampleBoost("Sample Brightness Multiplier", Range(0, 5)) = 1.0
         _UseInterpolation("UseInterpolation", Int) = 0
 
-        _EnableOutline("Enable Outline", Int) = 0
+        _EnableOutline("Enable Outline", Int) = 1
 
         _EnableShadow("Enable Shadow", Int) = 0
         _ShadowKernelSize("Shadow Blur Kernel Size", Range(0, 200)) = 28
@@ -603,7 +603,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     if (_EnableOutline == 1)
                     {
                         // Applying sobel filter
-                        float2 delta = float2(0.0015, 0.0015);
+                        float2 delta = float2(0.0075, 0.0015);
                         
                         float4 hr = float4(0, 0, 0, 0);
                         float4 vt = float4(0, 0, 0, 0);
@@ -631,8 +631,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                         if(edges != 0){ //Outline the edges
                             if (col.r + col.g + col.b < 0.5){
                                 col = float4(1, 1, 1, 1); // White outline if low grayscale value
-                            } 
+                            }else{
                             col = float4(0, 0, 0, 1); // black outline if high grayscale value
+                            } 
                         }
                     }
                 }
