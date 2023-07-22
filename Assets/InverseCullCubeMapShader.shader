@@ -604,6 +604,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     {
                         // Applying sobel filter
                         float2 delta = float2(0.0075, 0.0015);
+                        float delta_z = 0.0015;
                         
                         float4 hr = float4(0, 0, 0, 0);
                         float4 vt = float4(0, 0, 0, 0);
@@ -617,7 +618,14 @@ Shader "Unlit/InverseCullCubeMapShader"
                         for (int i = -1; i <= 1; i++){
                             for (int j = -1; j <= 1; j++){
                                 float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
-                                float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
+                                float zCoords = vdata.uv.z;
+                                if (i != 0){
+                                    zCoords -= delta_z;
+                                }
+                                if (j != 0){
+                                    zCoords -= delta_z;
+                                }
+                                float3 coords = float3(xyCoords.x, xyCoords.y, zCoords);
 
                                 hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
                                 vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
