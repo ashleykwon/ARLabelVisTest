@@ -22,6 +22,11 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _BillboardColorMethod("Billboard Color Method", Int) = 1
         _BillboardLightnessContrastThreshold("Billboard lightness contrast threshold", Range(0,1)) = 0.5
+        
+        _LabelRotationMatrixRow1("Label Rotation Matrix", Vector) = (0,0,0,0)
+        _LabelRotationMatrixRow2("Label Rotation Matrix", Vector) = (0,0,0,0)
+        _LabelRotationMatrixRow3("Label Rotation Matrix", Vector) = (0,0,0,0)
+        _LabelRotationMatrixRow4("Label Rotation Matrix", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -68,10 +73,18 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _ShadowScale;
             float _ShadowMultiplier;
             float4 _BlurredLabelTex_TexelSize;
+            float4 _LabelTex_TexelSize;
 
             // Billboard-related variables
             int _BillboardColorMethod;
             float _BillboardLightnessContrastThreshold;
+
+            // rotation matrix
+            float4x4 _LabelRotationMatrix;
+            float4 _LabelRotationMatrixRow1;
+            float4 _LabelRotationMatrixRow2;
+            float4 _LabelRotationMatrixRow3;
+            float4 _LabelRotationMatrixRow4;
         
             struct v2f 
             {
@@ -81,7 +94,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         
             v2f vert( appdata_img v )
             {
-
+                
                 v2f o;
                 o.pos = UnityObjectToClipPos( v.vertex );
                 o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
@@ -528,6 +541,8 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Color assignment
             fixed4 frag( v2f vdata ) : SV_Target 
             {
+                _LabelRotationMatrix = float4x4(_LabelRotationMatrixRow1, _LabelRotationMatrixRow2,_LabelRotationMatrixRow3, _LabelRotationMatrixRow4);
+
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
@@ -547,7 +562,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 billboardTex = texCUBE(_BillboardCubeMap, vdata.uv*rotationVec);
                 billboardTex = separateBillboardLabelShadow(billboardTex, 1);
 
-                fixed4 shadowTex = texCUBE(_ShadowCubeMap, vdata.uv*rotationVec);
+                fixed4 shadowTex = texCUBE(_ShadowCubeMap,vdata.uv*rotationVec);
                 shadowTex = separateBillboardLabelShadow(shadowTex, 2);
 
                 
@@ -604,7 +619,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     {
                         // Applying sobel filter
                         float2 delta = float2(0.0075, 0.0015);
-                        float delta_z = 0.0015;
+                        // float2 delta = float2(1,1);
                         
                         float4 hr = float4(0, 0, 0, 0);
                         float4 vt = float4(0, 0, 0, 0);
@@ -618,17 +633,20 @@ Shader "Unlit/InverseCullCubeMapShader"
                         for (int i = -1; i <= 1; i++){
                             for (int j = -1; j <= 1; j++){
                                 float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
-                                float zCoords = vdata.uv.z;
-                                if (i != 0){
-                                    zCoords -= delta_z;
+                                float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
+                                float4 pix = texCUBE(_LabelCubeMap, coords*rotationVec);
+                                if (pix[0] == 1 && pix[1] == 1 && pix[2] == 1 && pix[3] == 1) // is a label pixel
+                                {
+                                    hr += pix *  filter[i + 1][j + 1];
+                                    vt += pix *  filter[j + 1][i + 1];
                                 }
-                                if (j != 0){
-                                    zCoords -= delta_z;
+                                else
+                                {
+                                    hr += float4(0,0,0,0)*  filter[i + 1][j + 1];
+                                    vt += float4(0,0,0,0)*  filter[j + 1][i + 1];
                                 }
-                                float3 coords = float3(xyCoords.x, xyCoords.y, zCoords);
-
-                                hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
-                                vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
+                                // hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
+                                // vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
                             }
                         }
 
@@ -636,6 +654,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         float edges =  sqrt(hr * hr + vt * vt);
                         // sobel(_LabelTex, vdata.uv);
 
+                        
                         if(edges != 0){ //Outline the edges
                             if (col.r + col.g + col.b < 0.5){
                                 col = float4(1, 1, 1, 1); // White outline if low grayscale value
@@ -678,33 +697,21 @@ Shader "Unlit/InverseCullCubeMapShader"
                     if (shadowTex[3] == 1)
                     {
                         col = float4(0.1, 0.1, 0.1, 0.8);
+                        float4 acc = float4(0, 0, 0, 0);
+                        for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) 
+                        {
+                            float y = vdata.uv.y + i * _LabelTex_TexelSize.y;
+                            float x = vdata.uv.x;
+                            float2 coords = float2(x, y);
+                            coords = (coords - 0.5) / _ShadowScale + 0.5;
+                            float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
+                            float weight = gaussian1D(i, _ShadowSigma); 
+                            acc += shadowTex * weight; // gaussian blur applied along the y axis
+                        }
+                        
+                        col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
                     }
-                    // float4 acc = float4(0, 0, 0, 0);
-                    // for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) {
-                    //     float y = vdata.uv.y + i * _BlurredLabelTex_TexelSize.y;
-                    //     float x = vdata.uv.x;
-                    //     float2 coords = float2(x, y);
-                    //     coords = (coords - 0.5) / _ShadowScale + 0.5;
-                    //     float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
-                    //     float weight = gaussian1D(i, _ShadowSigma); 
-                    //     float4 pix = texCUBE(_BlurredLabelTex, coordswithZ*rotationVec);
-                    //     // if (pix[0] > 0 && pix[1] > 0 && pix[2] > 0)
-                    //     // { 
-                    //     acc += pix * weight; // gaussian blur applied along the y axis
-                    //     // }
-                    //     // else
-                    //     // { 
-                    //     //     continue;
-                    //     // }
-                    // }
-
-                    // Render shadows only on parts that belong to the background (not label)
-                    // float4 pix = texCUBE(_BlurredLabelTex, vdata.uv);
-                    // if (shadowTex[3] == 1) // is where the shadow should be
-                    // {   
-                    //     //col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
-
-                    // }
+                    
                 }
 
                 // col = billboardTex;

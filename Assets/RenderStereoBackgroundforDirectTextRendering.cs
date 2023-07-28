@@ -18,7 +18,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int cubemapSize = 1024; // this can change for a better resolution
+        int cubemapSize = 2048; // this can change for a better resolution
         
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
      
@@ -30,8 +30,6 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         renderTexture.autoGenerateMips = false;
         renderTexture.useMipMap = false;
         renderTexture.filterMode = FilterMode.Point;
-
-
 
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -56,7 +54,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     {     
         // Take a screenshot and render it to a cubemap
        
-        LabelScreenshotCamera.targetTexture = renderTexture2;
+        // LabelScreenshotCamera.targetTexture = renderTexture2;
         // backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture2); // Extract render texture directly from UICamera, which renders the white label and the black background 
         // backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture2);
         // Set the background texture in the shader attached to backgroundAndLabelSphereMaterial

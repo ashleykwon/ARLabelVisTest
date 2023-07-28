@@ -9,7 +9,7 @@ public class sum_all : MonoBehaviour
     int[] analysisResult;
     int r_sum;
 
-    public Texture2D inputTexture;   
+    //public Texture2D inputTexture;   
 
 
     // Start is called before the first frame update

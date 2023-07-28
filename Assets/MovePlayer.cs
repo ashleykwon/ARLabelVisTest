@@ -10,6 +10,7 @@ public class MovePlayer : MonoBehaviour
     public GameObject BackgroundAndLabelSphere;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
+    int shadowIntensityIdx;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
 
 
@@ -18,9 +19,10 @@ public class MovePlayer : MonoBehaviour
     {
         CurrentColorAssignmentAlgo = 1;
         CurrentBillboardColorAssignmentAlgo = 0;
+        shadowIntensityIdx = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
-
     }
+
 
     // Update is called once per frame
     void Update()
@@ -83,14 +85,33 @@ public class MovePlayer : MonoBehaviour
         {
             Debug.Log("B button pressed");
             int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
+            
+            // if (shadowEnabled == 0)
+            // {
+            //     labelSphereMaterial.SetInt("_EnableShadow", 1);
+            // }
+            // else
+            // {
+            //     labelSphereMaterial.SetInt("_EnableShadow", 0);
+            // }       
             if (shadowEnabled == 0)
             {
                 labelSphereMaterial.SetInt("_EnableShadow", 1);
             }
-            else
+            if (shadowEnabled == 1)
             {
-                labelSphereMaterial.SetInt("_EnableShadow", 0);
-            }            
+                shadowIntensityIdx += 1;
+                if (shadowIntensityIdx == 4)
+                {
+                    labelSphereMaterial.SetInt("_EnableShadow", 0);
+                    shadowIntensityIdx = 0; 
+                }
+                else 
+                {
+                    labelSphereMaterial.SetFloat("_ShadowMultiplier", shadowIntensityIdx*0.5f);
+                }
+                
+            }     
         }
     }
 

@@ -79,7 +79,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _BillboardColorMethod: 0
-    - _BillboardLightnessContrastThreshold: 0.5
+    - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
     - _ColorMethod: 3
     - _Cutoff: 0.5
@@ -90,6 +90,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _LabelRotationMatrix: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -97,8 +98,8 @@ Material:
     - _SampleBoost: 0
     - _SampleKernelSize: 87.3
     - _SampleSigma: 0
-    - _ShadowKernelSize: 31
-    - _ShadowMultiplier: 0.9
+    - _ShadowKernelSize: 64
+    - _ShadowMultiplier: 0
     - _ShadowScale: 0.971
     - _ShadowSigma: 0.2
     - _SmoothnessTextureChannel: 0
@@ -110,4 +111,8 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LabelRotationMatrixRow1: {r: 0.000000059604645, g: 0.00000008742278, b: 0.99999994, a: 0}
+    - _LabelRotationMatrixRow2: {r: 0, g: -0.9999999, b: 0.00000008742278, a: 0}
+    - _LabelRotationMatrixRow3: {r: 0.99999994, g: 0, b: 0.000000059604645, a: 0}
+    - _LabelRotationMatrixRow4: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
