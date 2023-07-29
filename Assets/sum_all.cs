@@ -25,7 +25,7 @@ public class sum_all : MonoBehaviour
     }
 
     void get_sum(){
-        r_sum = cShader.FindKernel("CSr_sum");
+        r_sum = cShader.FindKernel("CSMain");
         cBuffer = new ComputeBuffer(1, sizeof(int));
 
         cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
