@@ -13,11 +13,16 @@ public class RenderStereoBackground : MonoBehaviour
     public Material labelSphereMaterial;
     RenderTexture renderTexture;
 
-  
+    
+    public ComputeShader cShader;
+    public Shader surface_shader;
+    ComputeBuffer cBuffer;
+    int r_sum;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        
         int cubemapSize = 1024; // this can change for a better resolution
         
         labelSphere.GetComponent<MeshRenderer>().sharedMaterial.SetTexture("_LabelCubeMap", cubemapLabel);
@@ -30,6 +35,12 @@ public class RenderStereoBackground : MonoBehaviour
        
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
+
+        //sum_all
+        Material material = new Material(surface_shader);
+        get_sum();
+        material.SetBuffer ("sum_all_results", cBuffer);
+
     }
 
     void Update()
@@ -43,6 +54,8 @@ public class RenderStereoBackground : MonoBehaviour
         float newXAngle = player.transform.eulerAngles.x;
         float newYAngle = player.transform.eulerAngles.y;
         labelSphere.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+
+        get_sum();
     }
 
     // Update is called once per frame
@@ -57,4 +70,18 @@ public class RenderStereoBackground : MonoBehaviour
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
         RenderTexture.active = null;
     }
+
+    //bind to compute shader
+    void get_sum(){
+    r_sum = cShader.FindKernel("CSMain");
+    cBuffer = new ComputeBuffer(1, sizeof(int));
+
+    cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
+    cShader.Dispatch(r_sum, 16, 16, 1);
+
+    cBuffer.Release();
+    cBuffer = null;
+
+    }
+
 }

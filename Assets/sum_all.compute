@@ -1,21 +1,18 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
-Texture2D<float4> InputImage;
-RWStructuredBuffer<int> ResultBuffer;
+RWStructuredBuffer<float> ResultBuffer;
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
 
-    // Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
     uint4 col = InputImage[id.xy];
 
-    InterlockedAdd(ResultBuffer[0], col.r * 255);
-    InterlockedAdd(ResultBuffer[1], col.g * 25);
-    InterlockedAdd(ResultBuffer[2], col.b * 25);
+    InterlockedAdd(ResultBuffer[0], col.r);
+    InterlockedAdd(ResultBuffer[1], col.g);
+    InterlockedAdd(ResultBuffer[2], col.b);
+
 
 }
