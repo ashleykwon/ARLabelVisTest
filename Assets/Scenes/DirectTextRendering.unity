@@ -355,6 +355,8 @@ MonoBehaviour:
   player: {fileID: 1308607590}
   backgroundAndLabelSphereMaterial: {fileID: 0}
   labelSphereMaterial: {fileID: 0}
+  cShader: {fileID: 7200000, guid: 33f0ac48211d147118473dfdcadd8081, type: 3}
+  surface_shader: {fileID: 4800000, guid: 9f08025f583fb4a4f84a5f62c1057a81, type: 3}
 --- !u!1 &321853016
 GameObject:
   m_ObjectHideFlags: 0
