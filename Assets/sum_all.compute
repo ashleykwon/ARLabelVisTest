@@ -13,6 +13,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     InterlockedAdd(ResultBuffer[0], col.r);
     InterlockedAdd(ResultBuffer[1], col.g);
     InterlockedAdd(ResultBuffer[2], col.b);
+    InterlockedAdd(ResultBuffer[3], 1);
 
 
 }
