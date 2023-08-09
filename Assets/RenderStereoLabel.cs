@@ -48,6 +48,8 @@ public class RenderStereoLabel : MonoBehaviour
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
 
+        ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+
                 //sum_all
         Material material = new Material(surface_shader);
         get_sum();
@@ -61,22 +63,7 @@ public class RenderStereoLabel : MonoBehaviour
     {
         // Only render elements on the UI layer (black sphere + white label + magenta shadow + blue billboard)
         ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
-        // ScreenshotCamera.targetTexture = renderTexture;
-        // RenderTexture.active = renderTexture;
-
-        // // Vector3 currentAngle = player.transform.eulerAngles;// shouldn't I be updating the currentAngle based on the deviation from the starting position?
-        // // Quaternion adjustedAngle = Quaternion.Euler(initialRotation[0]+currentAngle[0], initialRotation[1]+currentAngle[1], initialRotation[2]+currentAngle[2]);
-        // // m = Matrix4x4.TRS(Vector3.zero, initialRotation, new Vector3(1,1,1) );
-        // Graphics.Blit(ScreenshotCamera.targetTexture, renderTexture);
-
-        // // backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
-        // // backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture);
-        // // backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", renderTexture);
-
-
-        // RenderTexture.active = null;
-        //Graphics.Blit(ScreenshotCamera.targetTexture, renderTexture);
-
+       
     //     // Move and rotate the sphere with the player
     //     //backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
 
