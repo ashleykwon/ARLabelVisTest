@@ -106,6 +106,7 @@ public class RenderStereoLabel : MonoBehaviour
     r_sum = cShader.FindKernel("CSMain");
     cBuffer = new ComputeBuffer(1, sizeof(int));
 
+    cShader.SetTexture(r_sum, "InputImage", renderTexture);
     cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
     cShader.Dispatch(r_sum, 16, 16, 1);
 
