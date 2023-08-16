@@ -15,10 +15,10 @@ public class RenderStereoLabel : MonoBehaviour
     Quaternion initialRotation;
     Matrix4x4 m;
 
-    public ComputeShader cShader;
-    public Shader surface_shader;
-    ComputeBuffer cBuffer;
-    int r_sum;
+    // public ComputeShader cShader;
+    // public Shader surface_shader;
+    // ComputeBuffer cBuffer;
+    // int r_sum;
 
   
     // Start is called before the first frame update
@@ -51,9 +51,9 @@ public class RenderStereoLabel : MonoBehaviour
         ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 
                 //sum_all
-        Material material = new Material(surface_shader);
-        get_sum();
-        material.SetBuffer ("sum_all_results", cBuffer);
+        // Material material = new Material(surface_shader);
+        // get_sum();
+        // material.SetBuffer ("sum_all_results", cBuffer);
 
 
 
@@ -98,21 +98,21 @@ public class RenderStereoLabel : MonoBehaviour
 
         RenderTexture.active = null;
 
-        get_sum();
+        // get_sum();
     }
 
     //bind to compute shader
-    void get_sum(){
-    r_sum = cShader.FindKernel("CSMain");
-    cBuffer = new ComputeBuffer(1, sizeof(int));
+    // void get_sum(){
+    // r_sum = cShader.FindKernel("CSMain");
+    // cBuffer = new ComputeBuffer(1, sizeof(int));
 
-    cShader.SetTexture(r_sum, "InputImage", renderTexture);
-    cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
-    cShader.Dispatch(r_sum, 16, 16, 1);
+    // cShader.SetTexture(r_sum, "InputImage", renderTexture);
+    // cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
+    // cShader.Dispatch(r_sum, 16, 16, 1);
 
-    cBuffer.Release();
-    cBuffer = null;
+    // cBuffer.Release();
+    // cBuffer = null;
 
-    }
+    // }
 
 }

@@ -87,7 +87,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             float4 _LabelRotationMatrixRow4;
 
             //sum_all result
-            StructuredBuffer<float> sum_all_results;
+            //StructuredBuffer<float> sum_all_results;
             //<usage> : sum_red = sum_all_results[0]; sum_green = sum_all_results[1]; sum_blue = sum_all_results[2]; num_pixels = sum_all_results[3]
             
             struct v2f 
@@ -685,8 +685,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                         // float4 local_backgroundSum = local_pixel_sum(neighborhoodSize, vdata);
                         // float4 local_backgroundAvg = local_backgroundSum/pow(neighborhoodSize, 2);
 
-                        float4 local_backgroundAvg = float4(sum_all_results[0]/sum_all_results[3], sum_all_results[1]/sum_all_results[3], sum_all_results[2]/sum_all_results[3], 1);
+                        //float4 local_backgroundAvg = float4(sum_all_results[0]/sum_all_results[3], sum_all_results[1]/sum_all_results[3], sum_all_results[2]/sum_all_results[3], 1);
                         // local_backgroundAvg /= 255;
+                        float4 local_backgroundAvg = float4(0,0,0,0);
                         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
                         float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
                         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
