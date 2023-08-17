@@ -15,8 +15,10 @@ public class RenderStereoLabel : MonoBehaviour
     Quaternion initialRotation;
     Matrix4x4 m;
 
+    private ComputeBuffer rotation_matrix_buffer;
+
     // public ComputeShader cShader;
-    // public Shader surface_shader;
+    public Shader surface_shader;
     // ComputeBuffer cBuffer;
     // int r_sum;
 
@@ -45,12 +47,24 @@ public class RenderStereoLabel : MonoBehaviour
         // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow3", m.GetRow(2));
         // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow4", m.GetRow(3));
 
+        //rotation_matrix
+
+        //this is a 16 float array
+        // float [] rotation_matrix_array = ?
+
+        Material material = new Material(surface_shader);
+        int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(float));
+        rotation_matrix_buffer = new ComputeBuffer(16, stride, ComputeBufferType.Default);
+        // rotation_matrix_buffer.SetData(rotation_matrix_array);
+        // material.SetBuffer("rotation_matrix", rotation_matrix_buffer);
+
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
 
         ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 
-                //sum_all
+
+        //sum_all
         // Material material = new Material(surface_shader);
         // get_sum();
         // material.SetBuffer ("sum_all_results", cBuffer);

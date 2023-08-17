@@ -86,6 +86,9 @@ Shader "Unlit/InverseCullCubeMapShader"
             float4 _LabelRotationMatrixRow3;
             float4 _LabelRotationMatrixRow4;
 
+            //rotation matrix - a buffer with 16 floats
+            StructuredBuffer<float> rotation_matrix;
+            
             //sum_all result
             //StructuredBuffer<float> sum_all_results;
             //<usage> : sum_red = sum_all_results[0]; sum_green = sum_all_results[1]; sum_blue = sum_all_results[2]; num_pixels = sum_all_results[3]
