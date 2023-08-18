@@ -1,14 +1,34 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel CSInit
 
-StructuredBuffer<float> _SumBuffer;
+RWStructuredBuffer<int> _SumBuffer;
+Texture2D<float4> InputImage;
+
+
+[numthreads(1,1,1)]
+void CSInit (uint3 id : SV_DispatchThreadID)
+{
+    _SumBuffer[0] = 0;
+    _SumBuffer[1] = 0;
+    _SumBuffer[2] = 0;
+    _SumBuffer[3] = 0;
+
+    return;
+
+}
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
+    uint4 col = InputImage[id.xy];
 
-    // InterlockedAdd(_SumBuffer, 1.0);
+    InterlockedAdd(_SumBuffer[0], 1);
+    InterlockedAdd(_SumBuffer[1],col.r * 255);
+    InterlockedAdd(_SumBuffer[2],col.g * 255);
+    InterlockedAdd(_SumBuffer[3],col.b * 255);
+
     return;
 
 }

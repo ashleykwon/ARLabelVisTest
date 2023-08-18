@@ -22893,8 +22893,10 @@ struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public Mon
 	ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* ___cShader_15;
 	// UnityEngine.ComputeBuffer RenderStereoLabel::sumBuffer
 	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___sumBuffer_16;
-	// System.Int32 RenderStereoLabel::kernelID
-	int32_t ___kernelID_17;
+	// System.Int32 RenderStereoLabel::kernelID_main
+	int32_t ___kernelID_main_17;
+	// System.Int32 RenderStereoLabel::kernelID_init
+	int32_t ___kernelID_init_18;
 };
 
 // RequestCaptureFlow

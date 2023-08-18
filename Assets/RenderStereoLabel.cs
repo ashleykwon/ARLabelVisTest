@@ -20,7 +20,8 @@ public class RenderStereoLabel : MonoBehaviour
 
     public ComputeShader cShader;
     private ComputeBuffer sumBuffer;
-    private int kernelID;
+    private int kernelID_main;
+    private int kernelID_init;
 
   
     // Start is called before the first frame update
@@ -48,10 +49,8 @@ public class RenderStereoLabel : MonoBehaviour
         // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow4", m.GetRow(3));
 
         //rotation_matrix
-
         //this is a 16 float array
         float[] rotation_matrix_array = {1.0F,1.0F,1.0F};
-
         Material material = new Material(surface_shader);
         int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(float));
         rotation_matrix_buffer = new ComputeBuffer(16, stride, ComputeBufferType.Default);
@@ -60,13 +59,11 @@ public class RenderStereoLabel : MonoBehaviour
 
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
-
         ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 
 
         //sum_all
-        // Material material = new Material(surface_shader);
-        // get_sum();
+        Debug.Log("SetUp get_sum");
         SetUp_getSum();
         material.SetBuffer ("sum_all_results", sumBuffer);
 
@@ -85,6 +82,8 @@ public class RenderStereoLabel : MonoBehaviour
     //     // // float newXAngle = player.transform.eulerAngles.x;
     //     // // float newYAngle = player.transform.eulerAngles.y;
     //     //ScreenshotCamera.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
+            Update_getSum();
+
     }
 
     // Update is called once per frame
@@ -113,16 +112,29 @@ public class RenderStereoLabel : MonoBehaviour
 
         RenderTexture.active = null;
 
-        // get_sum();
+        Update_getSum();
     }
 
     private void SetUp_getSum(){
-        kernelID = cShader.FindKernel("CSMain");
-        cShader.SetBuffer(kernelID, "_SumBuffer", sumBuffer);
+        kernelID_main = cShader.FindKernel("CSMain");
+        kernelID_init = cShader.FindKernel("CSInit");
+
+        cShader.SetTexture(kernelID_main, "InputImage", renderTexture);
+        cShader.SetTexture(kernelID_init, "InputImage", renderTexture);
+
+        cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer);
+        cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
+
+        cShader.Dispatch(kernelID_init, 1, 1, 1);
     }
 
-    private void Update_getSum(){
-        cShader.Dispatch(kernelID, 16, 1, 1);
+    private void Update_getSum(){  
+        
+        Debug.Log("Update get_sum");
+        cShader.Dispatch(kernelID_main, 16, 1, 1);
+        int[] results = new int[4];
+        sumBuffer.GetData(results);
+
     }
 
 

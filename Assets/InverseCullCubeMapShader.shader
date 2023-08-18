@@ -91,7 +91,8 @@ Shader "Unlit/InverseCullCubeMapShader"
             
             //sum_all result
             StructuredBuffer<float> sum_all_results;
-            //<usage> : sum_red = sum_all_results[0]; sum_green = sum_all_results[1]; sum_blue = sum_all_results[2]; num_pixels = sum_all_results[3]
+            //<usage> : sum_red = sum_all_results[1]; sum_green = sum_all_results[2]; sum_blue = sum_all_results[3]; num_pixels = sum_all_results[0]
+            //al rgb values are in [0,255]
             
             struct v2f 
             {
