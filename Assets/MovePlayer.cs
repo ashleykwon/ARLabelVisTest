@@ -12,6 +12,8 @@ public class MovePlayer : MonoBehaviour
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     int shadowIntensityIdx;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
+    public GameObject CanvasContainer;
+    // public Camera LabelScreenshotCamera;
 
 
     // Start is called before the first frame update
@@ -21,19 +23,25 @@ public class MovePlayer : MonoBehaviour
         CurrentBillboardColorAssignmentAlgo = 0;
         shadowIntensityIdx = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+
+        // LabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        // Debug.Log("right joystick triggered");
         
         var joystickAxis = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick, OVRInput.Controller.RTouch);
         float fixedY = player.position.y;
 
         player.position += (transform.right * joystickAxis.x + transform.forward * joystickAxis.y) * Time.deltaTime * speed;
         player.position = new Vector3(player.position.x, 0, player.position.z);
+
+        // Move canvases with label, shadow, and billboard so that they face the player regardless of the player's position and rotation
+        CanvasContainer.transform.position = player.position;
+        CanvasContainer.transform.rotation = player.rotation; // Quaternion.Inverse didn't solve the problem where the label moves in the opposite direction of the user's head
+        // LabelScreenshotCamera.gameObject.transform.rotation = CanvasContainer.transform.rotation;
 
         bool AButtonPressed = OVRInput.GetDown(OVRInput.RawButton.A);
         bool BButtonPressed = OVRInput.GetDown(OVRInput.RawButton.B);
@@ -86,14 +94,6 @@ public class MovePlayer : MonoBehaviour
             Debug.Log("B button pressed");
             int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
             
-            // if (shadowEnabled == 0)
-            // {
-            //     labelSphereMaterial.SetInt("_EnableShadow", 1);
-            // }
-            // else
-            // {
-            //     labelSphereMaterial.SetInt("_EnableShadow", 0);
-            // }       
             if (shadowEnabled == 0)
             {
                 labelSphereMaterial.SetInt("_EnableShadow", 1);

@@ -21791,6 +21791,8 @@ struct MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4  : public MonoBehavi
 	int32_t ___shadowIntensityIdx_9;
 	// UnityEngine.Material MovePlayer::labelSphereMaterial
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_10;
+	// UnityEngine.GameObject MovePlayer::CanvasContainer
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___CanvasContainer_11;
 };
 
 // MoviePlayerSample
@@ -22831,27 +22833,25 @@ struct RenderStereoBackgroundforDirectTextRendering_tBFBA5C48A0E6915D1DB3D79897F
 {
 	// UnityEngine.Camera RenderStereoBackgroundforDirectTextRendering::ScreenshotCamera
 	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___ScreenshotCamera_4;
-	// UnityEngine.Camera RenderStereoBackgroundforDirectTextRendering::LabelScreenshotCamera
-	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___LabelScreenshotCamera_5;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::backgroundAndLabelSphere
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_6;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_5;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::labelSphere
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___labelSphere_7;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___labelSphere_6;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::player
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_8;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_7;
 	// UnityEngine.Material RenderStereoBackgroundforDirectTextRendering::backgroundAndLabelSphereMaterial
-	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_9;
+	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_8;
 	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_10;
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_9;
 	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture2
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture2_11;
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture2_10;
 };
 
 // RenderStereoLabel
 struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public MonoBehaviour_t532A11E69716D348D8AA7F854AFCBFCB8AD17F71
 {
-	// UnityEngine.Camera RenderStereoLabel::ScreenshotCamera
-	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___ScreenshotCamera_4;
+	// UnityEngine.Camera RenderStereoLabel::LabelScreenshotCamera
+	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___LabelScreenshotCamera_4;
 	// UnityEngine.GameObject RenderStereoLabel::backgroundAndLabelSphere
 	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_5;
 	// UnityEngine.GameObject RenderStereoLabel::labelSphere
@@ -22860,14 +22860,14 @@ struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public Mon
 	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_7;
 	// UnityEngine.Material RenderStereoLabel::backgroundAndLabelSphereMaterial
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_8;
-	// UnityEngine.Material RenderStereoLabel::labelSphereMaterial
-	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_9;
-	// UnityEngine.RenderTexture RenderStereoLabel::renderTexture
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_10;
+	// UnityEngine.RenderTexture RenderStereoLabel::labelRenderTexture
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___labelRenderTexture_9;
 	// UnityEngine.Quaternion RenderStereoLabel::initialRotation
-	Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___initialRotation_11;
+	Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___initialRotation_10;
 	// UnityEngine.Matrix4x4 RenderStereoLabel::m
-	Matrix4x4_tDB70CF134A14BA38190C59AA700BCE10E2AED3E6 ___m_12;
+	Matrix4x4_tDB70CF134A14BA38190C59AA700BCE10E2AED3E6 ___m_11;
+	// UnityEngine.ComputeBuffer RenderStereoLabel::rotation_matrix_buffer
+	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___rotation_matrix_buffer_12;
 };
 
 // RequestCaptureFlow
