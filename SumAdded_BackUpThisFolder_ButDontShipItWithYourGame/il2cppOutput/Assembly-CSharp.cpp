@@ -4589,6 +4589,8 @@ struct MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4  : public MonoBehavi
 	int32_t ___shadowIntensityIdx_9;
 	// UnityEngine.Material MovePlayer::labelSphereMaterial
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_10;
+	// UnityEngine.GameObject MovePlayer::CanvasContainer
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___CanvasContainer_11;
 };
 
 // MoviePlayerSample
@@ -7425,6 +7427,10 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Vector3_t24C512C7B96BBABAD472002D
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float Time_get_deltaTime_mC3195000401F0FD167DD2F948FD2BC58330D0865 (const RuntimeMethod* method) ;
 // System.Void UnityEngine.Rigidbody::set_position(UnityEngine.Vector3)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Rigidbody_set_position_mA15BE12B8D82220E8CA90A0F0CBFB206FE81B41C (Rigidbody_t268697F5A994213ED97393309870968BC1C7393C* __this, Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 ___value0, const RuntimeMethod* method) ;
+// UnityEngine.Quaternion UnityEngine.Rigidbody::get_rotation()
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 Rigidbody_get_rotation_m07882A7024FB3F96BA13EC577A96163BBB621AA1 (Rigidbody_t268697F5A994213ED97393309870968BC1C7393C* __this, const RuntimeMethod* method) ;
+// System.Void UnityEngine.Transform::set_rotation(UnityEngine.Quaternion)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Transform_set_rotation_m61340DE74726CF0F9946743A727C4D444397331D (Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* __this, Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___value0, const RuntimeMethod* method) ;
 // System.Boolean OVRInput::GetDown(OVRInput/RawButton,OVRInput/Controller)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139 (int32_t ___rawMask0, int32_t ___controllerMask1, const RuntimeMethod* method) ;
 // System.Void MovePlayer::ChangeColorAssignmentAlgo(System.Int32)
@@ -7858,8 +7864,6 @@ inline void Action_3_Invoke_mF6A40A89653ED19E1A40CDD2FA1384A67D7A77B4_inline (Ac
 {
 	((  void (*) (Action_3_t80944FFC9CADB830D422B964A02BAB2926E15CD4*, Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1*, Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2, Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974, const RuntimeMethod*))Action_3_Invoke_mD8CAE313E18D0B492B7706BBC64F505855760704_gshared_inline)(__this, ___arg10, ___arg21, ___arg32, method);
 }
-// System.Void UnityEngine.Transform::set_rotation(UnityEngine.Quaternion)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Transform_set_rotation_m61340DE74726CF0F9946743A727C4D444397331D (Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* __this, Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___value0, const RuntimeMethod* method) ;
 // UnityEngine.Quaternion UnityEngine.Quaternion::get_identity()
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 Quaternion_get_identity_m7E701AE095ED10FD5EA0B50ABCFDE2EEFF2173A5_inline (const RuntimeMethod* method) ;
 // UnityEngine.XR.InputDevice UnityEngine.XR.InputDevices::GetDeviceAtXRNode(UnityEngine.XR.XRNode)
@@ -10315,27 +10319,49 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MovePlayer_Update_mB2024089C129F95C3A8C7
 		Vector3__ctor_m376936E6B999EF1ECBE57D990A386303E2283DE0_inline((&L_29), L_25, (0.0f), L_28, /*hidden argument*/NULL);
 		NullCheck(L_22);
 		Rigidbody_set_position_mA15BE12B8D82220E8CA90A0F0CBFB206FE81B41C(L_22, L_29, NULL);
+		// CanvasContainer.transform.position = player.position;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_30 = __this->___CanvasContainer_11;
+		NullCheck(L_30);
+		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_31;
+		L_31 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_30, NULL);
+		Rigidbody_t268697F5A994213ED97393309870968BC1C7393C* L_32 = __this->___player_4;
+		NullCheck(L_32);
+		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_33;
+		L_33 = Rigidbody_get_position_m4ECB79BDBBF8FD1EA572EDB792D3330DDED24691(L_32, NULL);
+		NullCheck(L_31);
+		Transform_set_position_mA1A817124BB41B685043DED2A9BA48CDF37C4156(L_31, L_33, NULL);
+		// CanvasContainer.transform.rotation = player.rotation; // Quaternion.Inverse didn't solve the problem where the label moves in the opposite direction of the user's head
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_34 = __this->___CanvasContainer_11;
+		NullCheck(L_34);
+		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_35;
+		L_35 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_34, NULL);
+		Rigidbody_t268697F5A994213ED97393309870968BC1C7393C* L_36 = __this->___player_4;
+		NullCheck(L_36);
+		Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 L_37;
+		L_37 = Rigidbody_get_rotation_m07882A7024FB3F96BA13EC577A96163BBB621AA1(L_36, NULL);
+		NullCheck(L_35);
+		Transform_set_rotation_m61340DE74726CF0F9946743A727C4D444397331D(L_35, L_37, NULL);
 		// bool AButtonPressed = OVRInput.GetDown(OVRInput.RawButton.A);
-		bool L_30;
-		L_30 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(1, ((int32_t)-2147483648LL), NULL);
+		bool L_38;
+		L_38 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(1, ((int32_t)-2147483648LL), NULL);
 		// bool BButtonPressed = OVRInput.GetDown(OVRInput.RawButton.B);
-		bool L_31;
-		L_31 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(2, ((int32_t)-2147483648LL), NULL);
-		V_1 = L_31;
+		bool L_39;
+		L_39 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(2, ((int32_t)-2147483648LL), NULL);
+		V_1 = L_39;
 		// bool YButtonPressed = OVRInput.GetDown(OVRInput.RawButton.Y);
-		bool L_32;
-		L_32 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(((int32_t)512), ((int32_t)-2147483648LL), NULL);
+		bool L_40;
+		L_40 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(((int32_t)512), ((int32_t)-2147483648LL), NULL);
 		// bool XButtonPressed = OVRInput.GetDown(OVRInput.RawButton.X);
-		bool L_33;
-		L_33 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(((int32_t)256), ((int32_t)-2147483648LL), NULL);
+		bool L_41;
+		L_41 = OVRInput_GetDown_mEF663E99B6E5FABB41B86716C6D04C788C979139(((int32_t)256), ((int32_t)-2147483648LL), NULL);
 		// if (XButtonPressed) // Change color assignment algorithm on left trigger
-		G_B1_0 = L_32;
-		G_B1_1 = L_30;
-		if (!L_33)
+		G_B1_0 = L_40;
+		G_B1_1 = L_38;
+		if (!L_41)
 		{
-			G_B4_0 = L_32;
-			G_B4_1 = L_30;
-			goto IL_0110;
+			G_B4_0 = L_40;
+			G_B4_1 = L_38;
+			goto IL_0146;
 		}
 	}
 	{
@@ -10343,17 +10369,17 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MovePlayer_Update_mB2024089C129F95C3A8C7
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteralDC135745F8AB243827763BD025F45E7BFB88B3A6, NULL);
 		// CurrentColorAssignmentAlgo += 1;
-		int32_t L_34 = __this->___CurrentColorAssignmentAlgo_7;
-		__this->___CurrentColorAssignmentAlgo_7 = ((int32_t)il2cpp_codegen_add(L_34, 1));
+		int32_t L_42 = __this->___CurrentColorAssignmentAlgo_7;
+		__this->___CurrentColorAssignmentAlgo_7 = ((int32_t)il2cpp_codegen_add(L_42, 1));
 		// if (CurrentColorAssignmentAlgo > 4)
-		int32_t L_35 = __this->___CurrentColorAssignmentAlgo_7;
+		int32_t L_43 = __this->___CurrentColorAssignmentAlgo_7;
 		G_B2_0 = G_B1_0;
 		G_B2_1 = G_B1_1;
-		if ((((int32_t)L_35) <= ((int32_t)4)))
+		if ((((int32_t)L_43) <= ((int32_t)4)))
 		{
 			G_B3_0 = G_B1_0;
 			G_B3_1 = G_B1_1;
-			goto IL_0104;
+			goto IL_013a;
 		}
 	}
 	{
@@ -10363,23 +10389,23 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MovePlayer_Update_mB2024089C129F95C3A8C7
 		G_B3_1 = G_B2_1;
 	}
 
-IL_0104:
+IL_013a:
 	{
 		// ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
-		int32_t L_36 = __this->___CurrentColorAssignmentAlgo_7;
-		MovePlayer_ChangeColorAssignmentAlgo_mE3CDCCA1BEED3AA2D20F76DC7A6B034388254BDB(__this, L_36, NULL);
+		int32_t L_44 = __this->___CurrentColorAssignmentAlgo_7;
+		MovePlayer_ChangeColorAssignmentAlgo_mE3CDCCA1BEED3AA2D20F76DC7A6B034388254BDB(__this, L_44, NULL);
 		G_B4_0 = G_B3_0;
 		G_B4_1 = G_B3_1;
 	}
 
-IL_0110:
+IL_0146:
 	{
 		// if (YButtonPressed) // Change billboard color assignment on right trigger
 		G_B5_0 = G_B4_1;
 		if (!G_B4_0)
 		{
 			G_B8_0 = G_B4_1;
-			goto IL_0150;
+			goto IL_0186;
 		}
 	}
 	{
@@ -10387,15 +10413,15 @@ IL_0110:
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteralA0152650348AF3C4261FAEFC24F6CA5D511C1B3E, NULL);
 		// CurrentBillboardColorAssignmentAlgo += 1;
-		int32_t L_37 = __this->___CurrentBillboardColorAssignmentAlgo_8;
-		__this->___CurrentBillboardColorAssignmentAlgo_8 = ((int32_t)il2cpp_codegen_add(L_37, 1));
+		int32_t L_45 = __this->___CurrentBillboardColorAssignmentAlgo_8;
+		__this->___CurrentBillboardColorAssignmentAlgo_8 = ((int32_t)il2cpp_codegen_add(L_45, 1));
 		// if (CurrentBillboardColorAssignmentAlgo > 2)
-		int32_t L_38 = __this->___CurrentBillboardColorAssignmentAlgo_8;
+		int32_t L_46 = __this->___CurrentBillboardColorAssignmentAlgo_8;
 		G_B6_0 = G_B5_0;
-		if ((((int32_t)L_38) <= ((int32_t)2)))
+		if ((((int32_t)L_46) <= ((int32_t)2)))
 		{
 			G_B7_0 = G_B5_0;
-			goto IL_013a;
+			goto IL_0170;
 		}
 	}
 	{
@@ -10404,22 +10430,22 @@ IL_0110:
 		G_B7_0 = G_B6_0;
 	}
 
-IL_013a:
+IL_0170:
 	{
 		// labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_39 = __this->___labelSphereMaterial_10;
-		int32_t L_40 = __this->___CurrentBillboardColorAssignmentAlgo_8;
-		NullCheck(L_39);
-		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_39, _stringLiteralDD440B9E8FF04AC902A032D10C402B1D936B5718, L_40, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_47 = __this->___labelSphereMaterial_10;
+		int32_t L_48 = __this->___CurrentBillboardColorAssignmentAlgo_8;
+		NullCheck(L_47);
+		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_47, _stringLiteralDD440B9E8FF04AC902A032D10C402B1D936B5718, L_48, NULL);
 		G_B8_0 = G_B7_0;
 	}
 
-IL_0150:
+IL_0186:
 	{
 		// if (AButtonPressed) // Toggle outline
 		if (!G_B8_0)
 		{
-			goto IL_0198;
+			goto IL_01ce;
 		}
 	}
 	{
@@ -10427,49 +10453,49 @@ IL_0150:
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteral087A55CF76196B9B74A6484B272937A5632422C8, NULL);
 		// int currentInt = labelSphereMaterial.GetInt("_EnableOutline");
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_41 = __this->___labelSphereMaterial_10;
-		NullCheck(L_41);
-		int32_t L_42;
-		L_42 = Material_GetInt_mA772B615274DD11B37A352BC66EFA81BFD9C13EA(L_41, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, NULL);
-		V_2 = L_42;
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_49 = __this->___labelSphereMaterial_10;
+		NullCheck(L_49);
+		int32_t L_50;
+		L_50 = Material_GetInt_mA772B615274DD11B37A352BC66EFA81BFD9C13EA(L_49, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, NULL);
+		V_2 = L_50;
 		// if (currentInt == 0)
-		int32_t L_43 = V_2;
-		if (L_43)
+		int32_t L_51 = V_2;
+		if (L_51)
 		{
-			goto IL_0183;
+			goto IL_01b9;
 		}
 	}
 	{
 		// labelSphereMaterial.SetInt("_EnableOutline", 1);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_44 = __this->___labelSphereMaterial_10;
-		NullCheck(L_44);
-		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_44, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, 1, NULL);
-		goto IL_0198;
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_52 = __this->___labelSphereMaterial_10;
+		NullCheck(L_52);
+		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_52, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, 1, NULL);
+		goto IL_01ce;
 	}
 
-IL_0183:
+IL_01b9:
 	{
 		// else if (currentInt == 1)
-		int32_t L_45 = V_2;
-		if ((!(((uint32_t)L_45) == ((uint32_t)1))))
+		int32_t L_53 = V_2;
+		if ((!(((uint32_t)L_53) == ((uint32_t)1))))
 		{
-			goto IL_0198;
+			goto IL_01ce;
 		}
 	}
 	{
 		// labelSphereMaterial.SetInt("_EnableOutline", 0);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_46 = __this->___labelSphereMaterial_10;
-		NullCheck(L_46);
-		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_46, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, 0, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_54 = __this->___labelSphereMaterial_10;
+		NullCheck(L_54);
+		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_54, _stringLiteral01AF020F643043D4EFCBB7EB83ACBC94052C551E, 0, NULL);
 	}
 
-IL_0198:
+IL_01ce:
 	{
 		// if (BButtonPressed) // Toggle shadow
-		bool L_47 = V_1;
-		if (!L_47)
+		bool L_55 = V_1;
+		if (!L_55)
 		{
-			goto IL_0219;
+			goto IL_024f;
 		}
 	}
 	{
@@ -10477,66 +10503,66 @@ IL_0198:
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteral8FF97F89FA1AD7FB747BC525F5EAC7AFDEC6B8BB, NULL);
 		// int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_48 = __this->___labelSphereMaterial_10;
-		NullCheck(L_48);
-		int32_t L_49;
-		L_49 = Material_GetInt_mA772B615274DD11B37A352BC66EFA81BFD9C13EA(L_48, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_56 = __this->___labelSphereMaterial_10;
+		NullCheck(L_56);
+		int32_t L_57;
+		L_57 = Material_GetInt_mA772B615274DD11B37A352BC66EFA81BFD9C13EA(L_56, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, NULL);
 		// if (shadowEnabled == 0)
-		int32_t L_50 = L_49;
-		G_B15_0 = L_50;
-		if (L_50)
+		int32_t L_58 = L_57;
+		G_B15_0 = L_58;
+		if (L_58)
 		{
-			G_B16_0 = L_50;
-			goto IL_01c9;
+			G_B16_0 = L_58;
+			goto IL_01ff;
 		}
 	}
 	{
 		// labelSphereMaterial.SetInt("_EnableShadow", 1);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_51 = __this->___labelSphereMaterial_10;
-		NullCheck(L_51);
-		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_51, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, 1, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_59 = __this->___labelSphereMaterial_10;
+		NullCheck(L_59);
+		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_59, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, 1, NULL);
 		G_B16_0 = G_B15_0;
 	}
 
-IL_01c9:
+IL_01ff:
 	{
 		// if (shadowEnabled == 1)
 		if ((!(((uint32_t)G_B16_0) == ((uint32_t)1))))
 		{
-			goto IL_0219;
+			goto IL_024f;
 		}
 	}
 	{
 		// shadowIntensityIdx += 1;
-		int32_t L_52 = __this->___shadowIntensityIdx_9;
-		__this->___shadowIntensityIdx_9 = ((int32_t)il2cpp_codegen_add(L_52, 1));
+		int32_t L_60 = __this->___shadowIntensityIdx_9;
+		__this->___shadowIntensityIdx_9 = ((int32_t)il2cpp_codegen_add(L_60, 1));
 		// if (shadowIntensityIdx == 4)
-		int32_t L_53 = __this->___shadowIntensityIdx_9;
-		if ((!(((uint32_t)L_53) == ((uint32_t)4))))
+		int32_t L_61 = __this->___shadowIntensityIdx_9;
+		if ((!(((uint32_t)L_61) == ((uint32_t)4))))
 		{
-			goto IL_01fc;
+			goto IL_0232;
 		}
 	}
 	{
 		// labelSphereMaterial.SetInt("_EnableShadow", 0);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_54 = __this->___labelSphereMaterial_10;
-		NullCheck(L_54);
-		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_54, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, 0, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_62 = __this->___labelSphereMaterial_10;
+		NullCheck(L_62);
+		Material_SetInt_m41DF5404A9942239265888105E1DC83F2FBF901A(L_62, _stringLiteral0F92191C694644FAA7B6AD566B80370A344DFD75, 0, NULL);
 		// shadowIntensityIdx = 0;
 		__this->___shadowIntensityIdx_9 = 0;
 		return;
 	}
 
-IL_01fc:
+IL_0232:
 	{
 		// labelSphereMaterial.SetFloat("_ShadowMultiplier", shadowIntensityIdx*0.5f);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_55 = __this->___labelSphereMaterial_10;
-		int32_t L_56 = __this->___shadowIntensityIdx_9;
-		NullCheck(L_55);
-		Material_SetFloat_m879CF81D740BAE6F23C9822400679F4D16365836(L_55, _stringLiteralB9769061B6C047F239629EA298CA024CA1A0481A, ((float)il2cpp_codegen_multiply(((float)L_56), (0.5f))), NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_63 = __this->___labelSphereMaterial_10;
+		int32_t L_64 = __this->___shadowIntensityIdx_9;
+		NullCheck(L_63);
+		Material_SetFloat_m879CF81D740BAE6F23C9822400679F4D16365836(L_63, _stringLiteralB9769061B6C047F239629EA298CA024CA1A0481A, ((float)il2cpp_codegen_multiply(((float)L_64), (0.5f))), NULL);
 	}
 
-IL_0219:
+IL_024f:
 	{
 		// }
 		return;

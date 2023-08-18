@@ -5,17 +5,16 @@ using System.Linq;
 
 public class RenderStereoLabel : MonoBehaviour
 {
-    public Camera ScreenshotCamera;
+    public Camera LabelScreenshotCamera;
     public GameObject backgroundAndLabelSphere;
     public GameObject labelSphere;
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
-    public Material labelSphereMaterial;
-    RenderTexture renderTexture;
+    RenderTexture labelRenderTexture;
     Quaternion initialRotation;
     Matrix4x4 m;
 
-    public Shader surface_shader;
+    // Shader surface_shader;
     private ComputeBuffer rotation_matrix_buffer;
 
     public ComputeShader cShader;
@@ -30,18 +29,19 @@ public class RenderStereoLabel : MonoBehaviour
         int cubemapSize = 2048; // this can change for a better resolution            
 
         // Define a cube-shaped render texture for the white label + black background (default where alpha = 0)
-        renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16); 
-        renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
+        labelRenderTexture = new RenderTexture(cubemapSize, cubemapSize, 16); 
+        labelRenderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
 
         // To prevent antialiasing
-        renderTexture.autoGenerateMips = false;
-        renderTexture.useMipMap = false;
-        renderTexture.filterMode = FilterMode.Point;
+        labelRenderTexture.autoGenerateMips = false;
+        labelRenderTexture.useMipMap = false;
+        labelRenderTexture.filterMode = FilterMode.Point;
 
 
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
         initialRotation = Quaternion.Euler (180f, 270f, 0f); //Should place the label in the middle of the view
+
         // Matrix4x4 m = Matrix4x4.TRS(Vector3.zero, initialRotation, new Vector3(1,1,1) );
         // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow1", m.GetRow(0));
         // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow2", m.GetRow(1));
@@ -68,13 +68,12 @@ public class RenderStereoLabel : MonoBehaviour
         material.SetBuffer ("sum_all_results", sumBuffer);
 
 
-
     }
 
     void Update()
     {
         // Only render elements on the UI layer (black sphere + white label + magenta shadow + blue billboard)
-        ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
+        LabelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
        
     //     // Move and rotate the sphere with the player
     //     //backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
@@ -91,23 +90,15 @@ public class RenderStereoLabel : MonoBehaviour
     {
 
         // // Take a screenshot (white label + black background + blue billboard) and render it to billboard and label cubemaps (these two maps are initially simialr)
-        ScreenshotCamera.targetTexture = renderTexture;
-        RenderTexture.active = renderTexture;
+        LabelScreenshotCamera.targetTexture = labelRenderTexture;
+        RenderTexture.active = labelRenderTexture;
 
-        // // Graphics.Blit(ScreenshotCamera.targetTexture, renderTexture);
+        LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
 
-        
-        ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 
-        // // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow1", m.GetRow(0));
-        // // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow2", m.GetRow(1));
-        // // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow3", m.GetRow(2));
-        // // backgroundAndLabelSphereMaterial.SetVector("_LabelRotationMatrixRow4", m.GetRow(3)); 
-        // // Graphics.Blit(ScreenshotCamera.targetTexture, renderTexture);
-
-        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
-        backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture);
-        backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", renderTexture);
+        backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", labelRenderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
+        backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", labelRenderTexture);
+        backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", labelRenderTexture);
 
 
         RenderTexture.active = null;

@@ -23,10 +23,6 @@ Shader "Unlit/InverseCullCubeMapShader"
         _BillboardColorMethod("Billboard Color Method", Int) = 1
         _BillboardLightnessContrastThreshold("Billboard lightness contrast threshold", Range(0,1)) = 0.5
         
-        _LabelRotationMatrixRow1("Label Rotation Matrix", Vector) = (0,0,0,0)
-        _LabelRotationMatrixRow2("Label Rotation Matrix", Vector) = (0,0,0,0)
-        _LabelRotationMatrixRow3("Label Rotation Matrix", Vector) = (0,0,0,0)
-        _LabelRotationMatrixRow4("Label Rotation Matrix", Vector) = (0,0,0,0)
     }
     SubShader
     {
@@ -78,13 +74,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Billboard-related variables
             int _BillboardColorMethod;
             float _BillboardLightnessContrastThreshold;
-
-            // rotation matrix
-            float4x4 _LabelRotationMatrix;
-            float4 _LabelRotationMatrixRow1;
-            float4 _LabelRotationMatrixRow2;
-            float4 _LabelRotationMatrixRow3;
-            float4 _LabelRotationMatrixRow4;
 
             //rotation matrix - a buffer with 16 floats
             StructuredBuffer<float> rotation_matrix;
@@ -549,8 +538,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Color assignment
             fixed4 frag( v2f vdata ) : SV_Target 
             {
-                _LabelRotationMatrix = float4x4(_LabelRotationMatrixRow1, _LabelRotationMatrixRow2,_LabelRotationMatrixRow3, _LabelRotationMatrixRow4);
-
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv*rotationVec); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
