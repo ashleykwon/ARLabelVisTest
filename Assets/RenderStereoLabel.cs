@@ -15,12 +15,12 @@ public class RenderStereoLabel : MonoBehaviour
     Quaternion initialRotation;
     Matrix4x4 m;
 
+    public Shader surface_shader;
     private ComputeBuffer rotation_matrix_buffer;
 
-    // public ComputeShader cShader;
-    public Shader surface_shader;
-    // ComputeBuffer cBuffer;
-    // int r_sum;
+    public ComputeShader cShader;
+    private ComputeBuffer sumBuffer;
+    private int kernelID;
 
   
     // Start is called before the first frame update
@@ -67,7 +67,8 @@ public class RenderStereoLabel : MonoBehaviour
         //sum_all
         // Material material = new Material(surface_shader);
         // get_sum();
-        // material.SetBuffer ("sum_all_results", cBuffer);
+        SetUp_getSum();
+        material.SetBuffer ("sum_all_results", sumBuffer);
 
 
 
@@ -115,18 +116,14 @@ public class RenderStereoLabel : MonoBehaviour
         // get_sum();
     }
 
-    //bind to compute shader
-    // void get_sum(){
-    // r_sum = cShader.FindKernel("CSMain");
-    // cBuffer = new ComputeBuffer(1, sizeof(int));
+    private void SetUp_getSum(){
+        kernelID = cShader.FindKernel("CSMain");
+        cShader.SetBuffer(kernelID, "_SumBuffer", sumBuffer);
+    }
 
-    // cShader.SetTexture(r_sum, "InputImage", renderTexture);
-    // cShader.SetBuffer(r_sum, "ResultBuffer", cBuffer);
-    // cShader.Dispatch(r_sum, 16, 16, 1);
+    private void Update_getSum(){
+        cShader.Dispatch(kernelID, 16, 1, 1);
+    }
 
-    // cBuffer.Release();
-    // cBuffer = null;
-
-    // }
 
 }

@@ -22885,10 +22885,16 @@ struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public Mon
 	Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___initialRotation_11;
 	// UnityEngine.Matrix4x4 RenderStereoLabel::m
 	Matrix4x4_tDB70CF134A14BA38190C59AA700BCE10E2AED3E6 ___m_12;
-	// UnityEngine.ComputeBuffer RenderStereoLabel::rotation_matrix_buffer
-	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___rotation_matrix_buffer_13;
 	// UnityEngine.Shader RenderStereoLabel::surface_shader
-	Shader_tADC867D36B7876EE22427FAA2CE485105F4EE692* ___surface_shader_14;
+	Shader_tADC867D36B7876EE22427FAA2CE485105F4EE692* ___surface_shader_13;
+	// UnityEngine.ComputeBuffer RenderStereoLabel::rotation_matrix_buffer
+	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___rotation_matrix_buffer_14;
+	// UnityEngine.ComputeShader RenderStereoLabel::cShader
+	ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* ___cShader_15;
+	// UnityEngine.ComputeBuffer RenderStereoLabel::sumBuffer
+	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___sumBuffer_16;
+	// System.Int32 RenderStereoLabel::kernelID
+	int32_t ___kernelID_17;
 };
 
 // RequestCaptureFlow

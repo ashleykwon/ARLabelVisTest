@@ -1,20 +1,14 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-RWStructuredBuffer<float> ResultBuffer;
-RWTexture2DArray<uint4> InputImage;
+StructuredBuffer<float> _SumBuffer;
 
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
 
-    uint4 col = InputImage[id.xy];
-
-    InterlockedAdd(ResultBuffer[0], col.r);
-    InterlockedAdd(ResultBuffer[1], col.g);
-    InterlockedAdd(ResultBuffer[2], col.b);
-    InterlockedAdd(ResultBuffer[0], 1);
-
+    // InterlockedAdd(_SumBuffer, 1.0);
+    return;
 
 }
