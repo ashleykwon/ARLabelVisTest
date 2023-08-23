@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+
 public class RenderStereoLabel : MonoBehaviour
 {
     public Camera LabelScreenshotCamera;
@@ -15,6 +16,7 @@ public class RenderStereoLabel : MonoBehaviour
     Matrix4x4 m;
 
     public Shader surface_shader;
+    public Cubemap backgroundCubeMap; 
     private ComputeBuffer rotation_matrix_buffer;
 
     public ComputeShader cShader;
@@ -61,7 +63,7 @@ public class RenderStereoLabel : MonoBehaviour
         SetUp_getSum();
         material.SetBuffer ("sum_all_results", sumBuffer);
 
-
+        Sum_Single_Letter();
 
     }
 
@@ -105,6 +107,8 @@ public class RenderStereoLabel : MonoBehaviour
 
         cShader.SetTexture(kernelID_main, "InputImage", labelRenderTexture);
         cShader.SetTexture(kernelID_init, "InputImage", labelRenderTexture);
+        cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
+        cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
 
         cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer);
         cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
@@ -122,4 +126,128 @@ public class RenderStereoLabel : MonoBehaviour
     }
 
 
+    //method 3: sum only from a letter
+    private void Sum_Single_Letter(){
+
+        Debug.Log("method3!");
+        float sum_r = 0.0F;
+        float sum_g = 0.0F;
+        float sum_b = 0.0F;
+
+        Texture2D label_texture = getRTPixels(labelRenderTexture);
+
+        int x = 200;
+        int y = 200;
+        Coordination start_coords = new Coordination(x, y);
+        Result_color letter_sum = dfs(label_texture, start_coords);
+
+        sum_r = letter_sum.r;
+        sum_g = letter_sum.g;
+        sum_b = letter_sum.b;
+
+    }
+
+    //method 4: sum a kernel,  which is in the label
+    private void Sum_A_Kernel(int kernel_size){
+        float sum_r = 0.0F;
+        float sum_g = 0.0F;
+        float sum_b = 0.0F;
+
+        int x = 200;
+        int y = 200;
+        Texture2D label_texture = getRTPixels(labelRenderTexture);
+
+        for(int i = -kernel_size/2; i<kernel_size/2; i++){
+            for(int j = -kernel_size/2; j<kernel_size/2; j++){
+                int cur_x = x + i;
+                int cur_y = y + j;
+
+                sum_r += label_texture.GetPixel(cur_x, cur_y).r;
+                sum_g += label_texture.GetPixel(cur_x, cur_y).g;
+                sum_b += label_texture.GetPixel(cur_x, cur_y).b;
+
+            }
+        }
+    }
+
+
+    //this function gets pixel values from renderTexture
+    //this is a helper function
+    private Texture2D getRTPixels(RenderTexture rt){
+        RenderTexture currentActiveRT = RenderTexture.active;
+        RenderTexture.active = rt;
+
+        // Create a new Texture2D and read the RenderTexture image into it
+        Texture2D tex = new Texture2D(rt.width, rt.height);
+        tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
+
+        // Restorie previously active render texture
+        RenderTexture.active = currentActiveRT;
+        return tex;
+
+    }
+
+    private Result_color dfs(Texture2D label_texture, Coordination start_coords){
+        float r = 0.0F;
+        float g = 0.0F;
+        float b = 0.0F;
+
+        Stack<Coordination> myStack = new Stack<Coordination>();
+        myStack.Push(start_coords);
+
+        while(myStack.Count != 0){
+            Coordination cur = myStack.Pop();
+
+            int cur_x = cur.x;
+            int cur_y = cur.y;
+
+            float cur_r = label_texture.GetPixel(cur.x, cur.y).r;
+            float cur_g = label_texture.GetPixel(cur.x, cur.y).g;
+            float cur_b = label_texture.GetPixel(cur.x, cur.y).b;
+            r += cur_r;
+            g += cur_g;
+            b += cur_b;
+
+            if (cur_r!=0 || cur_g!=0 || cur_g!=0){
+                //if this pixel is a label pixel, continue the search
+                Coordination top = new Coordination(cur_x, cur_y+1);
+                Coordination bot = new Coordination(cur_x, cur_y-1);
+                Coordination left = new Coordination(cur_x-1, cur_y);
+                Coordination right = new Coordination(cur_x+1, cur_y);
+                myStack.Push(top);
+                myStack.Push(bot);
+                myStack.Push(left);
+                myStack.Push(right);
+            }
+
+        }
+
+        return new Result_color(r,g,b);
+
+    }
+
 }
+
+public struct Coordination{
+        public int x;
+        public int y;
+
+        public Coordination(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+
+public struct Result_color{
+        public float r;
+        public float g;
+        public float b;
+
+        public Result_color(float r, float g, float b){
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+    }
+

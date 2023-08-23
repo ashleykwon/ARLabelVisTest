@@ -4,6 +4,8 @@
 
 RWStructuredBuffer<int> _SumBuffer;
 Texture2D<float4> InputImage;
+TextureCube<float4> InputCubeMap;
+SamplerState _LinearClamp;
 
 
 [numthreads(1,1,1)]
@@ -21,13 +23,28 @@ void CSInit (uint3 id : SV_DispatchThreadID)
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
-    uint4 col = InputImage[id.xy];
-
     InterlockedAdd(_SumBuffer[0], 1);
-    InterlockedAdd(_SumBuffer[1],col.r * 255);
-    InterlockedAdd(_SumBuffer[2],col.g * 255);
-    InterlockedAdd(_SumBuffer[3],col.b * 255);
+
+    //label sample
+    float3 label_sample = InputImage[id.xy];
+
+    //background sample
+    float3 resolution = float3(1024,1024,1024);  //cubemap resolution
+    float3 pixel = float3(id.x, id.y, id.z);  //pixel coordinates
+    float3 uv = pixel / resolution;  //normalized uv coordinates
+    float4 background_sample = InputCubeMap.SampleLevel(_LinearClamp,uv,0);
+
+    //method 1: summ the background
+    //_SumBuffer[0]: total pixels, _SumBuffer[1]:red, _SumBuffer[2]:green, _SumBuffer[3]:blue
+    InterlockedAdd(_SumBuffer[1],background_sample.r);
+    InterlockedAdd(_SumBuffer[2],background_sample.g);
+    InterlockedAdd(_SumBuffer[3],background_sample.b);
+
+    //method 2: sum all the letters
+    //_SumBuffer[0]: total pixels, _SumBuffer[1]:red, _SumBuffer[2]:green, _SumBuffer[3]:blue
+    // InterlockedAdd(_SumBuffer[1],label_sample.r);
+    // InterlockedAdd(_SumBuffer[2],label_sample.g);
+    // InterlockedAdd(_SumBuffer[3],label_sample.b);
 
     return;
 

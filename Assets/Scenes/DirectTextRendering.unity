@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.19523752, g: 0.23659423, b: 0.3102816, a: 1}
+  m_IndirectSpecularColor: {r: 0.19522065, g: 0.2365883, b: 0.3102433, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -353,6 +353,9 @@ MonoBehaviour:
   labelSphere: {fileID: 1555055885}
   player: {fileID: 1308607590}
   backgroundAndLabelSphereMaterial: {fileID: 0}
+  surface_shader: {fileID: 4800000, guid: 9f08025f583fb4a4f84a5f62c1057a81, type: 3}
+  backgroundCubeMap: {fileID: 8900000, guid: 01f0d1a1b3fa02f489fb718c09ade892, type: 2}
+  cShader: {fileID: 7200000, guid: 33f0ac48211d147118473dfdcadd8081, type: 3}
 --- !u!1 &321853016
 GameObject:
   m_ObjectHideFlags: 0
