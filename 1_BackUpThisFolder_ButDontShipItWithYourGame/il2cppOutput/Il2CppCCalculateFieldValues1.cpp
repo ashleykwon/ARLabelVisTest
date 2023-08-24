@@ -28921,8 +28921,6 @@ struct MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4  : public MonoBehavi
 	int32_t ___shadowIntensityIdx_9;
 	// UnityEngine.Material MovePlayer::labelSphereMaterial
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_10;
-	// UnityEngine.GameObject MovePlayer::CanvasContainer
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___CanvasContainer_11;
 };
 
 // Oculus.Interaction.HandGrab.MoveTowardsTargetProvider
@@ -39359,9 +39357,9 @@ IL2CPP_EXTERN_C const int32_t g_FieldOffsetTable5923[1] =
 IL2CPP_EXTERN_C const int32_t g_FieldOffsetTable5924[2] = 
 {
 	static_cast<int32_t>(offsetof(MoveLabelSpherewithPlayer_tB9B03BDCE8C02CA826134B94CDAF6E50A919A61B, ___player_4)),static_cast<int32_t>(offsetof(MoveLabelSpherewithPlayer_tB9B03BDCE8C02CA826134B94CDAF6E50A919A61B, ___LabelSphere_5)),};
-IL2CPP_EXTERN_C const int32_t g_FieldOffsetTable5925[8] = 
+IL2CPP_EXTERN_C const int32_t g_FieldOffsetTable5925[7] = 
 {
-	static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___player_4)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___speed_5)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___BackgroundAndLabelSphere_6)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___CurrentColorAssignmentAlgo_7)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___CurrentBillboardColorAssignmentAlgo_8)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___shadowIntensityIdx_9)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___labelSphereMaterial_10)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___CanvasContainer_11)),};
+	static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___player_4)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___speed_5)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___BackgroundAndLabelSphere_6)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___CurrentColorAssignmentAlgo_7)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___CurrentBillboardColorAssignmentAlgo_8)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___shadowIntensityIdx_9)),static_cast<int32_t>(offsetof(MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4, ___labelSphereMaterial_10)),};
 IL2CPP_EXTERN_C const int32_t g_FieldOffsetTable5930[1] = 
 {
 	static_cast<int32_t>(offsetof(U3CU3Ec__DisplayClass41_0_tD03998B72130E379210125F837D005B365C1708B, ___handler_0)),};

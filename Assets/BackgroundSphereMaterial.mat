@@ -78,7 +78,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BillboardColorMethod: 1
+    - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
     - _ColorMethod: 3
@@ -90,6 +90,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _GranularityMethod: 0
     - _LabelRotationMatrix: 0
     - _Metallic: 0
     - _Mode: 0

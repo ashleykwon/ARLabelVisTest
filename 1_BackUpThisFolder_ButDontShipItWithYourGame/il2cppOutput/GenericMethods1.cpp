@@ -259,8 +259,6 @@ struct Color32U5BU5D_t38116C3E91765C4C5726CE12C77FAD7F9F737259;
 struct ColorOverrideU5BU5D_tDD9389027A32857CEBB7BB31C6F3E2A24870A400;
 // UnityEngine.UIElements.ComputedTransitionProperty[]
 struct ComputedTransitionPropertyU5BU5D_t25B9E78F5276CDA297C8215C316452CAB8219E82;
-// Coordination[]
-struct CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57;
 // System.Reflection.CustomAttributeNamedArgument[]
 struct CustomAttributeNamedArgumentU5BU5D_tC0A39D9401E28662213F5958EFF5D26D0681B440;
 // System.Reflection.CustomAttributeTypedArgument[]
@@ -836,7 +834,6 @@ struct ColorU5BU5D_t612261CF293F6FFC3D80AB52259FF0DC2B2CC389;
 struct Color32U5BU5D_t38116C3E91765C4C5726CE12C77FAD7F9F737259;
 struct ColorOverrideU5BU5D_tDD9389027A32857CEBB7BB31C6F3E2A24870A400;
 struct ComputedTransitionPropertyU5BU5D_t25B9E78F5276CDA297C8215C316452CAB8219E82;
-struct CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57;
 struct CustomAttributeNamedArgumentU5BU5D_tC0A39D9401E28662213F5958EFF5D26D0681B440;
 struct CustomAttributeTypedArgumentU5BU5D_t6CAA09EC6AACBED57FC8B02C587D50BF6B738C6B;
 struct DoubleU5BU5D_tCC308475BD3B8229DB2582938669EF2F9ECC1FEE;
@@ -1960,17 +1957,6 @@ struct EmptyArray_1_t7BBC8CED754F364A777871A238BBBE3F94FFDDE1_StaticFields
 	CharU5BU5D_t799905CF001DD5F13F7DBB310181FC4D8B7D0AAB* ___Value_0;
 };
 
-// System.EmptyArray`1<Coordination>
-struct EmptyArray_1_t7BE4F80FB012D5BCF9F5F43FFDBE927184262545  : public RuntimeObject
-{
-};
-
-struct EmptyArray_1_t7BE4F80FB012D5BCF9F5F43FFDBE927184262545_StaticFields
-{
-	// T[] System.EmptyArray`1::Value
-	CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57* ___Value_0;
-};
-
 // System.EmptyArray`1<System.Reflection.CustomAttributeNamedArgument>
 struct EmptyArray_1_t6CFD356A0751BCEBDD289F0037BDBD0264EC6EB7  : public RuntimeObject
 {
@@ -2576,15 +2562,6 @@ struct ComputedTransitionProperty_tD8E4D8EB5DD69E063944F27A48D9263F4F1354E1_mars
 	int32_t ___durationMs_1;
 	int32_t ___delayMs_2;
 	Il2CppMethodPointer ___easingCurve_3;
-};
-
-// Coordination
-struct Coordination_t004052626D4C318590AF646368277B484664B3E9 
-{
-	// System.Int32 Coordination::x
-	int32_t ___x_0;
-	// System.Int32 Coordination::y
-	int32_t ___y_1;
 };
 
 // System.Reflection.CustomAttributeTypedArgument
@@ -8556,39 +8533,6 @@ struct ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031  : public RuntimeArr
 		return m_Items + index;
 	}
 	inline void SetAtUnchecked(il2cpp_array_size_t index, uint8_t value)
-	{
-		m_Items[index] = value;
-	}
-};
-// Coordination[]
-struct CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57  : public RuntimeArray
-{
-	ALIGN_FIELD (8) Coordination_t004052626D4C318590AF646368277B484664B3E9 m_Items[1];
-
-	inline Coordination_t004052626D4C318590AF646368277B484664B3E9 GetAt(il2cpp_array_size_t index) const
-	{
-		IL2CPP_ARRAY_BOUNDS_CHECK(index, (uint32_t)(this)->max_length);
-		return m_Items[index];
-	}
-	inline Coordination_t004052626D4C318590AF646368277B484664B3E9* GetAddressAt(il2cpp_array_size_t index)
-	{
-		IL2CPP_ARRAY_BOUNDS_CHECK(index, (uint32_t)(this)->max_length);
-		return m_Items + index;
-	}
-	inline void SetAt(il2cpp_array_size_t index, Coordination_t004052626D4C318590AF646368277B484664B3E9 value)
-	{
-		IL2CPP_ARRAY_BOUNDS_CHECK(index, (uint32_t)(this)->max_length);
-		m_Items[index] = value;
-	}
-	inline Coordination_t004052626D4C318590AF646368277B484664B3E9 GetAtUnchecked(il2cpp_array_size_t index) const
-	{
-		return m_Items[index];
-	}
-	inline Coordination_t004052626D4C318590AF646368277B484664B3E9* GetAddressAtUnchecked(il2cpp_array_size_t index)
-	{
-		return m_Items + index;
-	}
-	inline void SetAtUnchecked(il2cpp_array_size_t index, Coordination_t004052626D4C318590AF646368277B484664B3E9 value)
 	{
 		m_Items[index] = value;
 	}
@@ -21232,15 +21176,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR CharU5BU5D_t799905CF001DD5F13F7DBB310181FC4D8
 	{
 		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
 		CharU5BU5D_t799905CF001DD5F13F7DBB310181FC4D8B7D0AAB* L_0 = ((EmptyArray_1_t7BBC8CED754F364A777871A238BBBE3F94FFDDE1_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___Value_0;
-		return L_0;
-	}
-}
-// T[] System.Array::Empty<Coordination>()
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57* Array_Empty_TisCoordination_t004052626D4C318590AF646368277B484664B3E9_m10991C69CF8E8E41CB4E67E34062F595D2FE8476_gshared (const RuntimeMethod* method) 
-{
-	{
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
-		CoordinationU5BU5D_t1CC05680D484A17CB74DCAE887570F7CB0E9CD57* L_0 = ((EmptyArray_1_t7BE4F80FB012D5BCF9F5F43FFDBE927184262545_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___Value_0;
 		return L_0;
 	}
 }

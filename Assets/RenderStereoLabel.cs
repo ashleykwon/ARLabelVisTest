@@ -59,11 +59,11 @@ public class RenderStereoLabel : MonoBehaviour
 
 
         //sum_all
-        Debug.Log("SetUp get_sum");
-        SetUp_getSum();
-        material.SetBuffer ("sum_all_results", sumBuffer);
+        // Debug.Log("SetUp get_sum");
+        // SetUp_getSum();
+        // material.SetBuffer ("sum_all_results", sumBuffer);
 
-        Sum_Single_Letter();
+        // Sum_Single_Letter();
 
     }
 
@@ -71,13 +71,6 @@ public class RenderStereoLabel : MonoBehaviour
     {
         // Only render elements on the UI layer (black sphere + white label + magenta shadow + blue billboard)
         LabelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
-       
-    //     // Move and rotate the sphere with the player
-    //     //backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-
-    //     // // float newXAngle = player.transform.eulerAngles.x;
-    //     // // float newYAngle = player.transform.eulerAngles.y;
-    //     //LabelScreenshotCamera.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
     }
 
     // Update is called once per frame
@@ -93,12 +86,12 @@ public class RenderStereoLabel : MonoBehaviour
 
         backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", labelRenderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
         backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", labelRenderTexture);
-        backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", labelRenderTexture);
+        //backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", labelRenderTexture);
 
 
         RenderTexture.active = null;
 
-        Update_getSum();
+        // Update_getSum();
     }
 
     private void SetUp_getSum(){
@@ -250,4 +243,3 @@ public struct Result_color{
             this.b = b;
         }
     }
-

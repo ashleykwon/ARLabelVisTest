@@ -6,15 +6,12 @@ using System.Linq;
 public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
 {
     public Camera ScreenshotCamera;
-    //public Camera LabelScreenshotCamera;
     public GameObject backgroundAndLabelSphere;
     public GameObject labelSphere;
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture renderTexture;
-    RenderTexture renderTexture2;
 
-  
     // Start is called before the first frame update
     void Start()
     {
@@ -38,15 +35,12 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     void Update()
     {
         // Block out the layer that contains the label and the black background behind the label (it's a plane object that has a material + shader)
-        ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
+        ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("BackgroundAndLabel"));
         ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("UI"));
 
         // Move and rotate the sphere with the player
         backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
         labelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-        // // float newXAngle = player.transform.eulerAngles.x;
-        // // float newYAngle = player.transform.eulerAngles.y;
-        // backgroundAndLabelSphere.transform.Rotate(player.transform.rotation[0], player.transform.rotation[1], player.transform.rotation[2]);
     }
 
     // Update is called once per frame
@@ -54,7 +48,6 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     {     
         // Take a screenshot and render it to a cubemap
        
-        // Set the background texture in the shader attached to backgroundAndLabelSphereMaterial
         backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
         
         ScreenshotCamera.targetTexture = renderTexture;
@@ -64,4 +57,5 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
         RenderTexture.active = null;
     }
+
 }

@@ -10,7 +10,7 @@ public class MainCameraView : MonoBehaviour
     void Start()
     {
         // Only show the sphere that contains the label
-        MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("Label"));
+        MainCamera.cullingMask &=  (1 << LayerMask.NameToLayer("BackgroundAndLabel"));
     }
 
     // Update is called once per frame

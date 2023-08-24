@@ -12,8 +12,6 @@ public class MovePlayer : MonoBehaviour
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     int shadowIntensityIdx;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
-    public GameObject CanvasContainer;
-    // public Camera LabelScreenshotCamera;
 
 
     // Start is called before the first frame update
@@ -23,14 +21,13 @@ public class MovePlayer : MonoBehaviour
         CurrentBillboardColorAssignmentAlgo = 0;
         shadowIntensityIdx = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
-
-        // LabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
     }
 
 
     // Update is called once per frame
     void Update()
     {
+        // Debug.Log("right joystick triggered");
         
         var joystickAxis = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick, OVRInput.Controller.RTouch);
         float fixedY = player.position.y;
@@ -38,15 +35,11 @@ public class MovePlayer : MonoBehaviour
         player.position += (transform.right * joystickAxis.x + transform.forward * joystickAxis.y) * Time.deltaTime * speed;
         player.position = new Vector3(player.position.x, 0, player.position.z);
 
-        // Move canvases with label, shadow, and billboard so that they face the player regardless of the player's position and rotation
-        CanvasContainer.transform.position = player.position;
-        CanvasContainer.transform.rotation = player.rotation; // Quaternion.Inverse didn't solve the problem where the label moves in the opposite direction of the user's head
-        // LabelScreenshotCamera.gameObject.transform.rotation = CanvasContainer.transform.rotation;
-
         bool AButtonPressed = OVRInput.GetDown(OVRInput.RawButton.A);
         bool BButtonPressed = OVRInput.GetDown(OVRInput.RawButton.B);
         bool YButtonPressed = OVRInput.GetDown(OVRInput.RawButton.Y);
         bool XButtonPressed = OVRInput.GetDown(OVRInput.RawButton.X);
+        bool joystickPressed = OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick);
 
         // float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         // float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
@@ -89,30 +82,43 @@ public class MovePlayer : MonoBehaviour
             }  
         }
 
-        if (BButtonPressed) // Toggle shadow
+        if (joystickPressed) // Change granularity
         {
-            Debug.Log("B button pressed");
-            int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
-            
-            if (shadowEnabled == 0)
+            int currentInt = labelSphereMaterial.GetInt("_GranularityMethod");
+            if (currentInt == 1)
             {
-                labelSphereMaterial.SetInt("_EnableShadow", 1);
+                labelSphereMaterial.SetInt("_GranularityMethod", 0);
             }
-            if (shadowEnabled == 1)
+            else
             {
-                shadowIntensityIdx += 1;
-                if (shadowIntensityIdx == 4)
-                {
-                    labelSphereMaterial.SetInt("_EnableShadow", 0);
-                    shadowIntensityIdx = 0; 
-                }
-                else 
-                {
-                    labelSphereMaterial.SetFloat("_ShadowMultiplier", shadowIntensityIdx*0.5f);
-                }
-                
-            }     
+                labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            }
         }
+
+        // if (BButtonPressed) // Toggle shadow
+        // {
+        //     Debug.Log("B button pressed");
+        //     int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
+
+        //     if (shadowEnabled == 0)
+        //     {
+        //         labelSphereMaterial.SetInt("_EnableShadow", 1);
+        //     }
+        //     if (shadowEnabled == 1)
+        //     {
+        //         shadowIntensityIdx += 1;
+        //         if (shadowIntensityIdx == 4)
+        //         {
+        //             labelSphereMaterial.SetInt("_EnableShadow", 0);
+        //             shadowIntensityIdx = 0; 
+        //         }
+        //         else 
+        //         {
+        //             labelSphereMaterial.SetFloat("_ShadowMultiplier", shadowIntensityIdx*0.5f);
+        //         }
+                
+        //     }     
+        // }
     }
 
 

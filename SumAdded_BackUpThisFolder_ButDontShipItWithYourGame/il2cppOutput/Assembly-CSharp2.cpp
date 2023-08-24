@@ -5221,25 +5221,27 @@ struct RenderStereoBackgroundforDirectTextRendering_tBFBA5C48A0E6915D1DB3D79897F
 {
 	// UnityEngine.Camera RenderStereoBackgroundforDirectTextRendering::ScreenshotCamera
 	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___ScreenshotCamera_4;
+	// UnityEngine.Camera RenderStereoBackgroundforDirectTextRendering::LabelScreenshotCamera
+	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___LabelScreenshotCamera_5;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::backgroundAndLabelSphere
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_5;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_6;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::labelSphere
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___labelSphere_6;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___labelSphere_7;
 	// UnityEngine.GameObject RenderStereoBackgroundforDirectTextRendering::player
-	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_7;
+	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_8;
 	// UnityEngine.Material RenderStereoBackgroundforDirectTextRendering::backgroundAndLabelSphereMaterial
-	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_8;
+	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_9;
 	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_9;
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_10;
 	// UnityEngine.RenderTexture RenderStereoBackgroundforDirectTextRendering::renderTexture2
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture2_10;
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture2_11;
 };
 
 // RenderStereoLabel
 struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public MonoBehaviour_t532A11E69716D348D8AA7F854AFCBFCB8AD17F71
 {
-	// UnityEngine.Camera RenderStereoLabel::LabelScreenshotCamera
-	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___LabelScreenshotCamera_4;
+	// UnityEngine.Camera RenderStereoLabel::ScreenshotCamera
+	Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* ___ScreenshotCamera_4;
 	// UnityEngine.GameObject RenderStereoLabel::backgroundAndLabelSphere
 	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___backgroundAndLabelSphere_5;
 	// UnityEngine.GameObject RenderStereoLabel::labelSphere
@@ -5248,14 +5250,14 @@ struct RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761  : public Mon
 	GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* ___player_7;
 	// UnityEngine.Material RenderStereoLabel::backgroundAndLabelSphereMaterial
 	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___backgroundAndLabelSphereMaterial_8;
-	// UnityEngine.RenderTexture RenderStereoLabel::labelRenderTexture
-	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___labelRenderTexture_9;
+	// UnityEngine.Material RenderStereoLabel::labelSphereMaterial
+	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_9;
+	// UnityEngine.RenderTexture RenderStereoLabel::renderTexture
+	RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* ___renderTexture_10;
 	// UnityEngine.Quaternion RenderStereoLabel::initialRotation
-	Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___initialRotation_10;
+	Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 ___initialRotation_11;
 	// UnityEngine.Matrix4x4 RenderStereoLabel::m
-	Matrix4x4_tDB70CF134A14BA38190C59AA700BCE10E2AED3E6 ___m_11;
-	// UnityEngine.ComputeBuffer RenderStereoLabel::rotation_matrix_buffer
-	ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* ___rotation_matrix_buffer_12;
+	Matrix4x4_tDB70CF134A14BA38190C59AA700BCE10E2AED3E6 ___m_12;
 };
 
 // SceneSettings
@@ -16240,37 +16242,37 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		// int cubemapSize = 2048; // this can change for a better resolution
 		V_0 = ((int32_t)2048);
 		// backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_0 = __this->___backgroundAndLabelSphere_5;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_0 = __this->___backgroundAndLabelSphere_6;
 		NullCheck(L_0);
 		MeshRenderer_t4B7747212F0B88244BB7790C61AE124BFC15BAAE* L_1;
 		L_1 = GameObject_GetComponent_TisMeshRenderer_t4B7747212F0B88244BB7790C61AE124BFC15BAAE_m7FF948365C38BC39333D82B235A7C4EAD219960D(L_0, GameObject_GetComponent_TisMeshRenderer_t4B7747212F0B88244BB7790C61AE124BFC15BAAE_m7FF948365C38BC39333D82B235A7C4EAD219960D_RuntimeMethod_var);
 		NullCheck(L_1);
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_2;
 		L_2 = Renderer_get_sharedMaterial_mA2E0CA0A564617FFC3E0E50947C6300082C35F81(L_1, NULL);
-		__this->___backgroundAndLabelSphereMaterial_8 = L_2;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___backgroundAndLabelSphereMaterial_8), (void*)L_2);
+		__this->___backgroundAndLabelSphereMaterial_9 = L_2;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___backgroundAndLabelSphereMaterial_9), (void*)L_2);
 		// renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
 		int32_t L_3 = V_0;
 		int32_t L_4 = V_0;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_5 = (RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27*)il2cpp_codegen_object_new(RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27_il2cpp_TypeInfo_var);
 		NullCheck(L_5);
 		RenderTexture__ctor_m45EACC89DDF408948889586516B3CA7AA8B73BFA(L_5, L_3, L_4, ((int32_t)16), NULL);
-		__this->___renderTexture_9 = L_5;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___renderTexture_9), (void*)L_5);
+		__this->___renderTexture_10 = L_5;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___renderTexture_10), (void*)L_5);
 		// renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_10;
 		NullCheck(L_6);
 		VirtualActionInvoker1< int32_t >::Invoke(8 /* System.Void UnityEngine.Texture::set_dimension(UnityEngine.Rendering.TextureDimension) */, L_6, 4);
 		// renderTexture.autoGenerateMips = false;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_7 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_7 = __this->___renderTexture_10;
 		NullCheck(L_7);
 		RenderTexture_set_autoGenerateMips_mDEFAC13954D315DE52B35B34577218D3AD4897A9(L_7, (bool)0, NULL);
 		// renderTexture.useMipMap = false;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_8 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_8 = __this->___renderTexture_10;
 		NullCheck(L_8);
 		RenderTexture_set_useMipMap_mB280A39DAB18372D3A0050FF20F730E5B0B44C32(L_8, (bool)0, NULL);
 		// renderTexture.filterMode = FilterMode.Point;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_9 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_9 = __this->___renderTexture_10;
 		NullCheck(L_9);
 		Texture_set_filterMode_mE423E58C0C16D059EA62BA87AD70F44AEA50CCC9(L_9, 0, NULL);
 		// ScreenshotCamera = gameObject.GetComponent<Camera>();
@@ -16317,11 +16319,11 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		NullCheck(L_5);
 		Camera_set_cullingMask_m14F426710530BA8FA53AEC02F79C418AA558CB32(L_5, ((int32_t)(L_6&((~((int32_t)(1<<((int32_t)(L_7&((int32_t)31))))))))), NULL);
 		// backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_8 = __this->___backgroundAndLabelSphere_5;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_8 = __this->___backgroundAndLabelSphere_6;
 		NullCheck(L_8);
 		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_9;
 		L_9 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_8, NULL);
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_10 = __this->___player_7;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_10 = __this->___player_8;
 		NullCheck(L_10);
 		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_11;
 		L_11 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_10, NULL);
@@ -16329,7 +16331,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_12;
 		L_12 = Transform_get_position_m69CD5FA214FDAE7BB701552943674846C220FDE1(L_11, NULL);
 		float L_13 = L_12.___x_2;
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_14 = __this->___player_7;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_14 = __this->___player_8;
 		NullCheck(L_14);
 		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_15;
 		L_15 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_14, NULL);
@@ -16337,7 +16339,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_16;
 		L_16 = Transform_get_position_m69CD5FA214FDAE7BB701552943674846C220FDE1(L_15, NULL);
 		float L_17 = L_16.___y_3;
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_18 = __this->___player_7;
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_18 = __this->___player_8;
 		NullCheck(L_18);
 		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_19;
 		L_19 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_18, NULL);
@@ -16350,40 +16352,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 		Vector3__ctor_m376936E6B999EF1ECBE57D990A386303E2283DE0_inline((&L_22), L_13, L_17, L_21, /*hidden argument*/NULL);
 		NullCheck(L_9);
 		Transform_set_position_mA1A817124BB41B685043DED2A9BA48CDF37C4156(L_9, L_22, NULL);
-		// labelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_23 = __this->___labelSphere_6;
-		NullCheck(L_23);
-		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_24;
-		L_24 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_23, NULL);
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_25 = __this->___player_7;
-		NullCheck(L_25);
-		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_26;
-		L_26 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_25, NULL);
-		NullCheck(L_26);
-		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_27;
-		L_27 = Transform_get_position_m69CD5FA214FDAE7BB701552943674846C220FDE1(L_26, NULL);
-		float L_28 = L_27.___x_2;
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_29 = __this->___player_7;
-		NullCheck(L_29);
-		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_30;
-		L_30 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_29, NULL);
-		NullCheck(L_30);
-		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_31;
-		L_31 = Transform_get_position_m69CD5FA214FDAE7BB701552943674846C220FDE1(L_30, NULL);
-		float L_32 = L_31.___y_3;
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_33 = __this->___player_7;
-		NullCheck(L_33);
-		Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1* L_34;
-		L_34 = GameObject_get_transform_m0BC10ADFA1632166AE5544BDF9038A2650C2AE56(L_33, NULL);
-		NullCheck(L_34);
-		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_35;
-		L_35 = Transform_get_position_m69CD5FA214FDAE7BB701552943674846C220FDE1(L_34, NULL);
-		float L_36 = L_35.___z_4;
-		Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2 L_37;
-		memset((&L_37), 0, sizeof(L_37));
-		Vector3__ctor_m376936E6B999EF1ECBE57D990A386303E2283DE0_inline((&L_37), L_28, L_32, L_36, /*hidden argument*/NULL);
-		NullCheck(L_24);
-		Transform_set_position_mA1A817124BB41B685043DED2A9BA48CDF37C4156(L_24, L_37, NULL);
 		// }
 		return;
 	}
@@ -16399,21 +16367,21 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoBackgroundforDirectTextRende
 	}
 	{
 		// backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
-		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_0 = __this->___backgroundAndLabelSphereMaterial_8;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_1 = __this->___renderTexture_9;
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_0 = __this->___backgroundAndLabelSphereMaterial_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_1 = __this->___renderTexture_10;
 		NullCheck(L_0);
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_0, _stringLiteralB388A772ABA26A1B4466D3807EBEF088E8A65482, L_1, NULL);
 		// ScreenshotCamera.targetTexture = renderTexture;
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_2 = __this->___ScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_3 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_3 = __this->___renderTexture_10;
 		NullCheck(L_2);
 		Camera_set_targetTexture_mE6C740F21A72DA47FB5B1D31D208710738A836C4(L_2, L_3, NULL);
 		// RenderTexture.active = renderTexture;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___renderTexture_10;
 		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB(L_4, NULL);
 		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_5 = __this->___ScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_10;
 		NullCheck(L_5);
 		bool L_7;
 		L_7 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_5, L_6, ((int32_t)63), NULL);
@@ -16454,28 +16422,28 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 	{
 		// int cubemapSize = 2048; // this can change for a better resolution
 		V_0 = ((int32_t)2048);
-		// labelRenderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
+		// renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
 		int32_t L_0 = V_0;
 		int32_t L_1 = V_0;
 		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_2 = (RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27*)il2cpp_codegen_object_new(RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27_il2cpp_TypeInfo_var);
 		NullCheck(L_2);
 		RenderTexture__ctor_m45EACC89DDF408948889586516B3CA7AA8B73BFA(L_2, L_0, L_1, ((int32_t)16), NULL);
-		__this->___labelRenderTexture_9 = L_2;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___labelRenderTexture_9), (void*)L_2);
-		// labelRenderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_3 = __this->___labelRenderTexture_9;
+		__this->___renderTexture_10 = L_2;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___renderTexture_10), (void*)L_2);
+		// renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_3 = __this->___renderTexture_10;
 		NullCheck(L_3);
 		VirtualActionInvoker1< int32_t >::Invoke(8 /* System.Void UnityEngine.Texture::set_dimension(UnityEngine.Rendering.TextureDimension) */, L_3, 4);
-		// labelRenderTexture.autoGenerateMips = false;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___labelRenderTexture_9;
+		// renderTexture.autoGenerateMips = false;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___renderTexture_10;
 		NullCheck(L_4);
 		RenderTexture_set_autoGenerateMips_mDEFAC13954D315DE52B35B34577218D3AD4897A9(L_4, (bool)0, NULL);
-		// labelRenderTexture.useMipMap = false;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_5 = __this->___labelRenderTexture_9;
+		// renderTexture.useMipMap = false;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_5 = __this->___renderTexture_10;
 		NullCheck(L_5);
 		RenderTexture_set_useMipMap_mB280A39DAB18372D3A0050FF20F730E5B0B44C32(L_5, (bool)0, NULL);
-		// labelRenderTexture.filterMode = FilterMode.Point;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___labelRenderTexture_9;
+		// renderTexture.filterMode = FilterMode.Point;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->___renderTexture_10;
 		NullCheck(L_6);
 		Texture_set_filterMode_mE423E58C0C16D059EA62BA87AD70F44AEA50CCC9(L_6, 0, NULL);
 		// backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
@@ -16491,18 +16459,18 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 		// initialRotation = Quaternion.Euler (180f, 270f, 0f); //Should place the label in the middle of the view
 		Quaternion_tDA59F214EF07D7700B26E40E562F267AF7306974 L_10;
 		L_10 = Quaternion_Euler_m9262AB29E3E9CE94EF71051F38A28E82AEC73F90_inline((180.0f), (270.0f), (0.0f), NULL);
-		__this->___initialRotation_10 = L_10;
-		// LabelScreenshotCamera = gameObject.GetComponent<Camera>();
+		__this->___initialRotation_11 = L_10;
+		// ScreenshotCamera = gameObject.GetComponent<Camera>();
 		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_11;
 		L_11 = Component_get_gameObject_m57AEFBB14DB39EC476F740BA000E170355DE691B(__this, NULL);
 		NullCheck(L_11);
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_12;
 		L_12 = GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6(L_11, GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
-		__this->___LabelScreenshotCamera_4 = L_12;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___LabelScreenshotCamera_4), (void*)L_12);
-		// LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_13 = __this->___LabelScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_14 = __this->___labelRenderTexture_9;
+		__this->___ScreenshotCamera_4 = L_12;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___ScreenshotCamera_4), (void*)L_12);
+		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_13 = __this->___ScreenshotCamera_4;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_14 = __this->___renderTexture_10;
 		NullCheck(L_13);
 		bool L_15;
 		L_15 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_13, L_14, ((int32_t)63), NULL);
@@ -16520,8 +16488,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Update_m05F9BD55DEE602
 		s_Il2CppMethodInitialized = true;
 	}
 	{
-		// LabelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_0 = __this->___LabelScreenshotCamera_4;
+		// ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_0 = __this->___ScreenshotCamera_4;
 		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_1 = L_0;
 		NullCheck(L_1);
 		int32_t L_2;
@@ -16546,33 +16514,33 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_LateUpdate_m4A661898ED
 		s_Il2CppMethodInitialized = true;
 	}
 	{
-		// LabelScreenshotCamera.targetTexture = labelRenderTexture;
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_0 = __this->___LabelScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_1 = __this->___labelRenderTexture_9;
+		// ScreenshotCamera.targetTexture = renderTexture;
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_0 = __this->___ScreenshotCamera_4;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_1 = __this->___renderTexture_10;
 		NullCheck(L_0);
 		Camera_set_targetTexture_mE6C740F21A72DA47FB5B1D31D208710738A836C4(L_0, L_1, NULL);
-		// RenderTexture.active = labelRenderTexture;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_2 = __this->___labelRenderTexture_9;
+		// RenderTexture.active = renderTexture;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_2 = __this->___renderTexture_10;
 		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB(L_2, NULL);
-		// LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_3 = __this->___LabelScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___labelRenderTexture_9;
+		// ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_3 = __this->___ScreenshotCamera_4;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_4 = __this->___renderTexture_10;
 		NullCheck(L_3);
 		bool L_5;
 		L_5 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_3, L_4, ((int32_t)63), NULL);
-		// backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", labelRenderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow
+		// backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", renderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_6 = __this->___backgroundAndLabelSphereMaterial_8;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_7 = __this->___labelRenderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_7 = __this->___renderTexture_10;
 		NullCheck(L_6);
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_6, _stringLiteral6452CE8ECE279EB3C9F48F27945942EAE7203F01, L_7, NULL);
-		// backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", labelRenderTexture);
+		// backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", renderTexture);
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_8 = __this->___backgroundAndLabelSphereMaterial_8;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_9 = __this->___labelRenderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_9 = __this->___renderTexture_10;
 		NullCheck(L_8);
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_8, _stringLiteralE24ED559728AD7A774EDA3CDBB59AF8641990AB4, L_9, NULL);
-		// backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", labelRenderTexture);
+		// backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", renderTexture);
 		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_10 = __this->___backgroundAndLabelSphereMaterial_8;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_11 = __this->___labelRenderTexture_9;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_11 = __this->___renderTexture_10;
 		NullCheck(L_10);
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_10, _stringLiteral7181839595AFEF877D6706E88ADE5BDE55228775, L_11, NULL);
 		// RenderTexture.active = null;
