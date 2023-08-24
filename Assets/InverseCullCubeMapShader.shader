@@ -78,6 +78,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             int _BillboardColorMethod;
             float _BillboardLightnessContrastThreshold;
 
+            int _GranularityMethod;
 
             //rotation matrix - a buffer with 16 floats
             StructuredBuffer<float> rotation_matrix;
@@ -85,7 +86,7 @@ Shader "Unlit/InverseCullCubeMapShader"
              //sum_all result
             StructuredBuffer<float> sum_all_results;
 
-            int _GranularityMethod;
+           
            
             struct v2f 
             {
@@ -568,58 +569,57 @@ Shader "Unlit/InverseCullCubeMapShader"
                 local_backgroundAvg /= 255;
 
 
-                
-
-                // //Label color and outline assignment
-                if (labelTex[3] != 0) // is a label pixel
+                // if _GranularityMethod = 0, do per-pixel color assignment
+                if (_GranularityMethod == 0)
                 {
-                    // if _GranularityMethod = 0, do per-pixel color assignment
-                    // if (_GranularityMethod == 0)
-                    // {
-                        //this is a sampled pixel
-                        if(isSample < _sampled_prob){
-                            col = function_f(_ColorMethod, bgSample);
-                        }else{
-                            //this is a unsampled pixel
-                            float top_r = 0.001;
-                            float top_g = 0.001;
-                            float top_b = 0.001;
-                            float top_a = 0.001;
-                            float bot= 0.001;
+                    // //Label color and outline assignment
+                    if (labelTex[3] != 0) // is a label pixel
+                    {
+                        
+                        
+                            //this is a sampled pixel
+                            if(isSample < _sampled_prob){
+                                col = function_f(_ColorMethod, bgSample);
+                            }else{
+                                //this is a unsampled pixel
+                                float top_r = 0.001;
+                                float top_g = 0.001;
+                                float top_b = 0.001;
+                                float top_a = 0.001;
+                                float bot= 0.001;
 
-                            //go through its neighbors
-                            for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
-                            for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
-                                float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-                                float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-                                    if (hash(x, y, offset)){
-                                        half3 coords = half3(x, y, vdata.uv.z);
-                                        float4 sample_col = texCUBE(_CubeMap, coords); 
-                                        float4 f_sample_col = function_f(_ColorMethod, bgSample);
-                                        float dist = float(i*i) + float(j*j) +1 ;
+                                //go through its neighbors
+                                for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
+                                for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
+                                    float x = vdata.uv.x + i * _MainTex_TexelSize.x;
+                                    float y = vdata.uv.y + j * _MainTex_TexelSize.y;
+                                        if (hash(x, y, offset)){
+                                            half3 coords = half3(x, y, vdata.uv.z);
+                                            float4 sample_col = texCUBE(_CubeMap, coords); 
+                                            float4 f_sample_col = function_f(_ColorMethod, bgSample);
+                                            float dist = float(i*i) + float(j*j) +1 ;
 
-                                        top_r += f_sample_col[0] / dist;
-                                        top_g += f_sample_col[1] / dist;
-                                        top_b += f_sample_col[2] / dist;
-                                        top_a += f_sample_col[3] / dist;
-                                        bot += 1.0 / dist;
-                                    }   
+                                            top_r += f_sample_col[0] / dist;
+                                            top_g += f_sample_col[1] / dist;
+                                            top_b += f_sample_col[2] / dist;
+                                            top_a += f_sample_col[3] / dist;
+                                            bot += 1.0 / dist;
+                                        }   
+                                    }
+                                }
+
+                                if (top_r != 0.001){
+                                    top_r = top_r / bot;
+                                    top_g = top_g / bot;
+                                    top_b = top_b / bot;
+                                    top_a = top_a / bot;
+                                    col = float4(top_r,top_g,top_b,top_a);
+                                }else{
+                                    //if we are so unlucky that no sample presents in the neighborhood
+                                col = function_f(_ColorMethod, bgSample);
                                 }
                             }
-
-                            if (top_r != 0.001){
-                                top_r = top_r / bot;
-                                top_g = top_g / bot;
-                                top_b = top_b / bot;
-                                top_a = top_a / bot;
-                                col = float4(top_r,top_g,top_b,top_a);
-                            }else{
-                                //if we are so unlucky that no sample presents in the neighborhood
-                            col = function_f(_ColorMethod, bgSample);
-                            }
-                        
-                        }
-    
+                    
                         // Apply outline if selected
                         if (_EnableOutline == 1)
                         {
@@ -670,11 +670,66 @@ Shader "Unlit/InverseCullCubeMapShader"
                             }
                         }
                     }
+                }
 
-                    // else if (_GranularityMethod == 1)
-                    // {
-                    //     float4 averageBackgroundPixel 
-                    // }
+                // if _GranularityMethod == 1, assign the same color to all label pixels and apply outline if selected
+                // else if (_GranularityMethod == 1)
+                // {
+                //     if (labelTex[3] != 0)
+                //     {
+                //         col = function_f(_ColorMethod, local_backgroundAvg);
+
+                //         // Apply outline if selected
+                //         if (_EnableOutline == 1)
+                //         {
+                //             // Applying sobel filter
+                //             float2 delta = float2(0.0075, 0.0015);
+                //             // float2 delta = float2(1,1);
+                            
+                //             float4 hr = float4(0, 0, 0, 0);
+                //             float4 vt = float4(0, 0, 0, 0);
+
+                //             float filter[3][3] = {
+                //                 {-1, 0, 1},
+                //                 {-2, 0, 2},
+                //                 {-1, 0, 1}
+                //             };
+
+                //             for (int i = -1; i <= 1; i++){
+                //                 for (int j = -1; j <= 1; j++){
+                //                     float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
+                //                     float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
+                //                     float4 pix = texCUBE(_LabelCubeMap, coords);
+                //                     if (pix[0] == 1 && pix[1] == 1 && pix[2] == 1 && pix[3] == 1) // is a label pixel
+                //                     {
+                //                         hr += pix *  filter[i + 1][j + 1];
+                //                         vt += pix *  filter[j + 1][i + 1];
+                //                     }
+                //                     else
+                //                     {
+                //                         hr += float4(0,0,0,0)*  filter[i + 1][j + 1];
+                //                         vt += float4(0,0,0,0)*  filter[j + 1][i + 1];
+                //                     }
+                //                     // hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
+                //                     // vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
+                //                 }
+                //             }
+
+
+                //             float edges =  sqrt(hr * hr + vt * vt);
+                //             // sobel(_LabelTex, vdata.uv);
+
+                            
+                //             if(edges != 0){ //Outline the edges
+                //                 if (col.r + col.g + col.b < 0.5){
+                //                     col = float4(1, 1, 1, 1); // White outline if low grayscale value
+                //                 }else{
+                //                 col = float4(0, 0, 0, 1); // black outline if high grayscale value
+                //                 } 
+                //             }
+                //         }
+                //     }      
+                // }
                     
                 
 

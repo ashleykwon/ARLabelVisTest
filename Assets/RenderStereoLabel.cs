@@ -59,11 +59,11 @@ public class RenderStereoLabel : MonoBehaviour
 
 
         //sum_all
-        // Debug.Log("SetUp get_sum");
-        // SetUp_getSum();
-        // material.SetBuffer ("sum_all_results", sumBuffer);
+        Debug.Log("SetUp get_sum");
+        SetUp_getSum();
+        material.SetBuffer("sum_all_results", sumBuffer);
 
-        // Sum_Single_Letter();
+        Sum_Single_Letter();
 
     }
 
@@ -91,7 +91,7 @@ public class RenderStereoLabel : MonoBehaviour
 
         RenderTexture.active = null;
 
-        // Update_getSum();
+        Update_getSum();
     }
 
     private void SetUp_getSum(){
