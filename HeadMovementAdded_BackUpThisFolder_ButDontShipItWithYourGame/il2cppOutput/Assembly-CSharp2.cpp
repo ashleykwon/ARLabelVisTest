@@ -16720,7 +16720,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_SetUp_getSum_mB79C0566
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral5C5F960AF6F91C9FB9F32C3D7CDC811DA0C1481C);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralAEA0C97FB9807977A6A3E67148313FC4644ED783);
@@ -16765,22 +16764,18 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_SetUp_getSum_mB79C0566
 		Cubemap_t4F2DFF70696A5CB5C1695DF8947CC60D718C4A1C* L_15 = __this->___backgroundCubeMap_13;
 		NullCheck(L_13);
 		ComputeShader_SetTexture_mCC0CE256668E97DB77AD607599380EC5EA941D14(L_13, L_14, _stringLiteralEDDD33A9254B1D2EC1379C837EAD69CEACC21C2D, L_15, NULL);
-		// Debug.Log(sumBuffer);
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_16 = __this->___sumBuffer_16;
-		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
-		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(L_16, NULL);
 		// cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
-		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_17 = __this->___cShader_15;
-		int32_t L_18 = __this->___kernelID_main_17;
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_19 = __this->___sumBuffer_16;
-		NullCheck(L_17);
-		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_17, L_18, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_19, NULL);
+		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_16 = __this->___cShader_15;
+		int32_t L_17 = __this->___kernelID_main_17;
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_18 = __this->___sumBuffer_16;
+		NullCheck(L_16);
+		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_16, L_17, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_18, NULL);
 		// cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
-		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_20 = __this->___cShader_15;
-		int32_t L_21 = __this->___kernelID_init_18;
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_22 = __this->___sumBuffer_16;
-		NullCheck(L_20);
-		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_20, L_21, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_22, NULL);
+		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_19 = __this->___cShader_15;
+		int32_t L_20 = __this->___kernelID_init_18;
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_21 = __this->___sumBuffer_16;
+		NullCheck(L_19);
+		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_19, L_20, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_21, NULL);
 		// }
 		return;
 	}

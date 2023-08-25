@@ -106,7 +106,7 @@ public class RenderStereoLabel : MonoBehaviour
         cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
         cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
 
-        Debug.Log(sumBuffer);
+        // Debug.Log(sumBuffer);
 
         cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
         cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);

@@ -565,7 +565,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // fixed4 shadowTex = texCUBE(_ShadowCubeMap,vdata.uv);
                 // shadowTex = separateBillboardLabelShadow(shadowTex, 2);
 
-                float4 local_backgroundAvg = float4(sum_all_results[0]/sum_all_results[3], sum_all_results[1]/sum_all_results[3], sum_all_results[2]/sum_all_results[3], 1);
+                float4 local_backgroundAvg = float4(sum_all_results[1]/sum_all_results[0], sum_all_results[2]/sum_all_results[0], sum_all_results[3]/sum_all_results[0], 1);
                 local_backgroundAvg /= 255;
 
 
@@ -733,7 +733,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                     
                 
 
-
                 // Render billboard if _BillboardColorMethod != 0
                 if (billboardTex[3] != 0)
                 {
@@ -749,7 +748,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         // float4 local_backgroundSum = local_pixel_sum(neighborhoodSize, vdata);
                         // float4 local_backgroundAvg = local_backgroundSum/pow(neighborhoodSize, 2);
 
-                        float4 local_backgroundAvg = float4(0,0,0,1);               
+                        float4 local_backgroundAvg = float4(0,0,0,1);      // for debugging purposes only         
                         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
                         float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
                         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
