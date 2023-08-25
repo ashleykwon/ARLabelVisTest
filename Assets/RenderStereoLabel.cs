@@ -57,13 +57,16 @@ public class RenderStereoLabel : MonoBehaviour
 
         LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
 
+        sumBuffer = new ComputeBuffer(4, 16);
+
+
 
         //sum_all
         Debug.Log("SetUp get_sum");
         SetUp_getSum();
         material.SetBuffer("sum_all_results", sumBuffer);
 
-        Sum_Single_Letter();
+        //Sum_Single_Letter();
 
     }
 
@@ -77,7 +80,7 @@ public class RenderStereoLabel : MonoBehaviour
     void LateUpdate() // This part causes the double-rendering
     {
 
-        // // Take a screenshot (white label + black background + blue billboard) and render it to billboard and label cubemaps (these two maps are initially simialr)
+        // Take a screenshot (white label + black background + blue billboard) and render it to billboard and label cubemaps (these two maps are initially simialr)
         LabelScreenshotCamera.targetTexture = labelRenderTexture;
         RenderTexture.active = labelRenderTexture;
 
@@ -103,15 +106,17 @@ public class RenderStereoLabel : MonoBehaviour
         cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
         cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
 
-        cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer);
+        Debug.Log(sumBuffer);
+
+        cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
         cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
 
-        cShader.Dispatch(kernelID_init, 1, 1, 1);
+        // cShader.Dispatch(kernelID_init, 1, 1, 1);
     }
 
     private void Update_getSum(){  
         
-        Debug.Log("Update get_sum");
+        // Debug.Log("Update get_sum");
         cShader.Dispatch(kernelID_main, 16, 1, 1);
         int[] results = new int[4];
         sumBuffer.GetData(results);

@@ -974,6 +974,7 @@ IL2CPP_EXTERN_C String_t* _stringLiteralB388A772ABA26A1B4466D3807EBEF088E8A65482
 IL2CPP_EXTERN_C String_t* _stringLiteralB92EF51E45166C91E2762DB6C9F27C8BD6EBE466;
 IL2CPP_EXTERN_C String_t* _stringLiteralB93F5E13E0AD8E8044D7D80E771F9A55F393D87F;
 IL2CPP_EXTERN_C String_t* _stringLiteralB9C9455B3E4B948A13662296FC407ECABE627584;
+IL2CPP_EXTERN_C String_t* _stringLiteralBC2FA825F2C2E862BB6F353863D152F2EB8750A8;
 IL2CPP_EXTERN_C String_t* _stringLiteralBDBB8D317096A0BA6BA9463FC2533707873DF8FD;
 IL2CPP_EXTERN_C String_t* _stringLiteralBF312D4ECBF434B103EC7D2AB0EDDCAA57411006;
 IL2CPP_EXTERN_C String_t* _stringLiteralC160D604752FF3C963D46235FADF691F22A6CABA;
@@ -994,7 +995,6 @@ IL2CPP_EXTERN_C String_t* _stringLiteralE95B20A3C0F0224ABEA60EBBCCE0DD745AF47376
 IL2CPP_EXTERN_C String_t* _stringLiteralEDDD33A9254B1D2EC1379C837EAD69CEACC21C2D;
 IL2CPP_EXTERN_C String_t* _stringLiteralEE12DBC05C7FC9FA2A8B746D643F2D6E1CCE6FEF;
 IL2CPP_EXTERN_C String_t* _stringLiteralF00ABD0EDECB5F784B852981D50B2B420FA66811;
-IL2CPP_EXTERN_C String_t* _stringLiteralF2CF12C23C6718537363AAD33632FD049E3CFAC1;
 IL2CPP_EXTERN_C String_t* _stringLiteralF766283E6A76BBE6D1D92A2B819533F1C7161D80;
 IL2CPP_EXTERN_C const RuntimeMethod* AnchorUIManager_PlaceAnchor_m171CD92E8687DD91E6F2D92564D2736ED2A99931_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* AnchorUIManager_SelectAnchor_m2956A73C1397E1018984941229D3E503F8222B1F_RuntimeMethod_var;
@@ -8496,6 +8496,10 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t Marshal_SizeOf_mED64846722033D6F60C29
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ComputeBuffer__ctor_m10899F96063EF384E8F25E2D61242CCF5F327D08 (ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* __this, int32_t ___count0, int32_t ___stride1, int32_t ___type2, const RuntimeMethod* method) ;
 // System.Void UnityEngine.ComputeBuffer::SetData(System.Array)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ComputeBuffer_SetData_m9F845E6B347CE028FA9A987D740FC642D828013A (ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* __this, RuntimeArray* ___data0, const RuntimeMethod* method) ;
+// System.Void RenderStereoLabel::SetUp_getSum()
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_SetUp_getSum_mB79C05663E51B55363DDECFBAE1B1ED44BE765D3 (RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761* __this, const RuntimeMethod* method) ;
+// System.Void RenderStereoLabel::Update_getSum()
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Update_getSum_m11EC841B44FD6262005C3E5E312767F76F15121C (RenderStereoLabel_t66F51F1A1ADA41081BAB5293B52989A94D55B761* __this, const RuntimeMethod* method) ;
 // System.Void UnityEngine.ComputeShader::SetTexture(System.Int32,System.String,UnityEngine.Texture)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ComputeShader_SetTexture_mCC0CE256668E97DB77AD607599380EC5EA941D14 (ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* __this, int32_t ___kernelIndex0, String_t* ___name1, Texture_t791CBB51219779964E0E8A2ED7C1AA5F92A4A700* ___texture2, const RuntimeMethod* method) ;
 // System.Void UnityEngine.ComputeBuffer::GetData(System.Array)
@@ -16514,6 +16518,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&GameObject_GetComponent_TisMeshRenderer_t4B7747212F0B88244BB7790C61AE124BFC15BAAE_m7FF948365C38BC39333D82B235A7C4EAD219960D_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Marshal_tD976A56A90263C3CE2B780D4B1CADADE2E70B4A7_il2cpp_TypeInfo_var);
@@ -16524,6 +16529,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&U3CPrivateImplementationDetailsU3E_t0F5473E849A5A5185A9F4C5246F0C32816C49FCA____8A31A40ECAC0CEB4D87B30BD156CA7A547E8E33DC071454B765FBC777D1C34A1_3_FieldInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralAA6897D381D17C44781D433697474E8A5DE940C4);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralBC2FA825F2C2E862BB6F353863D152F2EB8750A8);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralF766283E6A76BBE6D1D92A2B819533F1C7161D80);
 		s_Il2CppMethodInitialized = true;
 	}
 	int32_t V_0 = 0;
@@ -16603,23 +16610,39 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Start_m9D44537EFF5CC56
 		NullCheck(L_21);
 		ComputeBuffer_SetData_m9F845E6B347CE028FA9A987D740FC642D828013A(L_21, (RuntimeArray*)L_22, NULL);
 		// material.SetBuffer("rotation_matrix", rotation_matrix_buffer);
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_23 = __this->___rotation_matrix_buffer_14;
-		NullCheck(L_15);
-		Material_SetBuffer_mBE41E02CB7CE8817306B9F292A3EC786E1C84ED5(L_15, _stringLiteralAA6897D381D17C44781D433697474E8A5DE940C4, L_23, NULL);
+		Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* L_23 = L_15;
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_24 = __this->___rotation_matrix_buffer_14;
+		NullCheck(L_23);
+		Material_SetBuffer_mBE41E02CB7CE8817306B9F292A3EC786E1C84ED5(L_23, _stringLiteralAA6897D381D17C44781D433697474E8A5DE940C4, L_24, NULL);
 		// LabelScreenshotCamera = gameObject.GetComponent<Camera>();
-		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_24;
-		L_24 = Component_get_gameObject_m57AEFBB14DB39EC476F740BA000E170355DE691B(__this, NULL);
-		NullCheck(L_24);
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_25;
-		L_25 = GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6(L_24, GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
-		__this->___LabelScreenshotCamera_4 = L_25;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->___LabelScreenshotCamera_4), (void*)L_25);
+		GameObject_t76FEDD663AB33C991A9C9A23129337651094216F* L_25;
+		L_25 = Component_get_gameObject_m57AEFBB14DB39EC476F740BA000E170355DE691B(__this, NULL);
+		NullCheck(L_25);
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_26;
+		L_26 = GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6(L_25, GameObject_GetComponent_TisCamera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184_m3B3C11550E48AA36AFF82788636EB163CC51FEE6_RuntimeMethod_var);
+		__this->___LabelScreenshotCamera_4 = L_26;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___LabelScreenshotCamera_4), (void*)L_26);
 		// LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
-		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_26 = __this->___LabelScreenshotCamera_4;
-		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_27 = __this->___labelRenderTexture_9;
-		NullCheck(L_26);
-		bool L_28;
-		L_28 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_26, L_27, ((int32_t)63), NULL);
+		Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184* L_27 = __this->___LabelScreenshotCamera_4;
+		RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_28 = __this->___labelRenderTexture_9;
+		NullCheck(L_27);
+		bool L_29;
+		L_29 = Camera_RenderToCubemap_mD2B441113AD96FB75CEEE65F64582B85022C0F24(L_27, L_28, ((int32_t)63), NULL);
+		// sumBuffer = new ComputeBuffer(4, 16);
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_30 = (ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233*)il2cpp_codegen_object_new(ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233_il2cpp_TypeInfo_var);
+		NullCheck(L_30);
+		ComputeBuffer__ctor_mE40DE5EF5ADAC29B6B4DECBD1EE33E8526202617(L_30, 4, ((int32_t)16), NULL);
+		__this->___sumBuffer_16 = L_30;
+		Il2CppCodeGenWriteBarrier((void**)(&__this->___sumBuffer_16), (void*)L_30);
+		// Debug.Log("SetUp get_sum");
+		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
+		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteralBC2FA825F2C2E862BB6F353863D152F2EB8750A8, NULL);
+		// SetUp_getSum();
+		RenderStereoLabel_SetUp_getSum_mB79C05663E51B55363DDECFBAE1B1ED44BE765D3(__this, NULL);
+		// material.SetBuffer("sum_all_results", sumBuffer);
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_31 = __this->___sumBuffer_16;
+		NullCheck(L_23);
+		Material_SetBuffer_mBE41E02CB7CE8817306B9F292A3EC786E1C84ED5(L_23, _stringLiteralF766283E6A76BBE6D1D92A2B819533F1C7161D80, L_31, NULL);
 		// }
 		return;
 	}
@@ -16685,6 +16708,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_LateUpdate_m4A661898ED
 		Material_SetTexture_m06083C3F52EF02FFB1177901D9907314F280F9A5(L_8, _stringLiteralE24ED559728AD7A774EDA3CDBB59AF8641990AB4, L_9, NULL);
 		// RenderTexture.active = null;
 		RenderTexture_set_active_m5EE8E2327EF9B306C1425014CC34C41A8384E7AB((RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27*)NULL, NULL);
+		// Update_getSum();
+		RenderStereoLabel_Update_getSum_m11EC841B44FD6262005C3E5E312767F76F15121C(__this, NULL);
 		// }
 		return;
 	}
@@ -16695,6 +16720,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_SetUp_getSum_mB79C0566
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral5C5F960AF6F91C9FB9F32C3D7CDC811DA0C1481C);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralAEA0C97FB9807977A6A3E67148313FC4644ED783);
@@ -16739,23 +16765,22 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_SetUp_getSum_mB79C0566
 		Cubemap_t4F2DFF70696A5CB5C1695DF8947CC60D718C4A1C* L_15 = __this->___backgroundCubeMap_13;
 		NullCheck(L_13);
 		ComputeShader_SetTexture_mCC0CE256668E97DB77AD607599380EC5EA941D14(L_13, L_14, _stringLiteralEDDD33A9254B1D2EC1379C837EAD69CEACC21C2D, L_15, NULL);
-		// cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer);
-		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_16 = __this->___cShader_15;
-		int32_t L_17 = __this->___kernelID_main_17;
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_18 = __this->___sumBuffer_16;
-		NullCheck(L_16);
-		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_16, L_17, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_18, NULL);
+		// Debug.Log(sumBuffer);
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_16 = __this->___sumBuffer_16;
+		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
+		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(L_16, NULL);
+		// cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
+		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_17 = __this->___cShader_15;
+		int32_t L_18 = __this->___kernelID_main_17;
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_19 = __this->___sumBuffer_16;
+		NullCheck(L_17);
+		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_17, L_18, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_19, NULL);
 		// cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
-		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_19 = __this->___cShader_15;
-		int32_t L_20 = __this->___kernelID_init_18;
-		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_21 = __this->___sumBuffer_16;
-		NullCheck(L_19);
-		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_19, L_20, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_21, NULL);
-		// cShader.Dispatch(kernelID_init, 1, 1, 1);
-		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_22 = __this->___cShader_15;
-		int32_t L_23 = __this->___kernelID_init_18;
-		NullCheck(L_22);
-		ComputeShader_Dispatch_mEED7BA68C28B1B39E75208D0D4D9915D41985B0A(L_22, L_23, 1, 1, 1, NULL);
+		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_20 = __this->___cShader_15;
+		int32_t L_21 = __this->___kernelID_init_18;
+		ComputeBuffer_t51EADA9015EBCC1B982C5584E9AB2734415A8233* L_22 = __this->___sumBuffer_16;
+		NullCheck(L_20);
+		ComputeShader_SetBuffer_m3C3C7A2AA529EDBF2700C8953CA7EE373EA411B0(L_20, L_21, _stringLiteral53B6E9E15CB6C68BAA710CCEDA04F110A23E5C16, L_22, NULL);
 		// }
 		return;
 	}
@@ -16766,16 +16791,11 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderStereoLabel_Update_getSum_m11EC841
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32U5BU5D_t19C97395396A72ECAF310612F0760F165060314C_il2cpp_TypeInfo_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralF2CF12C23C6718537363AAD33632FD049E3CFAC1);
 		s_Il2CppMethodInitialized = true;
 	}
 	Int32U5BU5D_t19C97395396A72ECAF310612F0760F165060314C* V_0 = NULL;
 	{
-		// Debug.Log("Update get_sum");
-		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
-		Debug_Log_m87A9A3C761FF5C43ED8A53B16190A53D08F818BB(_stringLiteralF2CF12C23C6718537363AAD33632FD049E3CFAC1, NULL);
 		// cShader.Dispatch(kernelID_main, 16, 1, 1);
 		ComputeShader_tA7BDD0F6EE879D149480F5890BA2E665C50CFBF8* L_0 = __this->___cShader_15;
 		int32_t L_1 = __this->___kernelID_main_17;
