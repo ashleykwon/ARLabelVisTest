@@ -566,8 +566,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // shadowTex = separateBillboardLabelShadow(shadowTex, 2);
 
                 float4 local_backgroundAvg = float4(sum_all_results[1]/sum_all_results[0], sum_all_results[2]/sum_all_results[0], sum_all_results[3]/sum_all_results[0], 1);
-                local_backgroundAvg /= 255;
-
+                // local_backgroundAvg = float4(1,1,1,1);
 
                 // if _GranularityMethod = 0, do per-pixel color assignment
                 if (_GranularityMethod == 0)
