@@ -46,11 +46,11 @@ public class RenderStereoLabel : MonoBehaviour
         //this is a 16 float array
         float[] rotation_matrix_array = {1.0F,1.0F,1.0F};
 
-        Material material = new Material(surface_shader);
+        // Material material = new Material(surface_shader);
         int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(float));
         rotation_matrix_buffer = new ComputeBuffer(16, stride, ComputeBufferType.Default);
         rotation_matrix_buffer.SetData(rotation_matrix_array);
-        material.SetBuffer("rotation_matrix", rotation_matrix_buffer);
+        backgroundAndLabelSphereMaterial.SetBuffer("rotation_matrix", rotation_matrix_buffer);
 
         // Access the screenshot camera
         LabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -64,7 +64,7 @@ public class RenderStereoLabel : MonoBehaviour
         //sum_all
         Debug.Log("SetUp get_sum");
         SetUp_getSum();
-        material.SetBuffer("sum_all_results", sumBuffer);
+        backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
 
         //Sum_Single_Letter();
 
