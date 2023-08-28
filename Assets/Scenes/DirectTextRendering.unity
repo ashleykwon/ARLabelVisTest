@@ -778,6 +778,8 @@ MonoBehaviour:
   player: {fileID: 1308607596}
   speed: 100
   BackgroundAndLabelSphere: {fileID: 596797979}
+  LabelContainer: {fileID: 1542744195}
+  currentLabelMovementMode: 0
 --- !u!54 &1308607596
 Rigidbody:
   m_ObjectHideFlags: 0

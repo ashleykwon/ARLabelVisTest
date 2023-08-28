@@ -8,9 +8,13 @@ public class MovePlayer : MonoBehaviour
     public Rigidbody player;
     public float speed;
     public GameObject BackgroundAndLabelSphere;
+    public GameObject LabelContainer;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
-    int shadowIntensityIdx;
+    // int shadowIntensityIdx;
+
+    public int currentLabelMovementMode;
+    //public Vector3 DefaultLabelPosition;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
 
 
@@ -19,7 +23,8 @@ public class MovePlayer : MonoBehaviour
     {
         CurrentColorAssignmentAlgo = 1;
         CurrentBillboardColorAssignmentAlgo = 0;
-        shadowIntensityIdx = 0;
+        // shadowIntensityIdx = 0;
+        currentLabelMovementMode = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
     }
 
@@ -40,6 +45,7 @@ public class MovePlayer : MonoBehaviour
         bool YButtonPressed = OVRInput.GetDown(OVRInput.RawButton.Y);
         bool XButtonPressed = OVRInput.GetDown(OVRInput.RawButton.X);
         bool joystickPressed = OVRInput.GetDown(OVRInput.Button.PrimaryThumbstick);
+        bool rightJoystickPressed = OVRInput.GetDown(OVRInput.Button.SecondaryThumbstick);
 
         // float triggerLeft = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         // float triggerRight = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
@@ -92,6 +98,25 @@ public class MovePlayer : MonoBehaviour
             else
             {
                 labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            }
+        }
+
+        if (rightJoystickPressed)
+        {
+            // Debug.Log("rightJoystickPressed");
+            // currentLabelMovementMode += 1;
+            if (currentLabelMovementMode == 0) // default movement with the user's head
+            { 
+                LabelContainer.transform.localPosition = new Vector3(0,0,17);
+                currentLabelMovementMode = 1;
+            }
+            else// random x and y position assignment but within the user's field of view
+            {
+                float newX = Random.Range(-5,5);
+                float newY = Random.Range(-5,5);
+                LabelContainer.transform.localPosition= new Vector3(newX, newY, 17);
+                //LabelContainer.transform.rotation = player.rotation;
+                currentLabelMovementMode = 0;
             }
         }
 
