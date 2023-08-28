@@ -22506,7 +22506,7 @@ FINALLY_00d6:
 				RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_3 = __this->____tex_15;
 				NullCheck(L_3);
 				int32_t L_4;
-				L_4 = VirtualFuncInvoker0< int32_t >::Invoke(4 /* System.Int32 UnityEngine.Texture::get_width() */, L_3);
+				L_4 = VirtualFuncInvoker0< int32_t >::Invoke(5 /* System.Int32 UnityEngine.Texture::get_width() */, L_3);
 				int32_t L_5;
 				L_5 = Vector2Int_get_x_mA2CACB1B6E6B5AD0CCC32B2CD2EDCE3ECEB50576_inline((&V_0), NULL);
 				if ((!(((uint32_t)L_4) == ((uint32_t)L_5))))
@@ -22518,7 +22518,7 @@ FINALLY_00d6:
 				RenderTexture_tBA90C4C3AD9EECCFDDCC632D97C29FAB80D60D27* L_6 = __this->____tex_15;
 				NullCheck(L_6);
 				int32_t L_7;
-				L_7 = VirtualFuncInvoker0< int32_t >::Invoke(6 /* System.Int32 UnityEngine.Texture::get_height() */, L_6);
+				L_7 = VirtualFuncInvoker0< int32_t >::Invoke(7 /* System.Int32 UnityEngine.Texture::get_height() */, L_6);
 				int32_t L_8;
 				L_8 = Vector2Int_get_y_m48454163ECF0B463FB5A16A0C4FC4B14DB0768B3_inline((&V_0), NULL);
 				if ((!(((uint32_t)L_7) == ((uint32_t)L_8))))

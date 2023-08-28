@@ -16,7 +16,7 @@ public class RenderStereoLabel : MonoBehaviour
     Matrix4x4 m;
 
     public Shader surface_shader;
-    public Cubemap backgroundCubeMap; 
+    //public Cubemap backgroundCubeMap; 
     private ComputeBuffer rotation_matrix_buffer;
 
     public ComputeShader cShader;
@@ -41,16 +41,16 @@ public class RenderStereoLabel : MonoBehaviour
 
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
-        initialRotation = Quaternion.Euler (180f, 270f, 0f); //Should place the label in the middle of the view
+        // initialRotation = Quaternion.Euler (180f, 270f, 0f); //Should place the label in the middle of the view
        
-        //this is a 16 float array
-        float[] rotation_matrix_array = {1.0F,1.0F,1.0F};
+        // //this is a 16 float array
+        // float[] rotation_matrix_array = {1.0F,1.0F,1.0F};
 
-        // Material material = new Material(surface_shader);
-        int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(float));
-        rotation_matrix_buffer = new ComputeBuffer(16, stride, ComputeBufferType.Default);
-        rotation_matrix_buffer.SetData(rotation_matrix_array);
-        backgroundAndLabelSphereMaterial.SetBuffer("rotation_matrix", rotation_matrix_buffer);
+        // // Material material = new Material(surface_shader);
+        // int stride = System.Runtime.InteropServices.Marshal.SizeOf(typeof(float));
+        // rotation_matrix_buffer = new ComputeBuffer(16, stride, ComputeBufferType.Default);
+        // rotation_matrix_buffer.SetData(rotation_matrix_array);
+        // backgroundAndLabelSphereMaterial.SetBuffer("rotation_matrix", rotation_matrix_buffer);
 
         // Access the screenshot camera
         LabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
@@ -66,7 +66,7 @@ public class RenderStereoLabel : MonoBehaviour
         SetUp_getSum();
         backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
 
-        //Sum_Single_Letter();
+        // Sum_Single_Letter();
 
     }
 
@@ -103,8 +103,8 @@ public class RenderStereoLabel : MonoBehaviour
 
         cShader.SetTexture(kernelID_main, "InputImage", labelRenderTexture);
         cShader.SetTexture(kernelID_init, "InputImage", labelRenderTexture);
-        cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
-        cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
+        // cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
+        // cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
 
         // Debug.Log(sumBuffer);
 

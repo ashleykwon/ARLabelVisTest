@@ -12,6 +12,11 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture renderTexture;
 
+    public ComputeShader cShader;
+    private ComputeBuffer sumBuffer;
+    private int kernelID_main;
+    private int kernelID_init;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +35,13 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
 
         // Access the screenshot camera
         ScreenshotCamera = gameObject.GetComponent<Camera>(); 
+
+        sumBuffer = new ComputeBuffer(4, 16);
+
+        //sum_all
+        Debug.Log("SetUp get_sum");
+        SetUp_getSum();
+        backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
     }
 
     void Update()
@@ -56,6 +68,31 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         // Render the background and the label
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
         RenderTexture.active = null;
+
+        Update_getSum();
+    }
+
+
+    private void SetUp_getSum(){
+        kernelID_main = cShader.FindKernel("CSMain");
+        kernelID_init = cShader.FindKernel("CSInit");
+
+        cShader.SetTexture(kernelID_main, "InputCubeMap", renderTexture);
+        cShader.SetTexture(kernelID_init, "InputCubeMap", renderTexture);
+
+        cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
+        cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
+
+        // cShader.Dispatch(kernelID_init, 1, 1, 1);
+    }
+
+    private void Update_getSum(){  
+        
+        // Debug.Log("Update get_sum");
+        cShader.Dispatch(kernelID_main, 16, 1, 1);
+        int[] results = new int[4];
+        sumBuffer.GetData(results);
+
     }
 
 }
