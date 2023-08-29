@@ -63,10 +63,10 @@ public class RenderStereoLabel : MonoBehaviour
 
         //sum_all
         Debug.Log("SetUp get_sum");
-        SetUp_getSum();
-        backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
+        // SetUp_getSum();
 
-        // Sum_Single_Letter();
+        Sum_Single_Letter();
+        backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
 
     }
 
@@ -94,7 +94,7 @@ public class RenderStereoLabel : MonoBehaviour
 
         RenderTexture.active = null;
 
-        Update_getSum();
+        // Update_getSum();
     }
 
     private void SetUp_getSum(){
@@ -139,9 +139,13 @@ public class RenderStereoLabel : MonoBehaviour
         Coordination start_coords = new Coordination(x, y);
         Result_color letter_sum = dfs(label_texture, start_coords);
 
+        float count = letter_sum.count;
         sum_r = letter_sum.r;
         sum_g = letter_sum.g;
         sum_b = letter_sum.b;
+
+        float[] single_letter_sum = {count, sum_r, sum_g, sum_b};
+        sumBuffer.SetData(single_letter_sum);
 
     }
 
@@ -186,6 +190,8 @@ public class RenderStereoLabel : MonoBehaviour
     }
 
     private Result_color dfs(Texture2D label_texture, Coordination start_coords){
+        
+        float count = 1.0F;
         float r = 0.0F;
         float g = 0.0F;
         float b = 0.0F;
@@ -202,6 +208,7 @@ public class RenderStereoLabel : MonoBehaviour
             float cur_r = label_texture.GetPixel(cur.x, cur.y).r;
             float cur_g = label_texture.GetPixel(cur.x, cur.y).g;
             float cur_b = label_texture.GetPixel(cur.x, cur.y).b;
+            count += 1.0F;
             r += cur_r;
             g += cur_g;
             b += cur_b;
@@ -220,7 +227,7 @@ public class RenderStereoLabel : MonoBehaviour
 
         }
 
-        return new Result_color(r,g,b);
+        return new Result_color(count,r,g,b);
 
     }
 
@@ -238,11 +245,13 @@ public struct Coordination{
 
 
 public struct Result_color{
+        public float count;
         public float r;
         public float g;
         public float b;
 
-        public Result_color(float r, float g, float b){
+        public Result_color(float count, float r, float g, float b){
+            this.count = count;
             this.r = r;
             this.g = g;
             this.b = b;
