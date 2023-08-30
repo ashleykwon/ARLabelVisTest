@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.Networking;
+using System.IO;
+using System;
+using TMPro;
+using System.Text;
+using System.Linq;
+using UnityEngine.UI;
 
 public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
 {
@@ -16,6 +23,13 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     private ComputeBuffer sumBuffer;
     private int kernelID_main;
     private int kernelID_init;
+    private float time;
+    private float timeLimit = 5;
+    private readonly string url = "http://10.38.23.43:8000/predict";
+
+    public class BackgroundImageContainer{
+        public string rgb_base64;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +56,11 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         Debug.Log("SetUp get_sum");
         SetUp_getSum();
         backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
+
+        // StartCoroutine(PostScreenshot(renderTexture));
     }
+
+    
 
     void Update()
     {
@@ -67,9 +85,64 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         
         // Render the background and the label
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
+
+        // if (RenderTexture.active != null)
+        // {
+        //     StartCoroutine(PostScreenshot(renderTexture));
+        // }
+
         RenderTexture.active = null;
 
         Update_getSum();
+    }
+
+    IEnumerator PostScreenshot(RenderTexture screenshot) {
+        time += Time.deltaTime*1;
+
+        while (time > timeLimit)
+        {
+            var tempRend = RenderTexture.GetTemporary(screenshot.width, screenshot.height);
+            Graphics.Blit(screenshot, tempRend);
+            Texture2D tempText = new Texture2D(screenshot.width, screenshot.height, TextureFormat.RGBA32, false);
+            Rect rect = new Rect(0, 0, screenshot.width, screenshot.height);
+            tempText.ReadPixels(rect, 0, 0, false);
+            tempText.Apply();
+            tempText.Compress(false);
+            RenderTexture.ReleaseTemporary(tempRend);
+            byte[] bytes = tempText.EncodeToJPG();
+            
+            string img_base64 = Convert.ToBase64String(bytes);
+
+            BackgroundImageContainer myObject = new BackgroundImageContainer();
+            myObject.rgb_base64 =  img_base64;
+            string bodyJsonString = JsonUtility.ToJson(myObject);
+            var request = new UnityWebRequest(url, "PUT");
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
+            
+            request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError)
+            {
+                Debug.Log("Network Error: " + request.error);
+            }
+            else if (request.isHttpError)
+            {
+                Debug.Log("Http Error: " + request.error);
+            }
+            else
+            {
+                Debug.Log("Connection successful: " + request.downloadHandler.text);
+                string labelsRaw = request.downloadHandler.text;
+                string labelsEdited = labelsRaw.Replace('"',' ');
+                string labelsEdited2 = labelsEdited.Replace(@"\", "");
+                
+            }
+            
+            time = 0;
+        }
     }
 
 
