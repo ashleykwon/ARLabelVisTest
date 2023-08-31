@@ -19,7 +19,7 @@ public class GetLabelData : MonoBehaviour
     public Texture2D BackgroundScreenshotToSend;
     public GameObject player;
     public OVRCameraRig OVRCameraRig;
-    private readonly string url = "http://10.38.23.43:8000/predict";
+    private readonly string url = "http://Your IP Address:8000/predict";
 
 
     public class ScreenshotData{
