@@ -12,17 +12,19 @@ using System;
 public class GetLabelData : MonoBehaviour
 {
     public TMP_Text label;
-    public Camera ScreenshotCamera;
-    public GameObject backgroundAndLabelSphere;
-    public Material backgroundAndLabelSphereMaterial;
+    public Camera BackgroundAndLabelScreenshotCamera;
+    public Camera BackgroundScreenshotCamera;
     RenderTexture renderTexture;
-    Texture2D screenshotToSend;
+    Texture2D BackgroundAndLabelScreenshotToSend;
+    public Texture2D BackgroundScreenshotToSend;
     public GameObject player;
-    private readonly string url = "http://Your IP Address:8000/predict";
+    public OVRCameraRig OVRCameraRig;
+    private readonly string url = "http://10.38.23.43:8000/predict";
 
 
     public class ScreenshotData{
-        public string rgb_base64;
+        public string background_and_label_rgb_base64;
+        public string background_rgb_base64;
     }
 
 
@@ -31,7 +33,7 @@ public class GetLabelData : MonoBehaviour
     {
         int cubemapSize = 2048; // this can change for a better resolution
         
-        backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+        // backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
      
         // Define a cube-shaped render texture for the background
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
@@ -43,62 +45,57 @@ public class GetLabelData : MonoBehaviour
         renderTexture.filterMode = FilterMode.Point;
 
         // Access the screenshot camera
-        ScreenshotCamera = gameObject.GetComponent<Camera>(); 
-
-        ScreenshotCamera.RenderToCubemap(renderTexture, 63);
+        BackgroundAndLabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
+        // BackgroundScreenshotCamera = player.GetComponent<Camera>();
+        // Debug.Log(BackgroundScreenshotCamera);
     }
 
     void Update()
     {
         //ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("BackgroundAndLabel"));
         // Move and rotate the sphere with the player
-        backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+        //backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
     }
 
     
 
     void LateUpdate()
     {     
-        // Take a screenshot and render it to a cubemap
-        ScreenshotCamera.targetTexture = renderTexture;
-        RenderTexture.active = renderTexture;
-
-        // Render the background and the label
-        ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
-        backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
-
         // Take a screenshot of the current background and label to send to the server
         StartCoroutine(TakeScreenshot());
-
-        RenderTexture.active = null;
     }
 
 
     IEnumerator TakeScreenshot() // take screenshot of the current background and label as Texture2D
     {
         yield return new WaitForEndOfFrame();
-        screenshotToSend = ScreenCapture.CaptureScreenshotAsTexture();
-        if (screenshotToSend != null)
+        BackgroundAndLabelScreenshotToSend = ScreenCapture.CaptureScreenshotAsTexture();
+        if (BackgroundAndLabelScreenshotToSend != null)
         {
-            StartCoroutine(PostScreeshot(screenshotToSend));
+            StartCoroutine(PostScreeshot(BackgroundAndLabelScreenshotToSend));
         }
 
-        UnityEngine.Object.Destroy(screenshotToSend);
+        UnityEngine.Object.Destroy(BackgroundAndLabelScreenshotToSend);
     }
 
 
-    IEnumerator PostScreeshot(Texture2D screenshot) // Post the screenshot taken by TakeScreenshot() to the server
+    IEnumerator PostScreeshot(Texture2D backgroundAndLabelScreenshot) // Post the screenshot taken by TakeScreenshot() to the server
     {
         // Initiate screenshotContainer
  		ScreenshotData screenshotContainer = new ScreenshotData();
 
-        // Convert screen to a string so that it can be attached to the container
-        //screenshot.Compress(false); // compress the screenshot if latency is caused
-        byte[] bytes = screenshot.EncodeToJPG();
-        string rgb_base64 = Convert.ToBase64String(bytes);
+        // Convert the screenshot of the background and the label to a string so that it can be attached to the container
+        //screenshot.Compress(false); // can't compress the screenshot if it needs to be encoded to jpg, png ... etc.
+        byte[] bytes = backgroundAndLabelScreenshot.EncodeToJPG();
+        string background_and_label_rgb_base64 = Convert.ToBase64String(bytes);
 
-        // Attach the string created above to screenshotContainer
-        screenshotContainer.rgb_base64 = rgb_base64;
+        // Convert the screenshot of the background to a string so that it can be attached to the container
+        // byte[] bytesBackground = BackgroundScreenshotToSend.EncodeToJPG();
+        // string background_rgb_base64 = Convert.ToBase64String(bytesBackground)
+
+        // Attach the strings created above to screenshotContainer
+        screenshotContainer.background_and_label_rgb_base64 = background_and_label_rgb_base64;
+        screenshotContainer.background_rgb_base64 = background_and_label_rgb_base64; // this should be background_rgb_base64 derived above
         
         // Convert screenshotContainer to a JSON object and send it to the server
         string bodyJsonString = JsonUtility.ToJson(screenshotContainer);

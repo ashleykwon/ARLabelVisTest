@@ -123,11 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &81453106 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 100006, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
-  m_PrefabInstance: {fileID: 107234424}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &107234424
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -187,8 +182,64 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 20000010189485334, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+--- !u!1 &487844816 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 107234424}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &487844818 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 20000010189485334, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 107234424}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &487844819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 487844816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c30a947aa3e52047b5f58921801b4f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScreenshotCamera: {fileID: 487844818}
+  player: {fileID: 1148802130}
+--- !u!1 &603032189 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 107234424}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &603032191 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2037080, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+  m_PrefabInstance: {fileID: 107234424}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &603032193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603032189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6195162a1d6045469a2b9e8d60b79eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  label: {fileID: 1642037112}
+  BackgroundAndLabelScreenshotCamera: {fileID: 603032191}
+  BackgroundScreenshotCamera: {fileID: 487844818}
+  BackgroundScreenshotToSend: {fileID: 0}
+  player: {fileID: 1148802130}
+  OVRCameraRig: {fileID: 0}
 --- !u!1 &883391236
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +249,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 883391237}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LabelContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -428,7 +479,7 @@ GameObject:
   - component: {fileID: 1642037111}
   - component: {fileID: 1642037113}
   - component: {fileID: 1642037112}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -594,25 +645,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400006, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
   m_PrefabInstance: {fileID: 107234424}
   m_PrefabAsset: {fileID: 0}
---- !u!20 &1746247808 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 20000012175207052, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
-  m_PrefabInstance: {fileID: 107234424}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1746247809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81453106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6195162a1d6045469a2b9e8d60b79eb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  label: {fileID: 1642037112}
-  ScreenshotCamera: {fileID: 1746247808}
-  backgroundAndLabelSphere: {fileID: 982976504}
-  backgroundAndLabelSphereMaterial: {fileID: 0}
-  player: {fileID: 1148802130}
