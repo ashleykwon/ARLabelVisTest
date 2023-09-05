@@ -17,7 +17,7 @@ public class SendBackgroundImg : MonoBehaviour
     public GameObject player;
     public TMP_Text label;
     RenderTexture renderTexture;
-    private readonly string url = "http://10.38.23.43:8000/predict";
+    private readonly string url = "http://YourIPAddress:8000/predict";
     Texture2D Screenshot;
     
 
