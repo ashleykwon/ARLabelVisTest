@@ -181,6 +181,7 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Facebook.Wit.TTS.Samples.dll
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Unity.Services.Core.Configuration.dll
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\UnityEngine.SpatialTracking.dll
+--root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Simple360Render.Runtime.dll
 --assembly-folder=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\
 --pdb-search-paths=Temp/ManagedSymbols/
 --method=Unity.Jobs.IJobParallelForExtensions+ParallelForJobStruct`1[[Unity.Barracuda.BurstCPUOps+LogSoftmaxEndJob_Full_Half, Unity.Barracuda, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(Unity.Barracuda.BurstCPUOps+LogSoftmaxEndJob_Full_Half&, Unity.Barracuda, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--20ba3d13a564e7c8dba284c4597a7218
@@ -506,6 +507,7 @@ Library: lib_burst_generated
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Facebook.Wit.TTS.Samples.dll
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Unity.Services.Core.Configuration.dll
 --root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\UnityEngine.SpatialTracking.dll
+--root-assembly=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\Simple360Render.Runtime.dll
 --assembly-folder=C:\Users\Ashley Kwon\Desktop\ARLabelVisTest\Temp\StagingArea\Data\Managed\
 --pdb-search-paths=Temp/ManagedSymbols/
 --method=Unity.Jobs.IJobParallelForExtensions+ParallelForJobStruct`1[[Unity.Barracuda.BurstCPUOps+VectorBroadcastScaleBiasJob_Full_Float, Unity.Barracuda, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(Unity.Barracuda.BurstCPUOps+VectorBroadcastScaleBiasJob_Full_Float&, Unity.Barracuda, Version=3.0.1.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--c0071ef7214a57d43fdddd8c712e27af

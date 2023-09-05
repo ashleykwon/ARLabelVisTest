@@ -35,6 +35,7 @@ IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_Oculus_Platform_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_Oculus_Spatializer_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_Oculus_VR_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_Oculus_Voice_Demo_CodeGenModule;
+IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_Simple360Render_Runtime_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_System_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_System_Configuration_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_System_Core_CodeGenModule;
@@ -56,7 +57,6 @@ IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_JSONSerializeModule_Code
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_ParticleSystemModule_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_Physics2DModule_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_PhysicsModule_CodeGenModule;
-IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_ScreenCaptureModule_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_SharedInternalsModule_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_SpriteShapeModule_CodeGenModule;
 IL2CPP_EXTERN_C_CONST Il2CppCodeGenModule g_UnityEngine_SubsystemsModule_CodeGenModule;
@@ -106,6 +106,7 @@ const Il2CppCodeGenModule* g_CodeGenModules[68] =
 	(&g_Oculus_Spatializer_CodeGenModule),
 	(&g_Oculus_VR_CodeGenModule),
 	(&g_Oculus_Voice_Demo_CodeGenModule),
+	(&g_Simple360Render_Runtime_CodeGenModule),
 	(&g_System_CodeGenModule),
 	(&g_System_Configuration_CodeGenModule),
 	(&g_System_Core_CodeGenModule),
@@ -127,7 +128,6 @@ const Il2CppCodeGenModule* g_CodeGenModules[68] =
 	(&g_UnityEngine_ParticleSystemModule_CodeGenModule),
 	(&g_UnityEngine_Physics2DModule_CodeGenModule),
 	(&g_UnityEngine_PhysicsModule_CodeGenModule),
-	(&g_UnityEngine_ScreenCaptureModule_CodeGenModule),
 	(&g_UnityEngine_SharedInternalsModule_CodeGenModule),
 	(&g_UnityEngine_SpriteShapeModule_CodeGenModule),
 	(&g_UnityEngine_SubsystemsModule_CodeGenModule),
@@ -163,10 +163,10 @@ const Il2CppCodeRegistration g_CodeRegistration =
 {
 	11,
 	g_ReversePInvokeWrapperPointers,
-	43257,
+	43259,
 	g_Il2CppGenericMethodPointers,
 	g_Il2CppGenericAdjustorThunks,
-	12084,
+	12089,
 	g_Il2CppInvokerPointers,
 	1642,
 	g_UnresolvedVirtualMethodPointers,

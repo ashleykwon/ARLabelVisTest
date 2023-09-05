@@ -16,10 +16,9 @@ public class GetLabelData : MonoBehaviour
     public Camera BackgroundScreenshotCamera;
     RenderTexture renderTexture;
     Texture2D BackgroundAndLabelScreenshotToSend;
-    public Texture2D BackgroundScreenshotToSend;
     public GameObject player;
-    public OVRCameraRig OVRCameraRig;
-    private readonly string url = "http://Your IP Address:8000/predict";
+    private readonly string url = "http://10.38.23.43:8000/predict";
+    DateTime currentTime;
 
 
     public class ScreenshotData{
@@ -33,8 +32,6 @@ public class GetLabelData : MonoBehaviour
     {
         int cubemapSize = 2048; // this can change for a better resolution
         
-        // backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
-     
         // Define a cube-shaped render texture for the background
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
@@ -46,15 +43,6 @@ public class GetLabelData : MonoBehaviour
 
         // Access the screenshot camera
         BackgroundAndLabelScreenshotCamera = gameObject.GetComponent<Camera>(); 
-        // BackgroundScreenshotCamera = player.GetComponent<Camera>();
-        // Debug.Log(BackgroundScreenshotCamera);
-    }
-
-    void Update()
-    {
-        //ScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("BackgroundAndLabel"));
-        // Move and rotate the sphere with the player
-        //backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
     }
 
     
@@ -62,36 +50,43 @@ public class GetLabelData : MonoBehaviour
     void LateUpdate()
     {     
         // Take a screenshot of the current background and label to send to the server
-        StartCoroutine(TakeScreenshot());
+        StartCoroutine(PostScreenshot());
     }
 
 
-    IEnumerator TakeScreenshot() // take screenshot of the current background and label as Texture2D
+    // IEnumerator TakeScreenshot() // take screenshot of the current background and label as Texture2D
+    // {
+    //     yield return new WaitForEndOfFrame();
+    //     BackgroundAndLabelScreenshotToSend = ScreenCapture.CaptureScreenshotAsTexture();
+    //     if (BackgroundAndLabelScreenshotToSend != null)
+    //     {
+    //         StartCoroutine(PostScreeshot(BackgroundAndLabelScreenshotToSend));
+    //     }
+
+    //     UnityEngine.Object.Destroy(BackgroundAndLabelScreenshotToSend);
+    // }
+
+
+    IEnumerator PostScreenshot() // Post the screenshot taken by TakeScreenshot() to the server
     {
         yield return new WaitForEndOfFrame();
-        BackgroundAndLabelScreenshotToSend = ScreenCapture.CaptureScreenshotAsTexture();
-        if (BackgroundAndLabelScreenshotToSend != null)
-        {
-            StartCoroutine(PostScreeshot(BackgroundAndLabelScreenshotToSend));
-        }
-
-        UnityEngine.Object.Destroy(BackgroundAndLabelScreenshotToSend);
-    }
-
-
-    IEnumerator PostScreeshot(Texture2D backgroundAndLabelScreenshot) // Post the screenshot taken by TakeScreenshot() to the server
-    {
         // Initiate screenshotContainer
  		ScreenshotData screenshotContainer = new ScreenshotData();
-
-        // Convert the screenshot of the background and the label to a string so that it can be attached to the container
+        
+        // Convert the 360 degree screenshot of the background and the label to a string so that it can be attached to the container
         //screenshot.Compress(false); // can't compress the screenshot if it needs to be encoded to jpg, png ... etc.
-        byte[] bytes = backgroundAndLabelScreenshot.EncodeToJPG();
-        string background_and_label_rgb_base64 = Convert.ToBase64String(bytes);
+        byte[] bytesBackgroundAndLabel = I360Render.Capture(512, true, BackgroundAndLabelScreenshotCamera, true);
+        //File.WriteAllBytes(Application.dataPath + "/backgroundAndLabelScreenshot.jpg", bytesBackgroundAndLabel); // save the screenshot locally for debugging purposes only 
+        string background_and_label_rgb_base64 = Convert.ToBase64String(bytesBackgroundAndLabel);
 
         // Convert the screenshot of the background to a string so that it can be attached to the container
-        // byte[] bytesBackground = BackgroundScreenshotToSend.EncodeToJPG();
-        // string background_rgb_base64 = Convert.ToBase64String(bytesBackground)
+        // Get the current date time to find the corresponding background screenshot
+        currentTime = DateTime.Now;
+        string currentTimeAsString = currentTime.ToString("yyyy-MM-dd_hh-mm-ss")+".jpg";
+        string filePath = System.IO.Path.Combine(Application.dataPath, currentTimeAsString);
+        // StartCoroutine(WaitingLoop()); // Wait until SendBackgroundImg.cs writes the background jpg file
+        // byte[] bytesBackground = File.ReadAllBytes(filePath);
+        // string background_rgb_base64 = Convert.ToBase64String(bytesBackground);
 
         // Attach the strings created above to screenshotContainer
         screenshotContainer.background_and_label_rgb_base64 = background_and_label_rgb_base64;
@@ -126,5 +121,15 @@ public class GetLabelData : MonoBehaviour
         // Dispose request after use to prevent memory loss
         request.Dispose();
     }
+
+    // private IEnumerator WaitingLoop()
+    // {
+    //     WaitForSeconds waitTime = new WaitForSeconds(10);
+    //     while (true)
+    //     {
+    //         Debug.Log("waiting waiting.");
+    //         yield return waitTime;
+    //     }
+    // }
 
 }

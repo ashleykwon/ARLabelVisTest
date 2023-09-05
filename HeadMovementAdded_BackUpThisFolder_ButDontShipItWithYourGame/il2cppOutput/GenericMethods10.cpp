@@ -1034,6 +1034,7 @@ IL2CPP_EXTERN_C const RuntimeMethod* Array_Sort_TisWorkRequest_t8AF542F2E248D923
 IL2CPP_EXTERN_C const RuntimeMethod* Array_Sort_TisX509ChainStatus_t5A57DDA24AA1FCA9F2B8D70B767CDDF388E4A80D_mE15993628BBDD272038B8BB6E5847DD6ECFED252_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* Array_Sort_TisXRNodeState_t683158812A1D80A6BC73DB97405BB0B795A9111A_mE82DD02E102324627B71F114A5BAC410E2F2A1F3_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* Array_TrueForAll_TisRuntimeObject_mA1262790C180A58004F67F90006D2C8834525E04_RuntimeMethod_var;
+IL2CPP_EXTERN_C const RuntimeMethod* AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* AsyncGPUReadbackRequest_GetData_TisSingle_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_mCD520E10A2FF9A6B23B92761C1E60AE9793DC1C9_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* AsyncTaskMethodBuilder_Start_TisRuntimeObject_mEFE065A20533413CD8BB8FAEAF761102588337FB_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* AsyncTaskMethodBuilder_Start_TisU3CConnectU3Ed__16_t50543F8A6C628D1FD81B23F9987D142F1A645989_mBA821122D7F94F8D9AD4603A85182FB592D62451_RuntimeMethod_var;
@@ -2791,6 +2792,17 @@ struct KeyValuePair_2_tFC32D2507216293851350D29B64D79F950B55230
 	RuntimeObject* ___key_0;
 	// TValue System.Collections.Generic.KeyValuePair`2::value
 	RuntimeObject* ___value_1;
+};
+
+// Unity.Collections.NativeArray`1<System.Byte>
+struct NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF 
+{
+	// System.Void* Unity.Collections.NativeArray`1::m_Buffer
+	void* ___m_Buffer_0;
+	// System.Int32 Unity.Collections.NativeArray`1::m_Length
+	int32_t ___m_Length_1;
+	// Unity.Collections.Allocator Unity.Collections.NativeArray`1::m_AllocatorLabel
+	int32_t ___m_AllocatorLabel_2;
 };
 
 // Unity.Collections.NativeArray`1<System.Single>
@@ -4831,18 +4843,6 @@ struct SigmoidJobHelper_t79E382158A6A02AD47F403F13B5B38B1D8A69A5B
 		{
 		};
 		uint8_t SigmoidJobHelper_t79E382158A6A02AD47F403F13B5B38B1D8A69A5B__padding[1];
-	};
-};
-
-// Unity.Barracuda.BurstCPUOps/SinJobHelper
-struct SinJobHelper_t14BE9DB6342EC93530DE5146D746BDF803E2224A 
-{
-	union
-	{
-		struct
-		{
-		};
-		uint8_t SinJobHelper_t14BE9DB6342EC93530DE5146D746BDF803E2224A__padding[1];
 	};
 };
 
@@ -8124,39 +8124,6 @@ struct SigmoidJob_Full_Float_tE93EDF0E3F3ED3744C2C51E2EDA14CB18593B703
 	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
 	// Unity.Barracuda.BurstCPUOps/SigmoidJobHelper Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Float::data
 	SigmoidJobHelper_t79E382158A6A02AD47F403F13B5B38B1D8A69A5B ___data_2;
-};
-
-// Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half
-struct SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88 
-{
-	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half::<X>k__BackingField
-	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
-	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half::<O>k__BackingField
-	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
-	// Unity.Barracuda.BurstCPUOps/SigmoidJobHelper Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half::data
-	SigmoidJobHelper_t79E382158A6A02AD47F403F13B5B38B1D8A69A5B ___data_2;
-};
-
-// Unity.Barracuda.BurstCPUOps/SinJob_Full_Float
-struct SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1 
-{
-	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/SinJob_Full_Float::<X>k__BackingField
-	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
-	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/SinJob_Full_Float::<O>k__BackingField
-	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
-	// Unity.Barracuda.BurstCPUOps/SinJobHelper Unity.Barracuda.BurstCPUOps/SinJob_Full_Float::data
-	SinJobHelper_t14BE9DB6342EC93530DE5146D746BDF803E2224A ___data_2;
-};
-
-// Unity.Barracuda.BurstCPUOps/SinJob_Full_Half
-struct SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB 
-{
-	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/SinJob_Full_Half::<X>k__BackingField
-	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
-	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/SinJob_Full_Half::<O>k__BackingField
-	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
-	// Unity.Barracuda.BurstCPUOps/SinJobHelper Unity.Barracuda.BurstCPUOps/SinJob_Full_Half::data
-	SinJobHelper_t14BE9DB6342EC93530DE5146D746BDF803E2224A ___data_2;
 };
 
 // Unity.Barracuda.BurstCPUOps/VectorBroadcastJob
@@ -13741,6 +13708,8 @@ struct DelegateU5BU5D_tC5AB7E8F745616680F337909D3A8E6C722CDF771  : public Runtim
 };
 
 
+// Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Byte>(System.Int32)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_gshared (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method) ;
 // Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Single>(System.Int32)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeArray_1_t3848EE4B6647317212A754634DE6DBC90B99FBEF AsyncGPUReadbackRequest_GetData_TisSingle_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_mCD520E10A2FF9A6B23B92761C1E60AE9793DC1C9_gshared (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method) ;
 // System.Void System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<System.Threading.Tasks.VoidTaskResult>::AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.ConfiguredTaskAwaitable`1/ConfiguredTaskAwaiter<System.Nullable`1<System.Int32>>,Mono.Net.Security.AsyncProtocolRequest/<ProcessOperation>d__24>(TAwaiter&,TStateMachine&)
@@ -13962,6 +13931,11 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR intptr_t AsyncGPUReadbackRequest_GetDataRaw_m
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void* IntPtr_op_Explicit_m2728CBA081E79B97DDCF1D4FAD77B309CA1E94BF (intptr_t ___value0, const RuntimeMethod* method) ;
 // System.Int32 UnityEngine.Rendering.AsyncGPUReadbackRequest::get_layerDataSize()
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t AsyncGPUReadbackRequest_get_layerDataSize_mCAE8CCE76C830532015EFC47D062917900DB749B (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, const RuntimeMethod* method) ;
+// Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Byte>(System.Int32)
+inline NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136 (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method)
+{
+	return ((  NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF (*) (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7*, int32_t, const RuntimeMethod*))AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_gshared)(__this, ___layer0, method);
+}
 // Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Single>(System.Int32)
 inline NativeArray_1_t3848EE4B6647317212A754634DE6DBC90B99FBEF AsyncGPUReadbackRequest_GetData_TisSingle_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_mCD520E10A2FF9A6B23B92761C1E60AE9793DC1C9 (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method)
 {
@@ -26576,6 +26550,136 @@ IL_001a:
 		RuntimeObject* L_4 = V_0;
 		return L_4;
 	}
+}
+// Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Byte>(System.Int32)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_gshared (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method) 
+{
+	int32_t V_0 = 0;
+	NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	bool V_2 = false;
+	bool V_3 = false;
+	NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF V_4;
+	memset((&V_4), 0, sizeof(V_4));
+	int32_t G_B3_0 = 0;
+	int32_t G_B8_0 = 0;
+	{
+		bool L_0;
+		L_0 = AsyncGPUReadbackRequest_get_done_mC042016E5BE850F18995831CBB4F06655914798C(__this, NULL);
+		if (!L_0)
+		{
+			goto IL_0011;
+		}
+	}
+	{
+		bool L_1;
+		L_1 = AsyncGPUReadbackRequest_get_hasError_m374BB20A32B9DCDBFD8F81BBE542847B82F04EE5(__this, NULL);
+		G_B3_0 = ((int32_t)(L_1));
+		goto IL_0012;
+	}
+
+IL_0011:
+	{
+		G_B3_0 = 1;
+	}
+
+IL_0012:
+	{
+		V_2 = (bool)G_B3_0;
+		bool L_2 = V_2;
+		if (!L_2)
+		{
+			goto IL_0021;
+		}
+	}
+	{
+		InvalidOperationException_t5DDE4D49B7405FAAB1E4576F4715A42A3FAD4BAB* L_3 = (InvalidOperationException_t5DDE4D49B7405FAAB1E4576F4715A42A3FAD4BAB*)il2cpp_codegen_object_new(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&InvalidOperationException_t5DDE4D49B7405FAAB1E4576F4715A42A3FAD4BAB_il2cpp_TypeInfo_var)));
+		NullCheck(L_3);
+		InvalidOperationException__ctor_mE4CB6F4712AB6D99A2358FBAE2E052B3EE976162(L_3, ((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral699ABA3941867526413B23699BCDD9DC20DA6D7A)), NULL);
+		IL2CPP_RAISE_MANAGED_EXCEPTION(L_3, ((RuntimeMethod*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_RuntimeMethod_var)));
+	}
+
+IL_0021:
+	{
+		int32_t L_4 = ___layer0;
+		if ((((int32_t)L_4) < ((int32_t)0)))
+		{
+			goto IL_0033;
+		}
+	}
+	{
+		int32_t L_5 = ___layer0;
+		int32_t L_6;
+		L_6 = AsyncGPUReadbackRequest_get_layerCount_m70DE577E87B38E6621851F88542E252123147501(__this, NULL);
+		G_B8_0 = ((((int32_t)((((int32_t)L_5) < ((int32_t)L_6))? 1 : 0)) == ((int32_t)0))? 1 : 0);
+		goto IL_0034;
+	}
+
+IL_0033:
+	{
+		G_B8_0 = 1;
+	}
+
+IL_0034:
+	{
+		V_3 = (bool)G_B8_0;
+		bool L_7 = V_3;
+		if (!L_7)
+		{
+			goto IL_0059;
+		}
+	}
+	{
+		int32_t L_8 = ___layer0;
+		int32_t L_9 = L_8;
+		RuntimeObject* L_10 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var)), &L_9);
+		int32_t L_11;
+		L_11 = AsyncGPUReadbackRequest_get_layerCount_m70DE577E87B38E6621851F88542E252123147501(__this, NULL);
+		int32_t L_12 = L_11;
+		RuntimeObject* L_13 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var)), &L_12);
+		String_t* L_14;
+		L_14 = String_Format_mFB7DA489BD99F4670881FF50EC017BFB0A5C0987(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral7F2AA158020B57C11060F4940998AEF1D121EF87)), L_10, L_13, NULL);
+		ArgumentException_tAD90411542A20A9C72D5CDA3A84181D8B947A263* L_15 = (ArgumentException_tAD90411542A20A9C72D5CDA3A84181D8B947A263*)il2cpp_codegen_object_new(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&ArgumentException_tAD90411542A20A9C72D5CDA3A84181D8B947A263_il2cpp_TypeInfo_var)));
+		NullCheck(L_15);
+		ArgumentException__ctor_m026938A67AF9D36BB7ED27F80425D7194B514465(L_15, L_14, NULL);
+		IL2CPP_RAISE_MANAGED_EXCEPTION(L_15, ((RuntimeMethod*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_RuntimeMethod_var)));
+	}
+
+IL_0059:
+	{
+		int32_t L_16;
+		L_16 = ((  int32_t (*) (const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(il2cpp_rgctx_method(method->rgctx_data, 0));
+		V_0 = L_16;
+		int32_t L_17 = ___layer0;
+		intptr_t L_18;
+		L_18 = AsyncGPUReadbackRequest_GetDataRaw_m73EA05E0647ED7BCB73E95C3C3E73F9C0B2F963C(__this, L_17, NULL);
+		void* L_19;
+		L_19 = IntPtr_op_Explicit_m2728CBA081E79B97DDCF1D4FAD77B309CA1E94BF(L_18, NULL);
+		int32_t L_20;
+		L_20 = AsyncGPUReadbackRequest_get_layerDataSize_mCAE8CCE76C830532015EFC47D062917900DB749B(__this, NULL);
+		int32_t L_21 = V_0;
+		NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF L_22;
+		L_22 = ((  NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF (*) (void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 1)))(L_19, ((int32_t)(L_20/L_21)), (int32_t)1, il2cpp_rgctx_method(method->rgctx_data, 1));
+		V_1 = L_22;
+		NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF L_23 = V_1;
+		V_4 = L_23;
+		goto IL_007f;
+	}
+
+IL_007f:
+	{
+		NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF L_24 = V_4;
+		return L_24;
+	}
+}
+IL2CPP_EXTERN_C  NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136_AdjustorThunk (RuntimeObject* __this, int32_t ___layer0, const RuntimeMethod* method)
+{
+	AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* _thisAdjusted;
+	int32_t _offset = 1;
+	_thisAdjusted = reinterpret_cast<AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7*>(__this + _offset);
+	NativeArray_1_t81F55263465517B73C455D3400CF67B4BADD85CF _returnValue;
+	_returnValue = AsyncGPUReadbackRequest_GetData_TisByte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_mC365851AEF03CCC25905B4A8808B40AB3969C136(_thisAdjusted, ___layer0, method);
+	return _returnValue;
 }
 // Unity.Collections.NativeArray`1<T> UnityEngine.Rendering.AsyncGPUReadbackRequest::GetData<System.Single>(System.Int32)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR NativeArray_1_t3848EE4B6647317212A754634DE6DBC90B99FBEF AsyncGPUReadbackRequest_GetData_TisSingle_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_mCD520E10A2FF9A6B23B92761C1E60AE9793DC1C9_gshared (AsyncGPUReadbackRequest_t6A735D3E0F1DEF8F43EBD0E6FE550FAE564519C7* __this, int32_t ___layer0, const RuntimeMethod* method) 
@@ -40546,180 +40650,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE0
 		int32_t L_10 = ___innerloopBatchCount4;
 		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
 		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SigmoidJob_Full_Float_tE93EDF0E3F3ED3744C2C51E2EDA14CB18593B703, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
-		V_1 = L_11;
-		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
-		int32_t L_12 = ___fencingMode5;
-		if (L_12)
-		{
-			goto IL_002b;
-		}
-	}
-	{
-		// jobFence.SetXOFences(X, O);
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
-		RuntimeObject* L_14 = ___X1;
-		RuntimeObject* L_15 = ___O2;
-		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
-	}
-
-IL_002b:
-	{
-		// return jobFence;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
-		return L_16;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88_mDAA6F705AF73B18A200B966BF77BA860597A7248_gshared (SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88 ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
-{
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
-		RuntimeObject* L_0 = ___X1;
-		RuntimeObject* L_1 = ___O2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
-		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
-		V_0 = L_2;
-		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
-		SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88 L_3 = ___jobData0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
-		RuntimeObject* L_5 = ___X1;
-		NullCheck(L_5);
-		void* L_6;
-		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
-		RuntimeObject* L_7 = ___O2;
-		NullCheck(L_7);
-		void* L_8;
-		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
-		int32_t L_9 = ___arrayLength3;
-		int32_t L_10 = ___innerloopBatchCount4;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
-		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
-		V_1 = L_11;
-		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
-		int32_t L_12 = ___fencingMode5;
-		if (L_12)
-		{
-			goto IL_002b;
-		}
-	}
-	{
-		// jobFence.SetXOFences(X, O);
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
-		RuntimeObject* L_14 = ___X1;
-		RuntimeObject* L_15 = ___O2;
-		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
-	}
-
-IL_002b:
-	{
-		// return jobFence;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
-		return L_16;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SinJob_Full_Float>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1_m6D45856D73BA097C8227359AEFCEBFCBAE07698D_gshared (SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1 ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
-{
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
-		RuntimeObject* L_0 = ___X1;
-		RuntimeObject* L_1 = ___O2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
-		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
-		V_0 = L_2;
-		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
-		SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1 L_3 = ___jobData0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
-		RuntimeObject* L_5 = ___X1;
-		NullCheck(L_5);
-		void* L_6;
-		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
-		RuntimeObject* L_7 = ___O2;
-		NullCheck(L_7);
-		void* L_8;
-		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
-		int32_t L_9 = ___arrayLength3;
-		int32_t L_10 = ___innerloopBatchCount4;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
-		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
-		V_1 = L_11;
-		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
-		int32_t L_12 = ___fencingMode5;
-		if (L_12)
-		{
-			goto IL_002b;
-		}
-	}
-	{
-		// jobFence.SetXOFences(X, O);
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
-		RuntimeObject* L_14 = ___X1;
-		RuntimeObject* L_15 = ___O2;
-		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
-	}
-
-IL_002b:
-	{
-		// return jobFence;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
-		return L_16;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SinJob_Full_Half>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB_mB8662741949CD1F4C1829B67A8DC5C6C8DC013B2_gshared (SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
-{
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
-		RuntimeObject* L_0 = ___X1;
-		RuntimeObject* L_1 = ___O2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
-		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
-		V_0 = L_2;
-		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
-		SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB L_3 = ___jobData0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
-		RuntimeObject* L_5 = ___X1;
-		NullCheck(L_5);
-		void* L_6;
-		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
-		RuntimeObject* L_7 = ___O2;
-		NullCheck(L_7);
-		void* L_8;
-		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
-		int32_t L_9 = ___arrayLength3;
-		int32_t L_10 = ___innerloopBatchCount4;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
-		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
 		V_1 = L_11;
 		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
 		int32_t L_12 = ___fencingMode5;

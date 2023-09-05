@@ -2882,6 +2882,30 @@ struct Void_t4861ACF8F4594C3437BB48B6E56783494B843915
 	};
 };
 
+// Unity.Barracuda.BurstCPUOps/CosJobHelper
+struct CosJobHelper_t90480AD8A41F04E3483B396BF40E664D2C1B7AB3 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t CosJobHelper_t90480AD8A41F04E3483B396BF40E664D2C1B7AB3__padding[1];
+	};
+};
+
+// Unity.Barracuda.BurstCPUOps/CoshJobHelper
+struct CoshJobHelper_t218EF37352AFA44801E69CB103DCE320CBD4B4B8 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t CoshJobHelper_t218EF37352AFA44801E69CB103DCE320CBD4B4B8__padding[1];
+	};
+};
+
 // Unity.Barracuda.BurstCPUOps/Dense3JobHelper
 struct Dense3JobHelper_t669592F7B5277D9B59DAF4EC57E1DB56D229282A 
 {
@@ -3954,6 +3978,78 @@ struct ByReference_1_tFE9AF4BD221B916FA525C43965FD23DB6BE5AC45
 {
 	// System.IntPtr System.ByReference`1::_value
 	intptr_t ____value_0;
+};
+
+// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CosJob_Full_Float>
+struct ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
+	};
+};
+
+struct ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507_StaticFields
+{
+	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
+	intptr_t ___jobReflectionData_0;
+};
+
+// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CosJob_Full_Half>
+struct ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
+	};
+};
+
+struct ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8_StaticFields
+{
+	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
+	intptr_t ___jobReflectionData_0;
+};
+
+// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float>
+struct ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
+	};
+};
+
+struct ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD_StaticFields
+{
+	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
+	intptr_t ___jobReflectionData_0;
+};
+
+// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half>
+struct ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B 
+{
+	union
+	{
+		struct
+		{
+		};
+		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
+	};
+};
+
+struct ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B_StaticFields
+{
+	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
+	intptr_t ___jobReflectionData_0;
 };
 
 // Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/Dense3Job_ActAsFloat_WeightAsHalf>
@@ -6995,6 +7091,50 @@ struct RawData_t37CAF2D3F74B7723974ED7CEEE9B297D8FA64ED0_marshaled_com
 	intptr_t ___Bounds_0;
 	intptr_t ___Count_1;
 	uint8_t ___Data_2;
+};
+
+// Unity.Barracuda.BurstCPUOps/CosJob_Full_Float
+struct CosJob_Full_Float_tD538294D0B69D6750F56BD5001D593BFFEC12767 
+{
+	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/CosJob_Full_Float::<X>k__BackingField
+	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
+	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/CosJob_Full_Float::<O>k__BackingField
+	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
+	// Unity.Barracuda.BurstCPUOps/CosJobHelper Unity.Barracuda.BurstCPUOps/CosJob_Full_Float::data
+	CosJobHelper_t90480AD8A41F04E3483B396BF40E664D2C1B7AB3 ___data_2;
+};
+
+// Unity.Barracuda.BurstCPUOps/CosJob_Full_Half
+struct CosJob_Full_Half_t89A977711D2BE4ED5CCB1B7971C97CA62B283F3E 
+{
+	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/CosJob_Full_Half::<X>k__BackingField
+	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
+	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/CosJob_Full_Half::<O>k__BackingField
+	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
+	// Unity.Barracuda.BurstCPUOps/CosJobHelper Unity.Barracuda.BurstCPUOps/CosJob_Full_Half::data
+	CosJobHelper_t90480AD8A41F04E3483B396BF40E664D2C1B7AB3 ___data_2;
+};
+
+// Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float
+struct CoshJob_Full_Float_t89CD8C2E09FE077DCCA2670DFC0D2397478E7FE7 
+{
+	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float::<X>k__BackingField
+	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
+	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float::<O>k__BackingField
+	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
+	// Unity.Barracuda.BurstCPUOps/CoshJobHelper Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float::data
+	CoshJobHelper_t218EF37352AFA44801E69CB103DCE320CBD4B4B8 ___data_2;
+};
+
+// Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half
+struct CoshJob_Full_Half_tA1A187747B31FCC47FD25FD7EF7FF1671DC78C5E 
+{
+	// Unity.Barracuda.BurstCPUOps/ReadOnlyMemResource Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half::<X>k__BackingField
+	ReadOnlyMemResource_t4340C3FE3CBCBD5A8904C1E4D8FF432AFDED52AE ___U3CXU3Ek__BackingField_0;
+	// Unity.Barracuda.BurstCPUOps/ReadWriteMemResource Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half::<O>k__BackingField
+	ReadWriteMemResource_tCC00155889F6BE8F4B47A0576D458C4C3DBA0BB5 ___U3COU3Ek__BackingField_1;
+	// Unity.Barracuda.BurstCPUOps/CoshJobHelper Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half::data
+	CoshJobHelper_t218EF37352AFA44801E69CB103DCE320CBD4B4B8 ___data_2;
 };
 
 // Unity.Barracuda.BurstCPUOps/Dense3Job_ActAsFloat_WeightAsHalf
@@ -11079,6 +11219,118 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void* IntPtr_op_Explicit_m2728CBA081E79B97DDC
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Char_Equals_mEA7BFB45790C973DF6352091FA924B3FB2EFCE4B (Il2CppChar* __this, Il2CppChar ___obj0, const RuntimeMethod* method) ;
 // System.Boolean UnityEngine.Vector2::Equals(UnityEngine.Vector2)
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool Vector2_Equals_mDF84D5ED14E018609C6A9C9BAE016C1B33BCFF4C_inline (Vector2_t1FD6F485C871E832B347AB2DC8CBA08B739D8DF7* __this, Vector2_t1FD6F485C871E832B347AB2DC8CBA08B739D8DF7 ___other0, const RuntimeMethod* method) ;
+// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CosJob_Full_Float>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCosJob_Full_Float_tD538294D0B69D6750F56BD5001D593BFFEC12767_m12D449F0AEAA868C2C34E03777A38043458D07BE_gshared (CosJob_Full_Float_tD538294D0B69D6750F56BD5001D593BFFEC12767 ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
+{
+	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		void* L_0;
+		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
+		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
+		intptr_t L_1 = ((ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
+		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
+		int32_t L_3 = ___arrayLength1;
+		int32_t L_4 = ___innerloopBatchCount2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
+		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
+		V_1 = L_5;
+		goto IL_0022;
+	}
+
+IL_0022:
+	{
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
+		return L_6;
+	}
+}
+// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CosJob_Full_Half>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCosJob_Full_Half_t89A977711D2BE4ED5CCB1B7971C97CA62B283F3E_m6758ABAE656CBA28C89487BE26D42EAD3D887910_gshared (CosJob_Full_Half_t89A977711D2BE4ED5CCB1B7971C97CA62B283F3E ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
+{
+	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		void* L_0;
+		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
+		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
+		intptr_t L_1 = ((ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
+		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
+		int32_t L_3 = ___arrayLength1;
+		int32_t L_4 = ___innerloopBatchCount2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
+		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
+		V_1 = L_5;
+		goto IL_0022;
+	}
+
+IL_0022:
+	{
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
+		return L_6;
+	}
+}
+// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCoshJob_Full_Float_t89CD8C2E09FE077DCCA2670DFC0D2397478E7FE7_m68F0739A67A12A870F15FDA906F39B777904326B_gshared (CoshJob_Full_Float_t89CD8C2E09FE077DCCA2670DFC0D2397478E7FE7 ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
+{
+	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		void* L_0;
+		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
+		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
+		intptr_t L_1 = ((ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
+		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
+		int32_t L_3 = ___arrayLength1;
+		int32_t L_4 = ___innerloopBatchCount2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
+		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
+		V_1 = L_5;
+		goto IL_0022;
+	}
+
+IL_0022:
+	{
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
+		return L_6;
+	}
+}
+// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCoshJob_Full_Half_tA1A187747B31FCC47FD25FD7EF7FF1671DC78C5E_m0121EFB50C9776F82C5834D01F741660A32DE8A1_gshared (CoshJob_Full_Half_tA1A187747B31FCC47FD25FD7EF7FF1671DC78C5E ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
+{
+	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		void* L_0;
+		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
+		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
+		intptr_t L_1 = ((ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
+		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
+		int32_t L_3 = ___arrayLength1;
+		int32_t L_4 = ___innerloopBatchCount2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
+		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
+		V_1 = L_5;
+		goto IL_0022;
+	}
+
+IL_0022:
+	{
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
+		return L_6;
+	}
+}
 // Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/Dense3Job_ActAsFloat_WeightAsHalf>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisDense3Job_ActAsFloat_WeightAsHalf_t381D80BDA5E19AC4630A18CA5BC5EADF1BF136F2_mFDA3589519193083F87E857E34F0FC2BE27F0A63_gshared (Dense3Job_ActAsFloat_WeightAsHalf_t381D80BDA5E19AC4630A18CA5BC5EADF1BF136F2 ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
 {

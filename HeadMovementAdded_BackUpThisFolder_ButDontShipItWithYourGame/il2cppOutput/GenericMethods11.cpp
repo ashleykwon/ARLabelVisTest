@@ -6315,78 +6315,6 @@ struct ParallelForJobStruct_1_t19E512694029B08AA572DBB80C40A8E402FB1E1E_StaticFi
 	intptr_t ___jobReflectionData_0;
 };
 
-// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CosJob_Full_Float>
-struct ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507 
-{
-	union
-	{
-		struct
-		{
-		};
-		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
-	};
-};
-
-struct ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507_StaticFields
-{
-	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
-	intptr_t ___jobReflectionData_0;
-};
-
-// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CosJob_Full_Half>
-struct ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8 
-{
-	union
-	{
-		struct
-		{
-		};
-		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
-	};
-};
-
-struct ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8_StaticFields
-{
-	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
-	intptr_t ___jobReflectionData_0;
-};
-
-// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float>
-struct ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD 
-{
-	union
-	{
-		struct
-		{
-		};
-		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
-	};
-};
-
-struct ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD_StaticFields
-{
-	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
-	intptr_t ___jobReflectionData_0;
-};
-
-// Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half>
-struct ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B 
-{
-	union
-	{
-		struct
-		{
-		};
-		uint8_t ParallelForJobStruct_1_t277DDAD81DFA4925045DD195910B21852EFA3EF1__padding[1];
-	};
-};
-
-struct ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B_StaticFields
-{
-	// System.IntPtr Unity.Jobs.IJobParallelForExtensions/ParallelForJobStruct`1::jobReflectionData
-	intptr_t ___jobReflectionData_0;
-};
-
 // System.Linq.Enumerable/WhereListIterator`1<System.Object>
 struct WhereListIterator_1_t1F40F08BAF8586F2C09294085BC605CC2FA432EB  : public Iterator_1_t99A1802EE86A3D5BF71B2DDB37F159C4AFA448EA
 {
@@ -12634,6 +12562,180 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE0
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Vector2__ctor_m9525B79969AFFE3254B303A40997A56DEEB6F548_inline (Vector2_t1FD6F485C871E832B347AB2DC8CBA08B739D8DF7* __this, float ___x0, float ___y1, const RuntimeMethod* method) ;
 // System.Void UnityEngine.Vector3::.ctor(System.Single,System.Single,System.Single)
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Vector3__ctor_m376936E6B999EF1ECBE57D990A386303E2283DE0_inline (Vector3_t24C512C7B96BBABAD472002D0BA2BDA40A5A80B2* __this, float ___x0, float ___y1, float ___z2, const RuntimeMethod* method) ;
+// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SigmoidJob_Full_Half>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88_mDAA6F705AF73B18A200B966BF77BA860597A7248_gshared (SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88 ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
+{
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
+		RuntimeObject* L_0 = ___X1;
+		RuntimeObject* L_1 = ___O2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
+		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
+		V_0 = L_2;
+		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
+		SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88 L_3 = ___jobData0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
+		RuntimeObject* L_5 = ___X1;
+		NullCheck(L_5);
+		void* L_6;
+		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
+		RuntimeObject* L_7 = ___O2;
+		NullCheck(L_7);
+		void* L_8;
+		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
+		int32_t L_9 = ___arrayLength3;
+		int32_t L_10 = ___innerloopBatchCount4;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
+		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SigmoidJob_Full_Half_tC00DD847E99EFFC203D47778CE7E8CC0AA64EA88, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
+		V_1 = L_11;
+		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
+		int32_t L_12 = ___fencingMode5;
+		if (L_12)
+		{
+			goto IL_002b;
+		}
+	}
+	{
+		// jobFence.SetXOFences(X, O);
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
+		RuntimeObject* L_14 = ___X1;
+		RuntimeObject* L_15 = ___O2;
+		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
+	}
+
+IL_002b:
+	{
+		// return jobFence;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
+		return L_16;
+	}
+}
+// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SinJob_Full_Float>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1_m6D45856D73BA097C8227359AEFCEBFCBAE07698D_gshared (SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1 ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
+{
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
+		RuntimeObject* L_0 = ___X1;
+		RuntimeObject* L_1 = ___O2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
+		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
+		V_0 = L_2;
+		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
+		SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1 L_3 = ___jobData0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
+		RuntimeObject* L_5 = ___X1;
+		NullCheck(L_5);
+		void* L_6;
+		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
+		RuntimeObject* L_7 = ___O2;
+		NullCheck(L_7);
+		void* L_8;
+		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
+		int32_t L_9 = ___arrayLength3;
+		int32_t L_10 = ___innerloopBatchCount4;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
+		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SinJob_Full_Float_tD214C2AAB87B9E19971E9E47351FCC0BECF44AA1, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
+		V_1 = L_11;
+		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
+		int32_t L_12 = ___fencingMode5;
+		if (L_12)
+		{
+			goto IL_002b;
+		}
+	}
+	{
+		// jobFence.SetXOFences(X, O);
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
+		RuntimeObject* L_14 = ___X1;
+		RuntimeObject* L_15 = ___O2;
+		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
+	}
+
+IL_002b:
+	{
+		// return jobFence;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
+		return L_16;
+	}
+}
+// Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SinJob_Full_Half>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB_mB8662741949CD1F4C1829B67A8DC5C6C8DC013B2_gshared (SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
+{
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
+	memset((&V_1), 0, sizeof(V_1));
+	{
+		// var fenceBeforeJobStart = GetFenceBeforeJobStartXO(X, O);
+		RuntimeObject* L_0 = ___X1;
+		RuntimeObject* L_1 = ___O2;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2;
+		L_2 = BurstSchedulingHelper_GetFenceBeforeJobStartXO_m624A770902D01307C2479B30F6E409C70C15155A(L_0, L_1, NULL);
+		V_0 = L_2;
+		// jobFence = ScheduleXOInternal(jobData, fenceBeforeJobStart, X.rawPtr, O.rawPtr, arrayLength, innerloopBatchCount);
+		SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB L_3 = ___jobData0;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_4 = V_0;
+		RuntimeObject* L_5 = ___X1;
+		NullCheck(L_5);
+		void* L_6;
+		L_6 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_5);
+		RuntimeObject* L_7 = ___O2;
+		NullCheck(L_7);
+		void* L_8;
+		L_8 = InterfaceFuncInvoker0< void* >::Invoke(4 /* System.Void* Unity.Barracuda.IDependableMemoryResource::get_rawPtr() */, IDependableMemoryResource_t9CF977A0A18F7354C404E3BBB74A6E10425B73D3_il2cpp_TypeInfo_var, L_7);
+		int32_t L_9 = ___arrayLength3;
+		int32_t L_10 = ___innerloopBatchCount4;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_11;
+		L_11 = ((  JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 (*) (SinJob_Full_Half_t399CDCB4B4B669268E509910A07EA8207BBA5EEB, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08, void*, void*, int32_t, int32_t, const RuntimeMethod*))il2cpp_codegen_get_method_pointer(il2cpp_rgctx_method(method->rgctx_data, 0)))(L_3, L_4, L_6, L_8, L_9, L_10, il2cpp_rgctx_method(method->rgctx_data, 0));
+		V_1 = L_11;
+		// if (fencingMode==FencingHelperMode.UpdateResourcesFencesOnScheduling)
+		int32_t L_12 = ___fencingMode5;
+		if (L_12)
+		{
+			goto IL_002b;
+		}
+	}
+	{
+		// jobFence.SetXOFences(X, O);
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_13 = V_1;
+		RuntimeObject* L_14 = ___X1;
+		RuntimeObject* L_15 = ___O2;
+		BurstSchedulingHelper_SetXOFences_m74AF4DFB20FCE0B9D9F8BE411489F70B14E786D3(L_13, L_14, L_15, NULL);
+	}
+
+IL_002b:
+	{
+		// return jobFence;
+		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_16 = V_1;
+		return L_16;
+	}
+}
 // Unity.Jobs.JobHandle Unity.Barracuda.BurstSchedulingHelper::ScheduleXO<Unity.Barracuda.BurstCPUOps/SinhJob_Full_Float>(T,Unity.Barracuda.IDependableMemoryResource,Unity.Barracuda.IDependableMemoryResource,System.Int32,System.Int32,Unity.Barracuda.BurstSchedulingHelper/FencingHelperMode)
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 BurstSchedulingHelper_ScheduleXO_TisSinhJob_Full_Float_t8854E2156C3DF1BB2B5E305C3580754D2A9EF926_mBB7AAB7EEB9A32CCFA2A96FFD0B4DBAE4841AD77_gshared (SinhJob_Full_Float_t8854E2156C3DF1BB2B5E305C3580754D2A9EF926 ___jobData0, RuntimeObject* ___X1, RuntimeObject* ___O2, int32_t ___arrayLength3, int32_t ___innerloopBatchCount4, int32_t ___fencingMode5, const RuntimeMethod* method) 
 {
@@ -35198,118 +35300,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE0
 		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
 		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
 		intptr_t L_1 = ((ParallelForJobStruct_1_t19E512694029B08AA572DBB80C40A8E402FB1E1E_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
-		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
-		int32_t L_3 = ___arrayLength1;
-		int32_t L_4 = ___innerloopBatchCount2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
-		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
-		V_1 = L_5;
-		goto IL_0022;
-	}
-
-IL_0022:
-	{
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
-		return L_6;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CosJob_Full_Float>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCosJob_Full_Float_tD538294D0B69D6750F56BD5001D593BFFEC12767_m12D449F0AEAA868C2C34E03777A38043458D07BE_gshared (CosJob_Full_Float_tD538294D0B69D6750F56BD5001D593BFFEC12767 ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
-{
-	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		void* L_0;
-		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
-		intptr_t L_1 = ((ParallelForJobStruct_1_t5EDCD34431729DDEE7BA29ABE78D2CDDF8248507_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
-		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
-		int32_t L_3 = ___arrayLength1;
-		int32_t L_4 = ___innerloopBatchCount2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
-		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
-		V_1 = L_5;
-		goto IL_0022;
-	}
-
-IL_0022:
-	{
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
-		return L_6;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CosJob_Full_Half>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCosJob_Full_Half_t89A977711D2BE4ED5CCB1B7971C97CA62B283F3E_m6758ABAE656CBA28C89487BE26D42EAD3D887910_gshared (CosJob_Full_Half_t89A977711D2BE4ED5CCB1B7971C97CA62B283F3E ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
-{
-	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		void* L_0;
-		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
-		intptr_t L_1 = ((ParallelForJobStruct_1_tA95DEE86506418165626080F76AD7452840B41B8_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
-		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
-		int32_t L_3 = ___arrayLength1;
-		int32_t L_4 = ___innerloopBatchCount2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
-		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
-		V_1 = L_5;
-		goto IL_0022;
-	}
-
-IL_0022:
-	{
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
-		return L_6;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Float>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCoshJob_Full_Float_t89CD8C2E09FE077DCCA2670DFC0D2397478E7FE7_m68F0739A67A12A870F15FDA906F39B777904326B_gshared (CoshJob_Full_Float_t89CD8C2E09FE077DCCA2670DFC0D2397478E7FE7 ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
-{
-	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		void* L_0;
-		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
-		intptr_t L_1 = ((ParallelForJobStruct_1_t01DF202A65E8AA41E9088AEA1FFF87487796B7DD_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
-		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
-		int32_t L_3 = ___arrayLength1;
-		int32_t L_4 = ___innerloopBatchCount2;
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_5;
-		L_5 = JobsUtility_ScheduleParallelFor_mEF775B0FF09686D0525DDFA9ED95A72EEDEC995C((&V_0), L_3, L_4, NULL);
-		V_1 = L_5;
-		goto IL_0022;
-	}
-
-IL_0022:
-	{
-		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_6 = V_1;
-		return L_6;
-	}
-}
-// Unity.Jobs.JobHandle Unity.Jobs.IJobParallelForExtensions::Schedule<Unity.Barracuda.BurstCPUOps/CoshJob_Full_Half>(T,System.Int32,System.Int32,Unity.Jobs.JobHandle)
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 IJobParallelForExtensions_Schedule_TisCoshJob_Full_Half_tA1A187747B31FCC47FD25FD7EF7FF1671DC78C5E_m0121EFB50C9776F82C5834D01F741660A32DE8A1_gshared (CoshJob_Full_Half_tA1A187747B31FCC47FD25FD7EF7FF1671DC78C5E ___jobData0, int32_t ___arrayLength1, int32_t ___innerloopBatchCount2, JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 ___dependsOn3, const RuntimeMethod* method) 
-{
-	JobScheduleParameters_tBA5415DA68E52ABC80373CD13D66C9AFAF8F542B V_0;
-	memset((&V_0), 0, sizeof(V_0));
-	JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 V_1;
-	memset((&V_1), 0, sizeof(V_1));
-	{
-		void* L_0;
-		L_0 = il2cpp_codegen_unsafe_cast((&___jobData0));
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_rgctx_data(method->rgctx_data, 0));
-		intptr_t L_1 = ((ParallelForJobStruct_1_t9C507C38ABF765F6EBFDE72F73D322B450CBD07B_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_rgctx_data(method->rgctx_data, 0)))->___jobReflectionData_0;
 		JobHandle_t5DF5F99902FED3C801A81C05205CEA6CE039EF08 L_2 = ___dependsOn3;
 		JobScheduleParameters__ctor_m5FFED3B28A1FA2C3EC7D1C50A7D7E788C411CE04((&V_0), L_0, L_1, L_2, (int32_t)1, NULL);
 		int32_t L_3 = ___arrayLength1;

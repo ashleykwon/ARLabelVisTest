@@ -29,16 +29,14 @@ def predict(input:Input):
     backgroundAndLabelString = input.background_and_label_rgb_base64
     backgroundAndLabelImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundAndLabelString))))
     backgroundAndLabel = lpips.im2tensor(backgroundAndLabelImg)
-    # backgroundAndLabel.cuda() #comment out if not using GPU
 
     # load the input image with background only
     backgroundString = input.background_rgb_base64
     backgroundImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundString))))
     background = lpips.im2tensor(backgroundImg)
-    # background.cuda() #comment out if not using GPU
 
     # run LPIPS to calculate the difference between Background vs. Background+Label
-    LPIPSDistance = loss_fn.forward(backgroundAndLabel.cuda(), background.cuda())[0][0][0][0].item()
+    LPIPSDistance = loss_fn.forward(backgroundAndLabel.cuda(), background.cuda())[0][0][0][0].item() # remove .cuda() if not using GPU
 
     # for debugging purposes only
     jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
@@ -47,4 +45,4 @@ def predict(input:Input):
 # Run the API with uvicorn
 #    Will run on http://Your IP Address:8000
 if __name__ == '__main__':
-    uvicorn.run(app, host='Your IP Address', port=8000)
+    uvicorn.run(app, host='10.38.23.43', port=8000)
