@@ -17,7 +17,7 @@ public class SendBackgroundImg : MonoBehaviour
     public GameObject player;
     public TMP_Text label;
     RenderTexture renderTexture;
-    private readonly string url = "http://YourIPAddress:8000/predict";
+    private readonly string url = "http://127.0.0.1:8000/predict"; 
     Texture2D Screenshot;
     
 
@@ -49,7 +49,7 @@ public class SendBackgroundImg : MonoBehaviour
     void Update()
     {
         BackgroundScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("UI"));
-        Debug.Log(BackgroundScreenshotCamera);
+        // Debug.Log(BackgroundScreenshotCamera);
     }
 
 
@@ -73,14 +73,14 @@ public class SendBackgroundImg : MonoBehaviour
 
         // Take a 360 degree screenshot of the background only and convert it to a string so that it can be attached to the container
         // string filePath = System.IO.Path.Combine(Application.dataPath, currentTimeAsString);
-        byte[] bytesBackground = I360Render.Capture(256, true, BackgroundScreenshotCamera, true);
+        byte[] bytesBackground = I360Render.Capture(1024, true, BackgroundScreenshotCamera, true);
         string background_rgb_base64 = Convert.ToBase64String(bytesBackground);
-        //File.WriteAllBytes(Application.dataPath + "/"+currentTimeAsString, bytesBackground); // for debugging purposes only 
+        // File.WriteAllBytes(Application.dataPath + "/"+currentTimeAsString, bytesBackground); // for debugging purposes only 
 
         // Take a 360 degree screenshot of the background AND the label. Then convert the screenshot to a string so that it can be attached to the container
-        byte[] bytesBackgroundAndLabel = I360Render.Capture(256, true, Camera.main, true);
+        byte[] bytesBackgroundAndLabel = I360Render.Capture(1024, true, Camera.main, true);
         string background_and_label_rgb_base64 = Convert.ToBase64String(bytesBackgroundAndLabel);
-        //File.WriteAllBytes(Application.dataPath + "/"+currentTimeAsString+"_backgroundAndLabel.jpg", bytesBackgroundAndLabel); // for debugging purposes only 
+        // File.WriteAllBytes(Application.dataPath + "/backgroundAndLabel_"+currentTimeAsString, bytesBackgroundAndLabel); // for debugging purposes only 
 
         // Attach the strings created above to screenshotContainer
         screenshotContainer.background_rgb_base64 = background_rgb_base64; 
@@ -108,7 +108,7 @@ public class SendBackgroundImg : MonoBehaviour
         {
             Debug.Log("Connection successful: " + request.downloadHandler.text);
             string labelsRaw = request.downloadHandler.text;
-            Debug.Log(labelsRaw);
+            // Debug.Log(labelsRaw);
             label.text = labelsRaw;
         }
 
