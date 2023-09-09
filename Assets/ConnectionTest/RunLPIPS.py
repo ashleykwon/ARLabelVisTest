@@ -15,7 +15,7 @@ app = FastAPI()
 
 # 3. Initiate lpips
 loss_fn = lpips.LPIPS(net='alex',version=0.1)
-loss_fn.cuda() #comment out if not using GPU
+# loss_fn.cuda() #comment out if not using GPU
 
 class Input(BaseModel): # should be in the same format as the object initiated in Unity
     background_and_label_rgb_base64: str
@@ -40,12 +40,12 @@ def predict(input:Input):
     # bg.save("background.jpg") #for debugging purposes only
 
     # run LPIPS to calculate the difference between Background vs. Background+Label
-    LPIPSDistance = loss_fn.forward(backgroundAndLabel.cuda(), background.cuda())[0][0][0][0].item() # remove .cuda() if not using GPU
+    LPIPSDistance = loss_fn.forward(backgroundAndLabel, background)[0][0][0][0].item() # remove .cuda() if not using GPU
 
     # for debugging purposes only
     jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
 
-    torch.cuda.empty_cache()
+    # torch.cuda.empty_cache()
     return jsonData
     
 # Run the API with uvicorn

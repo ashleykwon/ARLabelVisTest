@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using TMPro.Examples; 
 
 public class RenderStereoLabel : MonoBehaviour
 {
@@ -24,6 +24,9 @@ public class RenderStereoLabel : MonoBehaviour
     private int kernelID_main;
     private int kernelID_init;
   
+    //sum a character
+    private TMP_Text m_TextComponent;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -126,7 +129,8 @@ public class RenderStereoLabel : MonoBehaviour
 
     //method 3: sum only from a letter
     private void Sum_Single_Letter(){
-
+        
+        //this method uses dfs 
         Debug.Log("method3!");
         float sum_r = 0.0F;
         float sum_g = 0.0F;
@@ -146,6 +150,17 @@ public class RenderStereoLabel : MonoBehaviour
 
         float[] single_letter_sum = {count, sum_r, sum_g, sum_b};
         sumBuffer.SetData(single_letter_sum);
+
+        //this method uses TMP tools
+        //input: target character id
+        //Example: "helloworld", the id of "h" is 0; id of "e" is 1
+        
+        int target_char = 0;
+        TMP_TextInfoDebugTool.ShowCharacters = true;
+        m_TextComponent = gameObject.GetComponent<TMP_Text>();
+        TMP_TextInfo textInfo = m_TextComponent.textInfo;
+        TMP_CharacterInfo cInfo = textInfo.characterInfo[target_char];
+        public Color32 character_color = cInfo.color;
 
     }
 
