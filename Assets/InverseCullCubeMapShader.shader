@@ -5,6 +5,7 @@ Shader "Unlit/InverseCullCubeMapShader"
         _CubeMap( "Cube Map (RGBA)", Cube ) = "white" {}
         _LabelCubeMap( "LabelCubeMap", Cube ) = "white" {}
         _BillboardCubeMap("BillboardCubeMap", Cube) = "white" {}
+        _ModeCubeMap("ModeCubeMap", Cube) = "white" {}
         // _ShadowCubeMap("ShadowCubeMap", Cube) = "white" {}
         _SampleKernelSize("Sample Blur Kernel Size", Range(0, 100)) = 15
         _ColorMethod("Color Method", Int) = 3
@@ -54,7 +55,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             samplerCUBE _LabelCubeMap;
             // samplerCUBE _BlurredLabelTex;
             samplerCUBE _BillboardCubeMap;
-            // samplerCUBE _ShadowCubeMap;
+            samplerCUBE _ModeCubeMap;
             float _SampleKernelSize;
             int _ColorMethod;
             float4 _MainTex_TexelSize;
@@ -446,56 +447,56 @@ Shader "Unlit/InverseCullCubeMapShader"
                     col = paletteCol; 
                 }
                 //Yuanbo's method
-                    else if (_ColorMethod == 2) 
-                    {
-                        float dummy = float4(1.0, 1.0, 1.0, 1.0);
-                        float4 flip_col = dummy - bgSample;//tex2D(_MainTex, coords_flip);
-                        col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
+                else if (_ColorMethod == 2) 
+                {
+                    float dummy = float4(1.0, 1.0, 1.0, 1.0);
+                    float4 flip_col = dummy - bgSample;//tex2D(_MainTex, coords_flip);
+                    col = float4(flip_col[0], flip_col[1], flip_col[2], 1.0);
+                }
+                // HSV inversion
+                else if (_ColorMethod == 3) 
+                {
+                    float4 hsv = RGB2HSV(bgSample);
+                    float h = hsv[0];
+                    float s = hsv[1];
+                    float v = hsv[2];
+                    h += 0.5;
+                    h %= 1.0;
+                    if (v > 0.5){
+                        v = 0;
+                    } else {
+                        v = 1;
                     }
-                    // HSV inversion
-                    else if (_ColorMethod == 3) 
-                    {
-                        float4 hsv = RGB2HSV(bgSample);
-                        float h = hsv[0];
-                        float s = hsv[1];
-                        float v = hsv[2];
-                        h += 0.5;
-                        h %= 1.0;
-                        if (v > 0.5){
-                            v = 0;
-                        } else {
-                            v = 1;
-                        }
 
-                        float4 inverted_hsv = float4(h, s, v, hsv.a);
-                        col = HSV2RGB(inverted_hsv);
+                    float4 inverted_hsv = float4(h, s, v, hsv.a);
+                    col = HSV2RGB(inverted_hsv);
+                }
+                // CIELAB inversion
+                else if (_ColorMethod == 4)
+                {
+                    float4 lab = RGB2LAB(bgSample);
+                    float l = lab[0];
+                    float a = lab[1];
+                    float b = lab[2];
+
+                    if (l > 75 || l < 25){
+                        l = 100 - l;
+                    } else if (l > 50){
+                        l = (100 - l) + 25;
+                    } else {
+                        l = (100 - l) - 25;
                     }
-                    // CIELAB inversion
-                    else if (_ColorMethod == 4)
-                    {
-                        float4 lab = RGB2LAB(bgSample);
-                        float l = lab[0];
-                        float a = lab[1];
-                        float b = lab[2];
 
-                        if (l > 75 || l < 25){
-                            l = 100 - l;
-                        } else if (l > 50){
-                            l = (100 - l) + 25;
-                        } else {
-                            l = (100 - l) - 25;
-                        }
+                    // l = 100 - l;
+                    // a *= -1;
+                    // b *= -1;
+                    a = 62.1313548;// -81.1856371;
+                    b = -95.50187772;//76.11578826;
 
-                        // l = 100 - l;
-                        // a *= -1;
-                        // b *= -1;
-                        a = 62.1313548;// -81.1856371;
-                        b = -95.50187772;//76.11578826;
-
-                        float4 inverted_lab = float4(l, a, b, lab.a);
-                        col = LAB2RGB(inverted_lab);
-                    } 
-                    return col;
+                    float4 inverted_lab = float4(l, a, b, lab.a);
+                    col = LAB2RGB(inverted_lab);
+                } 
+                return col;
             }
 
             // For interpolation
@@ -504,7 +505,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             }
 
             // For label and billboard separation
-            float4 separateBillboardLabelShadow(float4 nonBackgroundPixVal, int componentIdx)
+            float4 separateBillboardLabelMode(float4 nonBackgroundPixVal, int componentIdx)
             {
                 float4 finalPixVal = float4(0,0,0,0);
                 if (componentIdx == 0) // should be a label
@@ -546,7 +547,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
                 // float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
-                labelTex = separateBillboardLabelShadow(labelTex, 0);
+                labelTex = separateBillboardLabelMode(labelTex, 0);
                 float offset = 78;
 
                 float sample_x = (vdata.uv.x+1) * 100;
@@ -560,10 +561,10 @@ Shader "Unlit/InverseCullCubeMapShader"
                 int _neighborhoodSize= 5;
 
                 fixed4 billboardTex = texCUBE(_BillboardCubeMap, vdata.uv);
-                billboardTex = separateBillboardLabelShadow(billboardTex, 1);
+                billboardTex = separateBillboardLabelMode(billboardTex, 1);
 
-                // fixed4 shadowTex = texCUBE(_ShadowCubeMap,vdata.uv);
-                // shadowTex = separateBillboardLabelShadow(shadowTex, 2);
+                fixed4 modeTex = texCUBE(_ModeCubeMap,vdata.uv);
+                modeTex = separateBillboardLabelMode(modeTex, 2);
 
                 float4 local_backgroundAvg = float4(sum_all_results[1]/sum_all_results[0], sum_all_results[2]/sum_all_results[0], sum_all_results[3]/sum_all_results[0], 1);
                 // local_backgroundAvg = float4(1,1,1,1);
@@ -743,11 +744,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     {
                         float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
                         
-                        float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10
-                        // float4 local_backgroundSum = local_pixel_sum(neighborhoodSize, vdata);
-                        // float4 local_backgroundAvg = local_backgroundSum/pow(neighborhoodSize, 2);
-
-                        float4 local_backgroundAvg = float4(0,0,0,1);      // for debugging purposes only         
+                        float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10         
                         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
                         float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
                         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
@@ -756,6 +753,12 @@ Shader "Unlit/InverseCullCubeMapShader"
                             col = HSL2RGB(billboardHSL);
                         }
                     }
+                }
+
+                // Render billboard and label color mode
+                if (modeTex[3] != 0)
+                {
+                    col = float4(1,0,1,1);
                 }
 
                 // Apply shadow if selected // needs to be debugged.

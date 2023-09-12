@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using OVR;
+using TMPro;
 
 public class MovePlayer : MonoBehaviour
 {
@@ -9,13 +10,17 @@ public class MovePlayer : MonoBehaviour
     public float speed;
     public GameObject BackgroundAndLabelSphere;
     public GameObject LabelContainer;
+    public TMP_Text labelColorMode;
+    public TMP_Text billboardColorMode;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     // int shadowIntensityIdx;
-
     public int currentLabelMovementMode;
     //public Vector3 DefaultLabelPosition;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
+    string[] labelColorModesList;
+    string[] billboardColorModesList;
+    
 
 
     // Start is called before the first frame update
@@ -26,6 +31,8 @@ public class MovePlayer : MonoBehaviour
         // shadowIntensityIdx = 0;
         currentLabelMovementMode = 0;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+        labelColorModesList = new string[] {"Palette", "RGBA reversed", "HSV-based", "CIELAB-based"};
+        billboardColorModesList = new string[] {"None", "Blue", "HSV-based"};
     }
 
 
@@ -71,6 +78,7 @@ public class MovePlayer : MonoBehaviour
             {
                 CurrentBillboardColorAssignmentAlgo = 0;
             }
+            billboardColorMode.text = "Billboard Color: " +  billboardColorModesList[CurrentBillboardColorAssignmentAlgo];
             labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
         }
 
@@ -151,5 +159,6 @@ public class MovePlayer : MonoBehaviour
     {
         Debug.Log("Color assignment algorithm changed!");
         labelSphereMaterial.SetInt("_ColorMethod", CurrentColorAssignmentAlgo);
+        labelColorMode.text = "Label Color: " + labelColorModesList[CurrentColorAssignmentAlgo-1];
     }
 }

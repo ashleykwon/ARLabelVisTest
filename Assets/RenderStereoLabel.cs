@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using TMPro.Examples; 
+using TMPro;
 
 public class RenderStereoLabel : MonoBehaviour
 {
@@ -92,7 +93,7 @@ public class RenderStereoLabel : MonoBehaviour
 
         backgroundAndLabelSphereMaterial.SetTexture("_LabelCubeMap", labelRenderTexture); // Extract render texture directly from UICamera, which renders the white label and the black background, along with blue billboard and red shadow 
         backgroundAndLabelSphereMaterial.SetTexture("_BillboardCubeMap", labelRenderTexture);
-        //backgroundAndLabelSphereMaterial.SetTexture("_ShadowCubeMap", labelRenderTexture);
+        backgroundAndLabelSphereMaterial.SetTexture("_ModeCubeMap", labelRenderTexture);
 
 
         RenderTexture.active = null;
@@ -155,12 +156,12 @@ public class RenderStereoLabel : MonoBehaviour
         //input: target character id
         //Example: "helloworld", the id of "h" is 0; id of "e" is 1
         
-        int target_char = 0;
-        TMP_TextInfoDebugTool.ShowCharacters = true;
-        m_TextComponent = gameObject.GetComponent<TMP_Text>();
-        TMP_TextInfo textInfo = m_TextComponent.textInfo;
-        TMP_CharacterInfo cInfo = textInfo.characterInfo[target_char];
-        public Color32 character_color = cInfo.color;
+        // int target_char = 0;
+        // TMP_TextInfoDebugTool.ShowCharacters = true;
+        // m_TextComponent = gameObject.GetComponent<TMP_Text>();
+        // TMP_TextInfo textInfo = m_TextComponent.textInfo;
+        // TMP_CharacterInfo cInfo = textInfo.characterInfo[target_char];
+        // public Color32 character_color = cInfo.color;
 
     }
 
