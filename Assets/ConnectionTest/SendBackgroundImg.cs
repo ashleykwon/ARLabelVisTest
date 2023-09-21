@@ -20,6 +20,7 @@ public class SendBackgroundImg : MonoBehaviour
     private readonly string url = "http://127.0.0.1:8000/predict"; 
     Texture2D Screenshot;
     
+    bool serverOutputReceived = true;
 
 
     public class ScreenshotData{
@@ -94,7 +95,15 @@ public class SendBackgroundImg : MonoBehaviour
         request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
-        yield return request.SendWebRequest();
+        if (serverOutputReceived){
+            
+            yield return request.SendWebRequest();
+            Debug.Log("Request sent");
+            Debug.Log(System.DateTime.Now.Millisecond);
+            serverOutputReceived = false;
+        }
+        
+        // Debug.Log(request.isDone);
 
         if (request.isNetworkError) // print network error if there is one
         {
@@ -105,15 +114,21 @@ public class SendBackgroundImg : MonoBehaviour
             Debug.Log("Http Error: " + request.error);
         }
         else // if there is no error, print and process the string received from the server
-        {
-            Debug.Log("Connection successful: " + request.downloadHandler.text);
+        {   
+            // Debug.Log("Connection successful: " + request.downloadHandler.text);
+            Debug.Log("Output received");
+            Debug.Log(System.DateTime.Now.Millisecond);
             string labelsRaw = request.downloadHandler.text;
             // Debug.Log(labelsRaw);
             label.text = labelsRaw;
+            serverOutputReceived = true;
+            Debug.Log("end");
         }
 
         // Dispose request after use to prevent memory loss
         request.Dispose();
+
+        
     }
 
 

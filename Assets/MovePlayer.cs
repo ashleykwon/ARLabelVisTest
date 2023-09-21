@@ -12,6 +12,7 @@ public class MovePlayer : MonoBehaviour
     public GameObject LabelContainer;
     public TMP_Text labelColorMode;
     public TMP_Text billboardColorMode;
+    public TMP_Text granularitymode;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     // int shadowIntensityIdx;
@@ -20,6 +21,7 @@ public class MovePlayer : MonoBehaviour
     Material labelSphereMaterial; // Doesn't need to be specified at Start
     string[] labelColorModesList;
     string[] billboardColorModesList;
+    string[] granularityModesList;
     
 
 
@@ -33,6 +35,7 @@ public class MovePlayer : MonoBehaviour
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
         labelColorModesList = new string[] {"Palette", "RGBA reversed", "HSV-based", "CIELAB-based"};
         billboardColorModesList = new string[] {"None", "Blue", "HSV-based"};
+        granularityModesList = new string[] {"Per-pixel", "Background"};
     }
 
 
@@ -102,11 +105,14 @@ public class MovePlayer : MonoBehaviour
             if (currentInt == 1)
             {
                 labelSphereMaterial.SetInt("_GranularityMethod", 0);
+                granularitymode.text = "Granularity Mode: "  + granularityModesList[0];
             }
             else
             {
                 labelSphereMaterial.SetInt("_GranularityMethod", 1);
+                granularitymode.text = "Granularity Mode: "  + granularityModesList[1];
             }
+            
         }
 
         if (rightJoystickPressed)

@@ -12229,16 +12229,16 @@ struct U3CLoadSceneAsyncU3Ed__2_t297E1CD1969E0D630CBA04040E0841A0FD684AE9  : pub
 	AsyncOperation_tD2789250E4B098DEDA92B366A577E500A92D2D3C* ___U3CasyncLoadU3E5__2_3;
 };
 
-// SendBackgroundImg/<PostScreenshot>d__10
-struct U3CPostScreenshotU3Ed__10_t428DAFCC292E226D8894F5190FD7C0D1EE2C3FB9  : public RuntimeObject
+// SendBackgroundImg/<PostScreenshot>d__11
+struct U3CPostScreenshotU3Ed__11_t079C05FACFB42F59B85F3FB7559D25129BFD6901  : public RuntimeObject
 {
-	// System.Int32 SendBackgroundImg/<PostScreenshot>d__10::<>1__state
+	// System.Int32 SendBackgroundImg/<PostScreenshot>d__11::<>1__state
 	int32_t ___U3CU3E1__state_0;
-	// System.Object SendBackgroundImg/<PostScreenshot>d__10::<>2__current
+	// System.Object SendBackgroundImg/<PostScreenshot>d__11::<>2__current
 	RuntimeObject* ___U3CU3E2__current_1;
-	// SendBackgroundImg SendBackgroundImg/<PostScreenshot>d__10::<>4__this
+	// SendBackgroundImg SendBackgroundImg/<PostScreenshot>d__11::<>4__this
 	SendBackgroundImg_tEC2AB2978A628564190F3F7BC3111807AEC0C8B3* ___U3CU3E4__this_2;
-	// UnityEngine.Networking.UnityWebRequest SendBackgroundImg/<PostScreenshot>d__10::<request>5__2
+	// UnityEngine.Networking.UnityWebRequest SendBackgroundImg/<PostScreenshot>d__11::<request>5__2
 	UnityWebRequest_t6233B8E22992FC2364A831C1ACB033EF3260C39F* ___U3CrequestU3E5__2_3;
 };
 
@@ -44285,18 +44285,22 @@ struct MovePlayer_tC84F96B706D7FDC59EA861A8ED037C663448DAF4  : public MonoBehavi
 	TMP_Text_tE8D677872D43AD4B2AAF0D6101692A17D0B251A9* ___labelColorMode_8;
 	// TMPro.TMP_Text MovePlayer::billboardColorMode
 	TMP_Text_tE8D677872D43AD4B2AAF0D6101692A17D0B251A9* ___billboardColorMode_9;
+	// TMPro.TMP_Text MovePlayer::granularitymode
+	TMP_Text_tE8D677872D43AD4B2AAF0D6101692A17D0B251A9* ___granularitymode_10;
 	// System.Int32 MovePlayer::CurrentColorAssignmentAlgo
-	int32_t ___CurrentColorAssignmentAlgo_10;
+	int32_t ___CurrentColorAssignmentAlgo_11;
 	// System.Int32 MovePlayer::CurrentBillboardColorAssignmentAlgo
-	int32_t ___CurrentBillboardColorAssignmentAlgo_11;
+	int32_t ___CurrentBillboardColorAssignmentAlgo_12;
 	// System.Int32 MovePlayer::currentLabelMovementMode
-	int32_t ___currentLabelMovementMode_12;
+	int32_t ___currentLabelMovementMode_13;
 	// UnityEngine.Material MovePlayer::labelSphereMaterial
-	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_13;
+	Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3* ___labelSphereMaterial_14;
 	// System.String[] MovePlayer::labelColorModesList
-	StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248* ___labelColorModesList_14;
+	StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248* ___labelColorModesList_15;
 	// System.String[] MovePlayer::billboardColorModesList
-	StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248* ___billboardColorModesList_15;
+	StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248* ___billboardColorModesList_16;
+	// System.String[] MovePlayer::granularityModesList
+	StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248* ___granularityModesList_17;
 };
 
 // Oculus.Interaction.HandGrab.MoveTowardsTargetProvider
@@ -46129,6 +46133,8 @@ struct SendBackgroundImg_tEC2AB2978A628564190F3F7BC3111807AEC0C8B3  : public Mon
 	String_t* ___url_8;
 	// UnityEngine.Texture2D SendBackgroundImg::Screenshot
 	Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* ___Screenshot_9;
+	// System.Boolean SendBackgroundImg::serverOutputReceived
+	bool ___serverOutputReceived_10;
 };
 
 // Oculus.Interaction.PoseDetection.Sequence
@@ -57392,7 +57398,7 @@ const Il2CppTypeDefinitionSizes g_typeDefinitionSize7515 = { sizeof(ColorAssignm
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize7516;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize7516 = { sizeof(ScreenshotData_t3C61F62E7CC43A5164961AFAA39ACB85AFA64D28), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize7517;
-const Il2CppTypeDefinitionSizes g_typeDefinitionSize7517 = { sizeof(U3CPostScreenshotU3Ed__10_t428DAFCC292E226D8894F5190FD7C0D1EE2C3FB9), -1, 0, 0 };
+const Il2CppTypeDefinitionSizes g_typeDefinitionSize7517 = { sizeof(U3CPostScreenshotU3Ed__11_t079C05FACFB42F59B85F3FB7559D25129BFD6901), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize7518;
 const Il2CppTypeDefinitionSizes g_typeDefinitionSize7518 = { sizeof(SendBackgroundImg_tEC2AB2978A628564190F3F7BC3111807AEC0C8B3), -1, 0, 0 };
 extern const Il2CppTypeDefinitionSizes g_typeDefinitionSize7519;

@@ -27,23 +27,26 @@ class Input(BaseModel): # should be in the same format as the object initiated i
 def predict(input:Input):
     # load the input image with background and label
     backgroundAndLabelString = input.background_and_label_rgb_base64
-    backgroundAndLabelImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundAndLabelString))))
-    backgroundAndLabel = lpips.im2tensor(backgroundAndLabelImg)
-    # bgAndlb = Image.fromarray(backgroundAndLabelImg) #for debugging purposes only
-    # bgAndlb.save("backgroundAndLabel.jpg") #for debugging purposes only
+    if backgroundAndLabelString != "":
+        backgroundAndLabelImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundAndLabelString))))
+        backgroundAndLabel = lpips.im2tensor(backgroundAndLabelImg)
+        # bgAndlb = Image.fromarray(backgroundAndLabelImg) #for debugging purposes only
+        # bgAndlb.save("backgroundAndLabel.jpg") #for debugging purposes only
 
-    # load the input image with background only
-    backgroundString = input.background_rgb_base64
-    backgroundImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundString))))
-    background = lpips.im2tensor(backgroundImg)
-    # bg = Image.fromarray(backgroundImg) #for debugging purposes only
-    # bg.save("background.jpg") #for debugging purposes only
+        # load the input image with background only
+        backgroundString = input.background_rgb_base64
+        backgroundImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(backgroundString))))
+        background = lpips.im2tensor(backgroundImg)
+        # bg = Image.fromarray(backgroundImg) #for debugging purposes only
+        # bg.save("background.jpg") #for debugging purposes only
 
-    # run LPIPS to calculate the difference between Background vs. Background+Label
-    LPIPSDistance = loss_fn.forward(backgroundAndLabel, background)[0][0][0][0].item() # remove .cuda() if not using GPU
+        # run LPIPS to calculate the difference between Background vs. Background+Label
+        LPIPSDistance = loss_fn.forward(backgroundAndLabel, background)[0][0][0][0].item() # remove .cuda() if not using GPU
 
-    # for debugging purposes only
-    jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
+        # for debugging purposes only
+        jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
+        backgroundAndLabelString = ""
+
 
     # torch.cuda.empty_cache()
     return jsonData
