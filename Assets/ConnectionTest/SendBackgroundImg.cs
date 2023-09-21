@@ -63,14 +63,11 @@ public class SendBackgroundImg : MonoBehaviour
 
     IEnumerator PostScreenshot() // take screenshot of the current background and label as Texture2D
     {
+        // Wait until the current frame is fully rendered
         yield return new WaitForEndOfFrame();
 
+        // Initiate a container to hold the two screenshots
         ScreenshotData screenshotContainer = new ScreenshotData();
-        // Get the current time to generat time stamp
-        // System.DateTime currentTime = DateTime.Now;
-        // string currentTimeAsString = currentTime.ToString("yyyy-MM-dd_hh-mm-ss") +".jpg";
-        // Debug.Log("saved file name");
-        // Debug.Log(currentTimeAsString);
 
         // Take a 360 degree screenshot of the background only and convert it to a string so that it can be attached to the container
         // string filePath = System.IO.Path.Combine(Application.dataPath, currentTimeAsString);
@@ -89,22 +86,23 @@ public class SendBackgroundImg : MonoBehaviour
         
         // Convert screenshotContainer to a JSON object and send it to the server
         string bodyJsonString = JsonUtility.ToJson(screenshotContainer);
+
+        // Initiate the request to send the screenshot
         var request = new UnityWebRequest(url, "PUT");
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(bodyJsonString);
+        byte[] encodedScreenshots = Encoding.UTF8.GetBytes(bodyJsonString);
         
-        request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        request.uploadHandler = (UploadHandler)new UploadHandlerRaw(encodedScreenshots);
         request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+
+        // Specify the type of data in the request
         request.SetRequestHeader("Content-Type", "application/json");
         if (serverOutputReceived){
-            
             yield return request.SendWebRequest();
             Debug.Log("Request sent");
             Debug.Log(System.DateTime.Now.Millisecond);
             serverOutputReceived = false;
         }
         
-        // Debug.Log(request.isDone);
-
         if (request.isNetworkError) // print network error if there is one
         {
             Debug.Log("Network Error: " + request.error);
@@ -113,24 +111,15 @@ public class SendBackgroundImg : MonoBehaviour
         {
             Debug.Log("Http Error: " + request.error);
         }
-        else // if there is no error, print and process the string received from the server
+        else // if there is no error, extract and render the string from the server
         {   
-            // Debug.Log("Connection successful: " + request.downloadHandler.text);
-            Debug.Log("Output received");
-            Debug.Log(System.DateTime.Now.Millisecond);
             string labelsRaw = request.downloadHandler.text;
-            // Debug.Log(labelsRaw);
             label.text = labelsRaw;
             serverOutputReceived = true;
-            Debug.Log("end");
         }
 
         // Dispose request after use to prevent memory loss
         request.Dispose();
-
-        
+    
     }
-
-
-   
 }
