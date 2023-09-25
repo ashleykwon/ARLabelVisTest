@@ -70,15 +70,19 @@ public class SendBackgroundImg : MonoBehaviour
         ScreenshotData screenshotContainer = new ScreenshotData();
 
         // Take a 360 degree screenshot of the background only and convert it to a string so that it can be attached to the container
-        // string filePath = System.IO.Path.Combine(Application.dataPath, currentTimeAsString);
+        // string filePath = System.IO.Path.Combine(Application.dataPath, "testBackground");
         byte[] bytesBackground = I360Render.Capture(1024, true, BackgroundScreenshotCamera, true);
         string background_rgb_base64 = Convert.ToBase64String(bytesBackground);
-        // File.WriteAllBytes(Application.dataPath + "/"+currentTimeAsString, bytesBackground); // for debugging purposes only 
+        File.WriteAllBytes(Application.dataPath + "/background.jpg", bytesBackground); // for debugging purposes only 
 
         // Take a 360 degree screenshot of the background AND the label. Then convert the screenshot to a string so that it can be attached to the container
         byte[] bytesBackgroundAndLabel = I360Render.Capture(1024, true, Camera.main, true);
         string background_and_label_rgb_base64 = Convert.ToBase64String(bytesBackgroundAndLabel);
-        // File.WriteAllBytes(Application.dataPath + "/backgroundAndLabel_"+currentTimeAsString, bytesBackgroundAndLabel); // for debugging purposes only 
+        File.WriteAllBytes(Application.dataPath + "/backgroundAndLabel.jpg", bytesBackgroundAndLabel); // for debugging purposes only 
+
+        Debug.Log(Application.dataPath);
+
+        // Debug.Log("Screenshot taken");
 
         // Attach the strings created above to screenshotContainer
         screenshotContainer.background_rgb_base64 = background_rgb_base64; 
@@ -98,8 +102,8 @@ public class SendBackgroundImg : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/json");
         if (serverOutputReceived){
             yield return request.SendWebRequest();
-            Debug.Log("Request sent");
-            Debug.Log(System.DateTime.Now.Millisecond);
+            // Debug.Log("Request sent");
+            // Debug.Log(System.DateTime.Now.Millisecond);
             serverOutputReceived = false;
         }
         
