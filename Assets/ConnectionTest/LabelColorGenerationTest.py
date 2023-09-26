@@ -24,16 +24,9 @@ def loss(backgroundAndLabelImg, backgroundImg):
     
     # get the LPIPS loss
     lpipsLoss = -1 * loss_fn.forward(backgroundAndLabel.cuda(), background.cuda())[0][0][0][0].item() 
-
-    # get the contrast between each label pixel and its neighboring background pixels
-    blurredBackground = torchvision.transforms.GaussianBlur(5, sigma=(0.1, 2.0))(lpips.im2tensor(backgroundImg)).T.numpy().reshape(backgroundAndLabelImg.shape)
-    grayscaleBackgroundImg = (1/3)*np.absolute(blurredBackground[:, :, 0] + blurredBackground[:, :, 1] + backgroundImg[:, :, 2])
-    grayscaleBackgroundAndLabelImg = (1/3)*np.absolute(backgroundAndLabelImg[:, :, 0] + backgroundAndLabelImg[:, :, 1] + backgroundAndLabelImg[:, :, 2])
-    contrastDifferenceMatrix = np.absolute(np.subtract(grayscaleBackgroundImg, grayscaleBackgroundAndLabelImg))
-    contrastLoss = -1 * np.sum(contrastDifferenceMatrix)/backgroundImg.size # average contrast
-
+    
     # sum up the lpips and contrast losses
-    return lpipsLoss + contrastLoss
+    return lpipsLoss 
 
 # Add the optimizer function here and send the resulting array of pixels back to the headset
 loss(backgroundAndLabelImg, backgroundImg)
