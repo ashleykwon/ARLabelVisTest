@@ -20,7 +20,7 @@ public class SendBackgroundImg : MonoBehaviour
     private readonly string url = "http://127.0.0.1:8000/predict"; 
     Texture2D Screenshot;
     
-    bool serverOutputReceived = false;
+    bool serverOutputReceived = true;
 
 
     public class ScreenshotData{

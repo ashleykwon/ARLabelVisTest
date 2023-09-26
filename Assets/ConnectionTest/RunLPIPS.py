@@ -67,12 +67,8 @@ def predict(input:Input):
         # for debugging purposes only
         jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
         backgroundAndLabelString = ""
-    else:
-        jsonData = json.dumps("Initial output")
 
-
-    # torch.cuda.empty_cache()
-    return jsonData
+        return jsonData
     
 # Run the API with uvicorn
 #    Will run on http://Your IP Address:8000
