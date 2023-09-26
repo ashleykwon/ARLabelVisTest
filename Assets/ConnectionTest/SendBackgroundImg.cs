@@ -20,7 +20,7 @@ public class SendBackgroundImg : MonoBehaviour
     private readonly string url = "http://127.0.0.1:8000/predict"; 
     Texture2D Screenshot;
     
-    bool serverOutputReceived = true;
+    bool serverOutputReceived = false;
 
 
     public class ScreenshotData{
@@ -73,14 +73,14 @@ public class SendBackgroundImg : MonoBehaviour
         // string filePath = System.IO.Path.Combine(Application.dataPath, "testBackground");
         byte[] bytesBackground = I360Render.Capture(1024, true, BackgroundScreenshotCamera, true);
         string background_rgb_base64 = Convert.ToBase64String(bytesBackground);
-        File.WriteAllBytes(Application.dataPath + "/background.jpg", bytesBackground); // for debugging purposes only 
+        // File.WriteAllBytes(Application.dataPath + "/background.jpg", bytesBackground); // for debugging purposes only 
 
         // Take a 360 degree screenshot of the background AND the label. Then convert the screenshot to a string so that it can be attached to the container
         byte[] bytesBackgroundAndLabel = I360Render.Capture(1024, true, Camera.main, true);
         string background_and_label_rgb_base64 = Convert.ToBase64String(bytesBackgroundAndLabel);
-        File.WriteAllBytes(Application.dataPath + "/backgroundAndLabel.jpg", bytesBackgroundAndLabel); // for debugging purposes only 
+        // File.WriteAllBytes(Application.dataPath + "/backgroundAndLabel.jpg", bytesBackgroundAndLabel); // for debugging purposes only 
 
-        Debug.Log(Application.dataPath);
+        // Debug.Log(Application.dataPath);
 
         // Debug.Log("Screenshot taken");
 
@@ -102,18 +102,18 @@ public class SendBackgroundImg : MonoBehaviour
         request.SetRequestHeader("Content-Type", "application/json");
         if (serverOutputReceived){
             yield return request.SendWebRequest();
-            // Debug.Log("Request sent");
-            // Debug.Log(System.DateTime.Now.Millisecond);
             serverOutputReceived = false;
         }
         
         if (request.isNetworkError) // print network error if there is one
         {
             Debug.Log("Network Error: " + request.error);
+            serverOutputReceived = false;
         }
         else if (request.isHttpError) // print http error if there is one
         {
             Debug.Log("Http Error: " + request.error);
+            serverOutputReceived = false;
         }
         else // if there is no error, extract and render the string from the server
         {   

@@ -67,6 +67,8 @@ def predict(input:Input):
         # for debugging purposes only
         jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
         backgroundAndLabelString = ""
+    else:
+        jsonData = json.dumps("Initial output")
 
 
     # torch.cuda.empty_cache()
