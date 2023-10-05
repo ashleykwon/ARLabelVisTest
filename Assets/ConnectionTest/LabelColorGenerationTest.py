@@ -11,8 +11,8 @@ from torch.autograd import Variable
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
 loss_fn.cuda()
 
-b_path = "./background.jpg"
-b_w_l_path = "./backgroundAndLabel.jpg"
+b_path = "./test2.jpg"
+b_w_l_path = "./test2AndLabel.jpg"
 backgroundImg = np.asarray(Image.open(b_path))
 backgroundAndLabelImg = np.asarray(Image.open(b_w_l_path))
 
@@ -45,10 +45,10 @@ pred = Variable(lpips.im2tensor(lpips.load_image(b_w_l_path)), requires_grad=Tru
 
 # stochastic gradient descent-based optimizer
 # optimizer = torch.optim.SGD([torch.from_numpy(backgroundAndLabelImg)], lr=0.01, momentum=0.9)
-optimizer = torch.optim.SGD([pred], lr=0.02, momentum=0.9)
+# optimizer = torch.optim.SGD([pred], lr=0.05, momentum=0.9)
 
-# Adam optimizer
-# optimizer = torch.optim.Adam([pred,], lr=1e-4, betas=(0.9, 0.999))
+# Adam optimizer, original lr=1e-4
+optimizer = torch.optim.Adam([pred,], lr=0.01, betas=(0.9, 0.999))
 
 # Optimize
 for iter in range(MAX_ITER): 
@@ -84,7 +84,7 @@ for iter in range(MAX_ITER):
          pred.data = torch.clamp(pred.data, -1, 1)
          pred_img = lpips.tensor2im(pred.data)
          print(type(pred_img))
-         output_path = "./finalBackgroundAndLabel_sgd.jpg"
+         output_path = "./test2_adam.jpg"
          Image.fromarray(pred_img).save(output_path)
 
         #  # Check the size of the image after backpropping
