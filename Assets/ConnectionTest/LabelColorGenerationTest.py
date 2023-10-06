@@ -33,16 +33,13 @@ labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 MAX_ITER = 1000
 costList = []
 
-
 # Convert the image with the background only to a tensor
 backgroundImgAsTensor = lpips.im2tensor(lpips.load_image(b_path))
 
 # The predicted image
 pred = Variable(lpips.im2tensor(lpips.load_image(b_w_l_path)), requires_grad=True)
 
-# label mask
-#labelMaskAsTensor = torch.from_numpy(labelMaskImg).reshape(pred.shape).type(torch.float) #somehow this is completely black when I use lpips.im2tensor
-#labelMaskAsTensor = Variable(lpips.im2tensor(lpips.load_image(labelMask_path)), requires_grad= False) # mask should not be modified in the optimization process 
+# label mask (boolean mask with True where label pixels are)
 labelMaskAsTensor = lpips.im2tensor(lpips.load_image(labelMask_path)) > 0
 
 # stochastic gradient descent-based optimizer
@@ -52,15 +49,18 @@ labelMaskAsTensor = lpips.im2tensor(lpips.load_image(labelMask_path)) > 0
 # Adam optimizer, original lr=1e-4
 optimizer = torch.optim.Adam([pred,], lr=0.01, betas=(0.9, 0.999))
 
+distanceThreshold = 0.23
+
 # Optimize
 for iter in range(MAX_ITER): 
     if type(backgroundAndLabelImg) == torch.Tensor:
         backgroundAndLabelImg = backgroundAndLabelImg.numpy()
 
-    maskedLabelTensor = torch.mul(pred, labelMaskAsTensor)
+    # Apply the boolean mask for label pixels
+    # maskedLabelTensor = torch.mul(pred, labelMaskAsTensor)
+    maskedLabelTensor = pred.where(labelMaskAsTensor, -1) # sets all non-label pixels to 1
 
-    # Calculate the LPIPS loss (1 - LPIPS distance between the current backgroundAndLabelImage and the backgroundImage)
-    # LPIPSLoss = 1 - loss_fn.forward(lpips.im2tensor(backgroundAndLabelImg).cuda(), backgroundImgAsTensor.cuda())
+    # Calculate the LPIPS loss: -1 * LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
     LPIPSLoss = loss_fn.forward(maskedLabelTensor.cuda(), backgroundImgAsTensor.cuda())
     neg_loss = - LPIPSLoss
     
@@ -77,25 +77,18 @@ for iter in range(MAX_ITER):
 
     # Print out losses/distances
     if iter % 100 == 0:
-         print('iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
+        print('iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
 
     # Save the output image
-    if iter == MAX_ITER - 1:
-         print('Reached the last iteration')
-         pred.data = torch.clamp(pred.data, -1, 1)
-         pred_img = lpips.tensor2im(pred.data)
-         print(type(pred_img))
-         output_path = "./test2_adam.jpg"
-         Image.fromarray(pred_img).save(output_path)
+    if (iter == MAX_ITER - 1): 
+        print('Reached the last iteration')
+        pred.data = torch.clamp(pred.data, -1, 1)
+        pred_img = lpips.tensor2im(pred.data)
+        print(type(pred_img))
+        output_path = "./final_result_adam.jpg"
+        Image.fromarray(pred_img).save(output_path)
+        break
 
         #  # Check the size of the image after backpropping
         #  width, height = Image.open(output_path).size
         #  print(f"Image width: {width}px, Image height: {height}px")
-
-
-
-# Save the output image
-# if type(backgroundAndLabelImg) == torch.Tensor:
-#         backgroundAndLabelImg = backgroundAndLabelImg.numpy()
-# finalBackgroundAndLabel = Image.fromarray(backgroundAndLabelImg)
-# finalBackgroundAndLabel.save("finalBackgroundAndLabel.jpg")
