@@ -7,14 +7,24 @@ import numpy as np
 import lpips
 import torchvision
 from torch.autograd import Variable
+from matplotlib import pyplot as plt # for debugging purposes
 
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
 loss_fn.cuda()
 
-b_path = "./test2.jpg"
-b_w_l_path = "./test2AndLabel.jpg"
+# b_path = "./test2.jpg"
+# b_w_l_path = "./test2AndLabel.jpg"
+# backgroundImg = np.asarray(Image.open(b_path))
+# backgroundAndLabelImg = np.asarray(Image.open(b_w_l_path))
+
+
+b_path = "./background.jpg"
+# b_w_l_path = "./backgroundAndLabel.jpg"
+b_w_l_path = "./test_backgroundAndLabel.jpg"
+labelMask_path = "./test_mask.jpg"
 backgroundImg = np.asarray(Image.open(b_path))
 backgroundAndLabelImg = np.asarray(Image.open(b_w_l_path))
+labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 # # Check the size of the image before backpropping
 # width, height = Image.open(b_w_l_path).size
@@ -24,24 +34,16 @@ MAX_ITER = 1000
 costList = []
 
 
-class Model(torch.nn.Module):
-
-    def __init__(self):
-        super(Model, self).__init__()
-
-    def forward(self, x): # returns the input image, because we're directly modifying the input image
-        return x
-
-# Initialize the model (this is just to connect the input image to the gradient descent function)
-model = Model()
-
-
-
 # Convert the image with the background only to a tensor
 backgroundImgAsTensor = lpips.im2tensor(backgroundImg)
 
 # The predicted image
 pred = Variable(lpips.im2tensor(lpips.load_image(b_w_l_path)), requires_grad=True)
+
+# label mask
+#labelMaskAsTensor = torch.from_numpy(labelMaskImg).reshape(pred.shape).type(torch.float) #somehow this is completely black when I use lpips.im2tensor
+#labelMaskAsTensor = Variable(lpips.im2tensor(lpips.load_image(labelMask_path)), requires_grad= False) # mask should not be modified in the optimization process 
+labelMaskAsTensor = lpips.im2tensor(lpips.load_image(labelMask_path)) > 0
 
 # stochastic gradient descent-based optimizer
 # optimizer = torch.optim.SGD([torch.from_numpy(backgroundAndLabelImg)], lr=0.01, momentum=0.9)
@@ -55,12 +57,11 @@ for iter in range(MAX_ITER):
     if type(backgroundAndLabelImg) == torch.Tensor:
         backgroundAndLabelImg = backgroundAndLabelImg.numpy()
 
-    # This should just be the output image from the previous iteration
-    # backgroundAndLabelImg = model(torch.from_numpy(backgroundAndLabelImg)).numpy()
+    maskedLabelTensor = torch.mul(pred, labelMaskAsTensor)
 
     # Calculate the LPIPS loss (1 - LPIPS distance between the current backgroundAndLabelImage and the backgroundImage)
     # LPIPSLoss = 1 - loss_fn.forward(lpips.im2tensor(backgroundAndLabelImg).cuda(), backgroundImgAsTensor.cuda())
-    LPIPSLoss = loss_fn.forward(pred.cuda(), backgroundImgAsTensor.cuda())
+    LPIPSLoss = loss_fn.forward(maskedLabelTensor.cuda(), backgroundImgAsTensor.cuda())
     neg_loss = - LPIPSLoss
     
     # Clear the gradient for a new calculation

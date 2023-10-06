@@ -15,7 +15,7 @@ import scipy.optimize
 app = FastAPI()
 # print(torch.cuda.is_available()) # uncomment this line to check if cuda is available
 
-# 3. Initiate lpips
+# 3. Initiate lpips loss function
 loss_fn = lpips.LPIPS(net='alex',version=0.1)
 # loss_fn.cuda() #comment out if not using GPU
 
@@ -51,20 +51,8 @@ def predict(input:Input):
         # run LPIPS to calculate the difference between Background vs. Background+Label
         LPIPSDistance = loss_fn.forward(backgroundAndLabel, background)[0][0][0][0].item() # remove .cuda() if not using GPU
 
-        # # Concatenate the two np arrays to pass them into the optimize function as inputs 
-        # combined_images = np.concatenate((backgroundImg, backgroundAndLabelImg), axis=0)
 
-        # # Add the optimizer function here and send the resulting array of pixels back to the headset
-        # originalShape = backgroundAndLabelImg.shape
-        # backgroundAndLabelImg_flattened =  backgroundAndLabelImg.flatten()
-        # minimized = scipy.optimize.minimize(lpips_helper, backgroundAndLabelImg_flattened, args=(backgroundImg,originalShape), bounds=[(0,255)]*len(backgroundAndLabelImg_flattened))
-
-        # # encode and send the result of the minimization (by writing to a json file)
-        # encoded_result = base64.b64encode(minimized.x)
-        # jsonData = json.dumps(encoded_result)
-
-        # only sends the LPIPS distance
-        # for debugging purposes only
+        # only sends the LPIPS distance for debugging purposes only
         jsonData = json.dumps("LPIPS distance: " + str(LPIPSDistance))
         backgroundAndLabelString = ""
 
