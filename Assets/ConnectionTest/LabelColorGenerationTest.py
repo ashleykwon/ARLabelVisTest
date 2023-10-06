@@ -35,7 +35,7 @@ costList = []
 
 
 # Convert the image with the background only to a tensor
-backgroundImgAsTensor = lpips.im2tensor(backgroundImg)
+backgroundImgAsTensor = lpips.im2tensor(lpips.load_image(b_path))
 
 # The predicted image
 pred = Variable(lpips.im2tensor(lpips.load_image(b_w_l_path)), requires_grad=True)
