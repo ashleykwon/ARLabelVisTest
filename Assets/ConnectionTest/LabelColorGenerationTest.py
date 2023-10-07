@@ -10,7 +10,7 @@ from torch.autograd import Variable
 from matplotlib import pyplot as plt # for debugging purposes
 
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
-loss_fn.cuda()
+# loss_fn.cuda()
 
 # b_path = "./test2.jpg"
 # b_w_l_path = "./test2AndLabel.jpg"
@@ -63,6 +63,7 @@ for iter in range(MAX_ITER):
     # Calculate the LPIPS loss: -1 * LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
     LPIPSLoss = loss_fn.forward(maskedLabelTensor.cuda(), backgroundImgAsTensor.cuda())
     neg_loss = - LPIPSLoss
+    neg_loss = - pixel_distance_loss(maskedLabelTensor)
     
     # Clear the gradient for a new calculation
     optimizer.zero_grad()
@@ -92,3 +93,16 @@ for iter in range(MAX_ITER):
         #  # Check the size of the image after backpropping
         #  width, height = Image.open(output_path).size
         #  print(f"Image width: {width}px, Image height: {height}px")
+
+
+def pixel_distance_loss(maskedLabel, weigth = 1.0):
+  image = maskedLabel.permute(2, 3, 1, 0).detach().numpy()
+  image = image.squeeze()
+  # plt.imshow(image)
+  image = np.where(image < 0, 0, image)
+
+  diff = np.sum(np.abs(np.diff(image, axis=0))) + np.sum(np.abs(np.diff(image, axis=1)))
+  diff_weight = weight * diff / image.size
+
+  x = torch.tensor([diff_weight])
+  return x.cuda()
