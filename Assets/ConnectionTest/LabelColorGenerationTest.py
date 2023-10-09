@@ -8,6 +8,7 @@ import lpips
 import torchvision
 from torch.autograd import Variable
 from matplotlib import pyplot as plt # for debugging purposes
+from tqdm import tqdm
 
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
 # loss_fn.cuda()
@@ -52,7 +53,7 @@ optimizer = torch.optim.Adam([pred,], lr=0.01, betas=(0.9, 0.999))
 distanceThreshold = 0.23
 
 # Optimize
-for iter in range(MAX_ITER): 
+for iter in tqdm(range(MAX_ITER)):
     if type(backgroundAndLabelImg) == torch.Tensor:
         backgroundAndLabelImg = backgroundAndLabelImg.numpy()
 
