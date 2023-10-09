@@ -60,6 +60,7 @@ for iter in tqdm(range(MAX_ITER)):
     # Apply the boolean mask for label pixels
     # maskedLabelTensor = torch.mul(pred, labelMaskAsTensor)
     maskedLabelTensor = pred.where(labelMaskAsTensor, -1) # sets all non-label pixels to 1
+    maskedLabelTensor = blur_masked_label(maskedLabelTensor)
 
     # Calculate the LPIPS loss: -1 * LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
     LPIPSLoss = loss_fn.forward(maskedLabelTensor.cuda(), backgroundImgAsTensor.cuda())
@@ -107,3 +108,18 @@ def pixel_distance_loss(maskedLabel, weigth = 1.0):
 
   x = torch.tensor([diff_weight])
   return x.cuda()
+
+def blur_masked_label(maskedLabel):
+  image = maskedLabel.permute(2, 3, 1, 0).detach().numpy()
+  image = image.squeeze()
+  blurred_image = np.empty_like(image)
+
+  black_mask = np.all(image != [0, 0, 0], axis=-1)
+
+  for channel in range(3):
+    blurred_image[:, :, channel] = gaussian_filter(image[:, :, channel] * black_mask, sigma=1)
+  
+  # plt.imshow(blurred_image)
+  blurred_image = np.expand_dims(blurred_image, axis=-1)
+  blurred_image = np.transpose(blurred_image, (3, 2, 0, 1))
+  return torch.tensor(blurred_image)
