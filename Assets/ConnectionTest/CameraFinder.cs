@@ -16,7 +16,8 @@ public class CameraFinder : MonoBehaviour
     private readonly string url = "http://127.0.0.1:8000/predict"; 
     public GameObject player;
     public TMP_Text label;
-
+    RenderTexture rt;
+    Texture2D screenShot;
     public class ScreenshotData{
         public string background_and_label_rgb_base64;
         public string background_rgb_base64;
@@ -41,6 +42,12 @@ public class CameraFinder : MonoBehaviour
         
         // Left eye anchor: Occlude all layers except for the label layer (black background and white label) for the label screenshot camera
         allCameras[2].cullingMask &= (1 << LayerMask.NameToLayer("Label"));
+        
+        // initiate render texture
+        int resWidth = allCameras[0].pixelWidth;
+        int resHeight = allCameras[0].pixelHeight;
+        rt = new RenderTexture(resWidth, resHeight, 24);
+        screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24, false);
     }
 
     
@@ -111,15 +118,13 @@ public class CameraFinder : MonoBehaviour
             // get the current camera
             Camera currentCamera = allCameras[i].GetComponent<Camera>();
 
-            // initiate render texture
-            int resWidth = currentCamera.pixelWidth;
-            int resHeight = currentCamera.pixelHeight;
-            RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
+            
+            
             currentCamera.targetTexture = rt;
 
             // Render the currentCamera's view onto the render texture defined above
             currentCamera.Render();
-            Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24, false);
+            
             RenderTexture.active = rt;
 
             // Read pixels from the render texture onto a texture 2D object
