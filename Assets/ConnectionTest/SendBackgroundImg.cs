@@ -37,7 +37,7 @@ public class SendBackgroundImg : MonoBehaviour
         // Define a cube-shaped render texture for the background
         renderTexture = new RenderTexture(cubemapSize, cubemapSize, 16);
         renderTexture.dimension = UnityEngine.Rendering.TextureDimension.Cube;
-
+         
          // To prevent antialiasing
         renderTexture.autoGenerateMips = false;
         renderTexture.useMipMap = false;
@@ -60,6 +60,8 @@ public class SendBackgroundImg : MonoBehaviour
         StartCoroutine(PostScreenshot());
     }
 
+    
+
 
     IEnumerator PostScreenshot() // take screenshot of the current background and label as Texture2D
     {
@@ -68,7 +70,9 @@ public class SendBackgroundImg : MonoBehaviour
 
         // Initiate a container to hold the two screenshots
         ScreenshotData screenshotContainer = new ScreenshotData();
-
+        
+        Debug.Log("Screenshot taken");
+        
         // Take a 360 degree screenshot of the background only and convert it to a string so that it can be attached to the container
         // string filePath = System.IO.Path.Combine(Application.dataPath, "testBackground");
         byte[] bytesBackground = I360Render.Capture(1024, true, BackgroundScreenshotCamera, true);

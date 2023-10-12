@@ -22,6 +22,7 @@ loss_fn = lpips.LPIPS(net='alex',version=0.1)
 class Input(BaseModel): # should be in the same format as the object initiated in Unity
     background_and_label_rgb_base64: str
     background_rgb_base64: str
+    label_mask_rgb_base64: str
 
 # A wrapper func for lpips that takes in one numpy array (background concatenated with background_label and outputs a float representing the distance
 # To fit the parameter of scipy.optimize
@@ -47,6 +48,9 @@ def predict(input:Input):
         background = lpips.im2tensor(backgroundImg)
         # bg = Image.fromarray(backgroundImg) #for debugging purposes only
         # bg.save("background.jpg") #for debugging purposes only
+
+        labelMaskString = input.label_mask_rgb_base64
+        labelMaskImg = np.asarray(Image.open(io.BytesIO(base64.b64decode(labelMaskString))))
 
         # run LPIPS to calculate the difference between Background vs. Background+Label
         LPIPSDistance = loss_fn.forward(backgroundAndLabel, background)[0][0][0][0].item() # remove .cuda() if not using GPU

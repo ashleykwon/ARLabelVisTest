@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 #endif
 using TextureDimension = UnityEngine.Rendering.TextureDimension;
+using System.IO;
 
 public static class I360Render
 {
@@ -63,25 +64,28 @@ public static class I360Render
 		try
 		{
 			cubemap = RenderTexture.GetTemporary( cubemapSize, cubemapSize, 0 );
-			cubemap.dimension = TextureDimension.Cube;
+			// cubemap.dimension = TextureDimension.Cube;
+			cubemap.dimension = TextureDimension.Tex2D;
 
 			equirectangularTexture = RenderTexture.GetTemporary( cubemapSize, cubemapSize / 2, 0 );
 			equirectangularTexture.dimension = TextureDimension.Tex2D;
+			renderCam.Render(); 
+// 			if( !renderCam.Render() )
+// 			{
+// 				Debug.LogError( "Rendering to cubemap is not supported on device/platform!" );
 
-			if( !renderCam.RenderToCubemap( cubemap, 63 ) )
-			{
-				Debug.LogError( "Rendering to cubemap is not supported on device/platform!" );
+// #if UNITY_2018_2_OR_NEWER
+// 				if( asyncCallback != null )
+// 					asyncCallback( null );
+// #endif
 
-#if UNITY_2018_2_OR_NEWER
-				if( asyncCallback != null )
-					asyncCallback( null );
-#endif
-
-				return null;
-			}
+// 				return null;
+// 			}
 
 			equirectangularConverter.SetFloat( paddingX, faceCameraDirection ? ( renderCam.transform.eulerAngles.y / 360f ) : 0f );
-			Graphics.Blit( cubemap, equirectangularTexture, equirectangularConverter );
+			// equirectangularConverter.SetTexture("_MainTex", equirectangularTexture);
+			Graphics.Blit( cubemap, equirectangularTexture, equirectangularConverter ); // copy cubemap + equirectangularConvert (shader) into equirectangular texture
+			// Graphics.Blit( cubemap, equirectangularTexture);
 
 #if UNITY_2018_2_OR_NEWER
 			if( asyncCallback != null )
@@ -130,6 +134,8 @@ public static class I360Render
 				RenderTexture.active = equirectangularTexture;
 				output = new Texture2D( equirectangularTexture.width, equirectangularTexture.height, TextureFormat.RGB24, false );
 				output.ReadPixels( new Rect( 0, 0, equirectangularTexture.width, equirectangularTexture.height ), 0, 0 );
+
+				File.WriteAllBytes(Application.dataPath + "/background.jpg", output.EncodeToJPG());
 				return encodeAsJPEG ? InsertXMPIntoTexture2D_JPEG( output ) : InsertXMPIntoTexture2D_PNG( output );
 			}
 		}
