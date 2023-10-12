@@ -14,6 +14,21 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/ConnectionTest.unity
     guid: f6148fceb45f5394e8309291878f9569
+  - enabled: 1
+    path: Assets/TestScenes/CubeSphere_Geometry.unity
+    guid: 9f7d8c7034f5347f5b02c578f3d3ff29
+  - enabled: 1
+    path: Assets/TestScenes/CityBridge_360_Night.unity
+    guid: 5c6696ff86ab24767b4645d5f02459ca
+  - enabled: 1
+    path: Assets/TestScenes/HotelParanal_360_Day.unity
+    guid: 8f417359d02864dad8959e605da03415
+  - enabled: 1
+    path: Assets/TestScenes/LaSilla_360_Night.unity
+    guid: 11cb9e618fa7443c39541598a0714a19
+  - enabled: 1
+    path: Assets/TestScenes/MansonBayPier_360_Day.unity
+    guid: dd4a62cb3c75449d68e60025e987af78
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 206296f153514ee41ac161b0473cfc15, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d0c623da64389ba47b634bcd6b6e34ff, type: 2}
