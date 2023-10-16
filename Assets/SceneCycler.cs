@@ -20,7 +20,9 @@ public class SceneCycler : MonoBehaviour
     private TMP_Text curCatText;
     private float vanishTime = 5.0f;
     private GameObject sceneContainer;
-    private bool rTriggerHeld = false;
+    private bool rIndexTriggerHeld = false;
+    private bool lIndexTriggerHeld = false;
+    private bool lHandTriggerHeld = false;
 
     private OVRInput.Controller leftController = OVRInput.Controller.LTouch;
     private OVRInput.Controller rightController = OVRInput.Controller.RTouch;
@@ -87,15 +89,26 @@ public class SceneCycler : MonoBehaviour
     {
         //bool triggerRight = OVRInput.Get(OVRInput.Button.Two);
 
-        float rTrigger = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
+        float rIndexTrigger = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
+        float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
+        float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
 
-        if (rTrigger == 0) {
-            rTriggerHeld = false;
+
+        if (rIndexTrigger == 0) {
+            rIndexTriggerHeld = false;
         }
 
-        if (((rTrigger > 0) && !rTriggerHeld) || Input.GetKeyDown(KeyCode.N)) 
+        if (lIndexTrigger == 0) {
+            lIndexTriggerHeld = false;
+        }
+
+        if (lHandTrigger == 0) {
+            lHandTriggerHeld = false;
+        }
+
+        if ((rIndexTrigger > 0) && !rIndexTriggerHeld) 
         {   
-            rTriggerHeld = true;
+            rIndexTriggerHeld = true;
             CancelInvoke();
             sceneContainer.SetActive(true); 
             Invoke("HideSceneContainer", vanishTime);
@@ -104,8 +117,9 @@ public class SceneCycler : MonoBehaviour
                 LoadNext();
             }
         }
-        else if (OVRInput.Get(OVRInput.Button.Three))
+        else if ((lIndexTrigger > 0) && !lIndexTriggerHeld)
         {
+            lIndexTriggerHeld = true;
             CancelInvoke();
             sceneContainer.SetActive(true); 
             Invoke("HideSceneContainer", vanishTime);
@@ -172,8 +186,9 @@ public class SceneCycler : MonoBehaviour
                 SceneManager.LoadScene(activeScenes[sceneIdx]);
             }
         }
-        else if (OVRInput.Get(OVRInput.Button.Four))
+        else if ((lHandTrigger > 0) && !lHandTriggerHeld)
         {
+            lHandTriggerHeld = true;
             CancelInvoke();
             sceneContainer.SetActive(true); 
             Invoke("HideSceneContainer", vanishTime);
