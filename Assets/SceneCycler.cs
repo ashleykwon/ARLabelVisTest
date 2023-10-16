@@ -18,8 +18,9 @@ public class SceneCycler : MonoBehaviour
     private int sceneIdx = 0;
     private TMP_Text activeCatsText;
     private TMP_Text curCatText;
-    private float vanishTime = 3.0f;
+    private float vanishTime = 5.0f;
     private GameObject sceneContainer;
+    private bool rTriggerHeld = false;
 
     private OVRInput.Controller leftController = OVRInput.Controller.LTouch;
     private OVRInput.Controller rightController = OVRInput.Controller.RTouch;
@@ -86,8 +87,15 @@ public class SceneCycler : MonoBehaviour
     {
         //bool triggerRight = OVRInput.Get(OVRInput.Button.Two);
 
-        if (OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger)) 
+        float rTrigger = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
+
+        if (rTrigger == 0) {
+            rTriggerHeld = false;
+        }
+
+        if (((rTrigger > 0) && !rTriggerHeld) || Input.GetKeyDown(KeyCode.N)) 
         {   
+            rTriggerHeld = true;
             CancelInvoke();
             sceneContainer.SetActive(true); 
             Invoke("HideSceneContainer", vanishTime);
