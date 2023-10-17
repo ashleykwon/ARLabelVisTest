@@ -1,4 +1,4 @@
-Shader "Custom/GreyGradient"
+Shader "Custom/TwoGradient"
 {
     Properties {
         _Color1("Color 1", Color) = (1,1,1,1)

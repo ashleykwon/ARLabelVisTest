@@ -1,4 +1,4 @@
-Shader "Custom/ThreeGradient"
+Shader "Custom/TriColor"
 {
     Properties {
         _Color1("Color 1", Color) = (1,0,0,1)
@@ -39,13 +39,23 @@ Shader "Custom/ThreeGradient"
             half4 frag(v2f i) : SV_Target {
                 float3 spherePos = normalize(i.normal);
                 float theta = atan2(spherePos.z, spherePos.x);
-                float phi = acos(spherePos.y);
 
-                float t1 = (theta + UNITY_PI) / (2.0 * UNITY_PI);
-                float t2 = phi / UNITY_PI;
+                half4 color;
+                
+                if (-UNITY_PI <= theta && theta < -UNITY_PI / 3.0)
+                {
+                    color = _Color1;
+                } 
+                else if (-UNITY_PI / 3.0 <= theta && theta < UNITY_PI / 3.0)
+                {
+                    color = _Color2;
+                }
+                else
+                {
+                    color = _Color3;
+                }
 
-                half4 interpolatedColor = lerp(lerp(_Color1, _Color2, t1), _Color3, t2);
-                return interpolatedColor;
+                return color;
             }
             ENDCG
         }

@@ -36,6 +36,9 @@ EditorBuildSettings:
     path: Assets/TestScenes/RGBGradient_Spheres.unity
     guid: 716a437909e5f46e199f9f6bc7d7c671
   - enabled: 1
+    path: Assets/TestScenes/TriColorRGB_Spheres.unity
+    guid: a246712de3e794110a011ab7968db814
+  - enabled: 1
     path: Assets/TestScenes/Taipei_360_Timelapse.unity
     guid: 5fe9e391faad74f2e949de1b5be259f4
   m_configObjects:
