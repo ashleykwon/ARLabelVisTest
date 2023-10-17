@@ -12,18 +12,18 @@ from matplotlib import pyplot as plt # for debugging purposes
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
 loss_fn.cuda()
 
-# # Test images downloaded from online sources
-# b_path = "./testImg1/test1.jpg"
-# b_w_l_path = "./testImg1/test1AndLabel.jpg"
-# labelMask_path = "./testImg1/mask.png"
-# labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
-
-# Screenshots from the AR headset
-b_path = "./background.jpg"
-# b_w_l_path = "./backgroundAndLabel.jpg"
-b_w_l_path = "./test_backgroundAndLabel.jpg"
-labelMask_path = "./test_mask.jpg"
+# Test images downloaded from online sources
+b_path = "./testImg2/test2.jpg"
+b_w_l_path = "./testImg2/test2AndLabel.jpg"
+labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
+
+# # Screenshots from the AR headset
+# b_path = "./background.jpg"
+# # b_w_l_path = "./backgroundAndLabel.jpg"
+# b_w_l_path = "./test_backgroundAndLabel.jpg"
+# labelMask_path = "./test_mask.jpg"
+# labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 # # Check the size of the image before backpropping
 # width, height = Image.open(b_w_l_path).size
@@ -71,7 +71,7 @@ labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*nu
 # optimizer = torch.optim.SGD([pred], lr=0.05, momentum=0.9)
 
 # Adam optimizer, original lr=1e-4
-optimizer = torch.optim.Adam([labelVar,], lr=0.08, betas=(0.9, 0.999))
+optimizer = torch.optim.Adam([labelVar,], lr=0.2, betas=(0.9, 0.999))
 
 distanceThreshold = 0.23
 
@@ -119,8 +119,8 @@ for iter in range(MAX_ITER):
         full_img.data = torch.clamp(full_img.data, -1, 1)
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        # output_path = "./testImg1/final_result_adam_lr0.08.jpg"
-        output_path = "./final_result_adam_lr0.08.jpg"
+        output_path = "./testImg2/final_result_adam_lr0.2.jpg"
+        # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break
 
