@@ -5,6 +5,8 @@ import base64
 import PIL.Image as Image
 import numpy as np
 import lpips
+import cv2
+import scipy
 import torchvision
 from torch.autograd import Variable
 from matplotlib import pyplot as plt # for debugging purposes
@@ -56,14 +58,26 @@ maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
 # Separate background and label pixels
 labelFlat = imageFlat[:, maskFlat[0]] #[1,numLabelPixels]
-backgroundFlat = imageFlat[ :, ~maskFlat[0]]
+# backgroundFlat = imageFlat[ :, ~maskFlat[0]] # not used
 
 # Set them to torch variables for back-propagation
 labelVar = Variable(labelFlat, requires_grad=True)
-backgroundVar = Variable(imageFlat, requires_grad=False)
+# backgroundVar = Variable(imageFlat, requires_grad=False) # not used
 
 # Get indices of label pixels as a tuple of d tensors where d is the number of dimensions -> ([x1, x2, x3, ..., xn], [y1, y2, y3, ..., yn], ...)
 labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*numLabelPixels
+
+
+# # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
+backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30))
+backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
+
+imgReshaped = imageFlat.view(1,3,height,width)
+imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, 30, 30))
+print(type(imgReshaped))
+imgReshaped = torch.from_numpy(imgReshaped)
+imageBlurred = imgReshaped.view(1,3,-1)
+
 
 # # --------------Set optimizer and start iterating--------------------------------------------------------------------------
 # stochastic gradient descent-based optimizer
@@ -71,7 +85,7 @@ labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*nu
 # optimizer = torch.optim.SGD([pred], lr=0.05, momentum=0.9)
 
 # Adam optimizer, original lr=1e-4
-optimizer = torch.optim.Adam([labelVar,], lr=0.2, betas=(0.9, 0.999))
+optimizer = torch.optim.Adam([labelVar,], lr=0.08, betas=(0.9, 0.999))
 
 distanceThreshold = 0.23
 
@@ -85,7 +99,7 @@ for iter in range(MAX_ITER):
     # maskedLabelTensor = pred.where(torch.logical_not(labelMaskAsTensor), -1) # don't use this # sets all non-label pixels to -1
 
     # initialize to the origianl full image (does not matter what the pixels in label region are bc they will be overwritten later)
-    full_img = imageFlat  # torch.Size([1, 3, 524288])
+    full_img = imageBlurred  # torch.Size([1, 3, 524288])
 
     # Overwrite the label pixels using the updated results
     full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
@@ -116,10 +130,30 @@ for iter in range(MAX_ITER):
     # Save the output image
     if (iter == MAX_ITER - 1): 
         print('Reached the last iteration')
+        # Get the unblurred background + overlay with label
+        full_img = imageFlat # a tensor
+        full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
+        full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape -- this is unblurred label with unblurred background
         full_img.data = torch.clamp(full_img.data, -1, 1)
+
+        # ---------------------Try blurring the label-------------------------------------------
+        full_img = cv2.imread(b_w_l_path)
+        mask = (1/255)*cv2.imread(labelMask_path) 
+
+        blurred_label = full_img
+        blurred_label[mask > 0.5] = scipy.ndimage.gaussian_filter(full_img, sigma=(3, 3, 0))[mask > 0.5]
+        combined = full_img
+        combined[mask > 0.5] = blurred_label[mask > 0.5]
+        # output_img =  lpips.tensor2im(combined.data)
+
+        output_path = "./tests/test003.jpg"
+        cv2.imwrite(output_path, combined)
+
+        
+        
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        output_path = "./testImg2/final_result_adam_lr0.2.jpg"
+        output_path = "./testImg2/blurred_adam_lr0.08.jpg"
         # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break
