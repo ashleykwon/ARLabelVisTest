@@ -116,7 +116,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float del_Max = var_Max - var_Min;             //Delta RGB value
 
                 float H, S;
-                float V = var_Max;
+                float V = var_Max*100;
 
                 if (del_Max == 0)
                 {//This is a gray, no chroma...
@@ -125,23 +125,18 @@ Shader "Unlit/InverseCullCubeMapShader"
                 } 
                 else 
                 {                                  //Chromatic data...
-                    S = del_Max / var_Max;
+                    S = (del_Max / var_Max)*100;
 
-                    float del_R = (((var_Max - R) / 6) + (del_Max / 2)) / del_Max;
-                    float del_G = (((var_Max - G) / 6) + (del_Max / 2)) / del_Max;
-                    float del_B = (((var_Max - B) / 6) + (del_Max / 2)) / del_Max;
+                    // float del_R = (((var_Max - R) / 6) + (del_Max / 2)) / del_Max;
+                    // float del_G = (((var_Max - G) / 6) + (del_Max / 2)) / del_Max;
+                    // float del_B = (((var_Max - B) / 6) + (del_Max / 2)) / del_Max;
 
-                    if (R == var_Max) 
-                        H = del_B - del_G;
-                    else if (G == var_Max)
-                        H = (1 / 3) + del_R - del_B;
-                    else if (B == var_Max)
-                        H = (2 / 3) + del_G - del_R;
-
-                    if (H < 0) 
-                        H += 1;
-                    if (H > 1)
-                        H -= 1;
+                    if (R == var_Max) {
+                        H = (60 * ((G-B)/del_Max) + 360) % 360;}
+                    else if (G == var_Max){
+                        H = (60 * ((B-R)/del_Max) + 120) % 360;}
+                    else if (B == var_Max){
+                        H = (60 * ((R-G)/del_Max) + 240) % 360;}
 
                 }
                 return float4(H, S, V, rgb.a);
@@ -152,52 +147,58 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float H = hsv[0];
                 float S = hsv[1];
                 float V = hsv[2];
-                float R, G, B;
-                if (S == 0)
-                { // gray
-                    R = V;
-                    G = V;
-                    B = V;
-                } 
-                else 
-                {
-                    float var_h = H * 6;
-                    if (var_h == 6) 
-                        var_h = 0;     //H must be < 1
 
-                    float var_i = (int) var_h; //Or ... var_i = floor(var_h)
-                    float var_1 = V * (1 - S);
-                    float var_2 = V * (1 - S * (var_h - var_i));
-                    float var_3 = V * (1 - S * (1 - (var_h - var_i)));
+                float s = S/100;
+                float v = V/100;
+                float C = s*v;
+                float X = C*(1-abs((H/60.0)%2 -1 ));
+                float m = v - C;
+                float r=0;
+                float g=0;
+                float b=0;
 
-                    if (var_i == 0) { 
-                        R = V; 
-                        G = var_3;
-                        B = var_1;
-                    } else if (var_i == 1) { 
-                        R = var_2;
-                        G = V;
-                        B = var_1;
-                    } else if (var_i == 2) { 
-                        R = var_1;
-                        G = V;
-                        B = var_3;
-                    } else if (var_i == 3) {
-                        R = var_1;
-                        G = var_2;
-                        B = V;
-                    } else if (var_i == 4) {
-                        R = var_3;
-                        G = var_1;
-                        B = V;
-                    } else { 
-                        R = V;
-                        G = var_1;
-                        B = var_2;
-                    }
+                if(H >= 0 && H <60){
+                    r = C;
+                    g = X;
+                    b=0;
                 }
 
-                return float4(R, G, B, hsv.a);
+                else if(H>=60 && H<120){
+                    r=X;
+                    g=C;
+                    b=0;
+                }
+
+                else if(H>=120 && H<180){
+                    r =0;
+                    g=C;
+                    b=X;
+                }
+
+                else if(H>=180 && H<240){
+                    r=0;
+                    g=X;
+                    b=C;
+                }
+
+                else if(H>=240 && H<300){
+                    r=X;
+                    g=0;
+                    b=C;
+                }
+
+                else{
+                    r=C;
+                    g=0;
+                    b=X;
+                }
+
+                r = r+m;
+                g = g+m;
+                b = b+m;
+
+
+                return float4(r, g, b, hsv.a);
             }
 
             float4 RGB2LAB(float4 RGB) 
@@ -460,15 +461,15 @@ Shader "Unlit/InverseCullCubeMapShader"
                     float h = hsv[0];
                     float s = hsv[1];
                     float v = hsv[2];
-                    h += 0.5;
-                    h %= 1.0;
-                    if (v > 0.5){
-                        v = 0;
-                    } else {
-                        v = 1;
-                    }
+                    h += 180;
+                    h %= 360;
 
-                    float4 inverted_hsv = float4(h, s, v, hsv.a);
+                    v = 100 - v;
+
+                    // v +=50;
+                    // v %=100;
+                    
+                    float4 inverted_hsv = float4(h, s, v, 1.0);
                     col = HSV2RGB(inverted_hsv);
                 }
                 // CIELAB inversion
@@ -479,19 +480,12 @@ Shader "Unlit/InverseCullCubeMapShader"
                     float a = lab[1];
                     float b = lab[2];
 
-                    if (l > 75 || l < 25){
-                        l = 100 - l;
-                    } else if (l > 50){
-                        l = (100 - l) + 25;
-                    } else {
-                        l = (100 - l) - 25;
-                    }
-
-                    // l = 100 - l;
-                    // a *= -1;
-                    // b *= -1;
-                    a = 62.1313548;// -81.1856371;
-                    b = -95.50187772;//76.11578826;
+                    
+                    l *= -1;
+                    a *= -1;
+                    b *= -1;
+                    // a = 62.1313548;// -81.1856371;
+                    // b = -95.50187772;//76.11578826;
 
                     float4 inverted_lab = float4(l, a, b, lab.a);
                     col = LAB2RGB(inverted_lab);
