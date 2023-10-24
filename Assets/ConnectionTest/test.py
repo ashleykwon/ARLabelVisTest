@@ -19,10 +19,13 @@ from torch.autograd import Variable
 # backgroundAndLabelImg = np.asarray(Image.open(b_w_l_path))
 
 # Test images downloaded from online sources
-b_path = "./testImg2/test2.jpg"
-# b_w_l_path = "./testImg2/test2AndLabel.jpg"
-b_w_l_path = "./testImg2/blurred_adam_lr0.08.jpg"
-labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
+# b_path = "./testImg2/test2.jpg"
+# # b_w_l_path = "./testImg2/test2AndLabel.jpg"
+# b_w_l_path = "./testImg2/blurred_adam_lr0.08.jpg"
+# labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
+b_path = "./testGrey/greyBars.jpg"
+b_w_l_path = "./testGrey/blurredBG_lr0.08.jpg"
+labelMask_path = "./testGrey/greyBarsMask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 
@@ -54,9 +57,9 @@ combined = full_img
 combined[mask > 0.5] = blurred_label[mask > 0.5]
 # output_img =  lpips.tensor2im(combined.data)
 
-output_path = "./tests/test003.jpg"
+output_path = "./testGrey/blurredLabel_lr0.08.jpg"
 cv2.imwrite(output_path, combined)
-cv2.imwrite("./tests/test_mask.jpg", mask)
+# cv2.imwrite("./tests/test_mask.jpg", mask)
 # Image.fromarray(output_img).save(output_path)
 
 
