@@ -15,9 +15,13 @@ loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on 
 loss_fn.cuda()
 
 # Test images downloaded from online sources
-b_path = "./testGrey/greyBarsVertical.jpg"
-b_w_l_path = "./testGrey/greyBarsVerticalAndLabel.jpg"
-labelMask_path = "./testGrey/greyBarsVerticalMask.jpg"
+# b_path = "./testGrey/greyBarsVertical.jpg"
+# b_w_l_path = "./testGrey/greyBarsVerticalAndLabel.jpg"
+# labelMask_path = "./testGrey/greyBarsVerticalMask.jpg"
+
+b_path = "./testSingleColor/red.jpg"
+b_w_l_path = "./testSingleColor/redAndLabel.jpg"
+labelMask_path = "./testSingleColor/mask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 # # Screenshots from the AR headset
@@ -68,15 +72,15 @@ labelVar = Variable(labelFlat, requires_grad=True)
 labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*numLabelPixels
 
 
-# # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
-backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30))
-backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
+# # # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
+# backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30))
+# backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 
-imgReshaped = imageFlat.view(1,3,height,width)
-imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, 30, 30))
-print(type(imgReshaped))
-imgReshaped = torch.from_numpy(imgReshaped)
-imageBlurred = imgReshaped.view(1,3,-1)
+# imgReshaped = imageFlat.view(1,3,height,width)
+# imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, 30, 30))
+# print(type(imgReshaped))
+# imgReshaped = torch.from_numpy(imgReshaped)
+# imageBlurred = imgReshaped.view(1,3,-1)
 
 
 # # --------------Set optimizer and start iterating--------------------------------------------------------------------------
@@ -154,7 +158,7 @@ for iter in range(MAX_ITER):
         
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        output_path = "./testGrey/vertical_blurredBG_lr0.08.jpg"
+        output_path = "./testSingleColor/red_unblurredBG_lr0.08.jpg"
         # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break
