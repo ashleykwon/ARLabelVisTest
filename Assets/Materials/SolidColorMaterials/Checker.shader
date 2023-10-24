@@ -4,6 +4,7 @@ Shader "Custom/Checker"
         _Color1("Color 1", Color) = (1,0,0,1)
         _Color2("Color 2", Color) = (0,1,0,1)
         _Tiles("Tiles", Int) = 10
+        _Noise("Noise", float) = 0.0
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
@@ -28,6 +29,7 @@ Shader "Custom/Checker"
             half4 _Color1;
             half4 _Color2;
             int _Tiles;
+            float _Noise;
 
             v2f vert(appdata_t v) {
                 v2f o;
@@ -45,7 +47,10 @@ Shader "Custom/Checker"
                 int pPhi = floor((phi + UNITY_PI / 2.0) / (UNITY_PI / _Tiles));
 
                 half4 color = (pTheta + pPhi) % 2 ? _Color1 : _Color2;
-                return color;
+                float noise = frac(sin(dot(i.pos.xy, float2(12.9898,78.233))) * 43758.5453) - 1;
+                half4 noise4 = half4(noise, noise, noise, 0);
+
+                return color + noise4 * _Noise;
             }
             ENDCG
         }

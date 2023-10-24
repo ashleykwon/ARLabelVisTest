@@ -4,6 +4,7 @@ Shader "Custom/TriColor"
         _Color1("Color 1", Color) = (1,0,0,1)
         _Color2("Color 2", Color) = (0,1,0,1)
         _Color3("Color 3", Color) = (0,0,1,1)
+        _Noise("Noise", float) = 0.0
     }
     SubShader {
         Tags { "RenderType"="Opaque" }
@@ -28,6 +29,7 @@ Shader "Custom/TriColor"
             half4 _Color1;
             half4 _Color2;
             half4 _Color3;
+            float _Noise;
 
             v2f vert(appdata_t v) {
                 v2f o;
@@ -41,6 +43,8 @@ Shader "Custom/TriColor"
                 float theta = atan2(spherePos.z, spherePos.x);
 
                 half4 color;
+                float noise = frac(sin(dot(i.pos.xy, float2(12.9898,78.233))) * 43758.5453) - 1;
+                half4 noise4 = half4(noise, noise, noise, 0);
                 
                 if (-UNITY_PI <= theta && theta < -UNITY_PI / 3.0)
                 {
@@ -55,7 +59,7 @@ Shader "Custom/TriColor"
                     color = _Color3;
                 }
 
-                return color;
+                return color + noise4 * _Noise;
             }
             ENDCG
         }
