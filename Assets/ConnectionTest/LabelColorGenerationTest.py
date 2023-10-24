@@ -15,9 +15,9 @@ loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on 
 loss_fn.cuda()
 
 # Test images downloaded from online sources
-b_path = "./testRainbow/rainbow.jpg"
-b_w_l_path = "./testRainbow/rainbowAndLabel.jpg"
-labelMask_path = "./testRainbow/rainbowMask.jpg"
+b_path = "./testGrey/greyBarsVertical.jpg"
+b_w_l_path = "./testGrey/greyBarsVerticalAndLabel.jpg"
+labelMask_path = "./testGrey/greyBarsVerticalMask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 # # Screenshots from the AR headset
@@ -154,7 +154,7 @@ for iter in range(MAX_ITER):
         
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        output_path = "./testRainbow/blurredBG_lr0.08.jpg"
+        output_path = "./testGrey/vertical_blurredBG_lr0.08.jpg"
         # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break
