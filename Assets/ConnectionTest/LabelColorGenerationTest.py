@@ -15,13 +15,13 @@ loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on 
 loss_fn.cuda()
 
 # Test images downloaded from online sources
-b_path = "./testRainbow/rainbow.jpg"
-b_w_l_path = "./testRainbow/rainbowAndColorfulLabel.jpg"
-labelMask_path = "./testRainbow/rainbowAndColorfulLabelMask.jpg"
+# b_path = "./testImg2/test2.jpg"
+# b_w_l_path = "./testImg2/test2AndLabel.jpg"
+# labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
 
-# b_path = "./testSingleColor/green.jpg"
-# b_w_l_path = "./testSingleColor/greenAndLabel.jpg"
-# labelMask_path = "./testSingleColor/mask.jpg"
+b_path = "./testGrey/greyBars.jpg"
+b_w_l_path = "./testGrey/greyBarsAndLabel_black.jpg"
+labelMask_path = "./testGrey/greyBarsMask_bw.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 # # Screenshots from the AR headset
@@ -35,8 +35,7 @@ labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 # width, height = Image.open(b_w_l_path).size
 # print(f"Image width: {width}px, Image height: {height}px")
 
-MAX_ITER = 1000
-costList = []
+
 
 # # --------------Load images and convert them to tensors-----------------------------------------------------
 # Convert the images to tensors
@@ -73,11 +72,13 @@ labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*nu
 
 
 # # # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
-# backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30))
+# sigma = 60
+# r = 60
+# backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
 # backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 
 # imgReshaped = imageFlat.view(1,3,height,width)
-# imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, 30, 30))
+# imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, sigma, sigma), radius=None)
 # print(type(imgReshaped))
 # imgReshaped = torch.from_numpy(imgReshaped)
 # imageBlurred = imgReshaped.view(1,3,-1)
@@ -92,6 +93,9 @@ labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*nu
 optimizer = torch.optim.Adam([labelVar,], lr=0.08, betas=(0.9, 0.999))
 
 distanceThreshold = 0.23
+
+MAX_ITER = 2000
+costList = []
 
 # Optimize
 for iter in range(MAX_ITER): 
@@ -158,7 +162,7 @@ for iter in range(MAX_ITER):
         
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        output_path = "./testRainbow/colorfulLabel_unblurredBG_lr0.08.jpg"
+        output_path = "./testGrey/horizontal_black_lr0.08_itr2000.jpg"
         # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break

@@ -23,7 +23,7 @@ from torch.autograd import Variable
 # # b_w_l_path = "./testImg2/test2AndLabel.jpg"
 # b_w_l_path = "./testImg2/blurred_adam_lr0.08.jpg"
 # labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
-b_path = "./testGrey/greyBars.jpg"
+b_path = "./testImg2/test2.jpg"
 b_w_l_path = "./testGrey/blurredBG_lr0.08.jpg"
 labelMask_path = "./testGrey/greyBarsMask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
@@ -43,22 +43,25 @@ maskOrigFlat = labelMaskOrigAsTensor.view(1,3,-1) #[1,3,524288], rgb values
 maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,524288], true or false values
 imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1)
 
-backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30))
+backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30), radius=None)
 backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 pred_img = lpips.tensor2im(backgroundImgAsTensor.data)
+output_path = "./tests/testblur_r30.jpg"
+Image.fromarray(pred_img).save(output_path)
 
-# ---------------------Try blurring the label-------------------------------------------
-full_img = cv2.imread(b_w_l_path)
-mask = (1/255)*cv2.imread(labelMask_path) 
+# # ---------------------Try blurring the label-------------------------------------------
+# full_img = cv2.imread(b_w_l_path)
+# mask = (1/255)*cv2.imread(labelMask_path) 
 
-blurred_label = full_img
-blurred_label[mask > 0.5] = scipy.ndimage.gaussian_filter(full_img, sigma=(3, 3, 0))[mask > 0.5]
-combined = full_img
-combined[mask > 0.5] = blurred_label[mask > 0.5]
-# output_img =  lpips.tensor2im(combined.data)
+# blurred_label = full_img
+# blurred_label[mask > 0.5] = scipy.ndimage.gaussian_filter(full_img, sigma=(3, 3, 0))[mask > 0.5]
+# combined = full_img
+# combined[mask > 0.5] = blurred_label[mask > 0.5]
+# # output_img =  lpips.tensor2im(combined.data)
 
-output_path = "./testGrey/blurredLabel_lr0.08.jpg"
-cv2.imwrite(output_path, combined)
+# output_path = "./testGrey/blurredLabel_lr0.08.jpg"
+# cv2.imwrite(output_path, combined)
+
 # cv2.imwrite("./tests/test_mask.jpg", mask)
 # Image.fromarray(output_img).save(output_path)
 
