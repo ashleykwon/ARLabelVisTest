@@ -71,17 +71,17 @@ labelVar = Variable(labelFlat, requires_grad=True)
 labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*numLabelPixels
 
 
-# # # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
-# sigma = 60
-# r = 60
-# backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
-# backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
+# # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
+sigma = 90
+r = 60
+backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
+backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 
-# imgReshaped = imageFlat.view(1,3,height,width)
-# imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, sigma, sigma), radius=None)
-# print(type(imgReshaped))
-# imgReshaped = torch.from_numpy(imgReshaped)
-# imageBlurred = imgReshaped.view(1,3,-1)
+imgReshaped = imageFlat.view(1,3,height,width)
+imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, sigma, sigma), radius=None)
+print(type(imgReshaped))
+imgReshaped = torch.from_numpy(imgReshaped)
+imageBlurred = imgReshaped.view(1,3,-1)
 
 
 # # --------------Set optimizer and start iterating--------------------------------------------------------------------------
@@ -94,7 +94,7 @@ optimizer = torch.optim.Adam([labelVar,], lr=0.08, betas=(0.9, 0.999))
 
 distanceThreshold = 0.23
 
-MAX_ITER = 2000
+MAX_ITER = 1000
 costList = []
 
 # Optimize
@@ -107,8 +107,8 @@ for iter in range(MAX_ITER):
     # maskedLabelTensor = pred.where(torch.logical_not(labelMaskAsTensor), -1) # don't use this # sets all non-label pixels to -1
 
     # initialize to the origianl full image (does not matter what the pixels in label region are bc they will be overwritten later)
-    # full_img = imageBlurred  # torch.Size([1, 3, 524288])
-    full_img = imageFlat # background not blurred
+    full_img = imageBlurred  # torch.Size([1, 3, 524288])
+    # full_img = imageFlat # background not blurred
 
     # Overwrite the label pixels using the updated results
     full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
@@ -162,7 +162,7 @@ for iter in range(MAX_ITER):
         
         pred_img = lpips.tensor2im(full_img.data)
         print(type(pred_img))
-        output_path = "./testGrey/horizontal_black_lr0.08_itr2000.jpg"
+        output_path = "./testGrey/horizontal_black_blurredBG_lr0.08_sigma90_itr1000.jpg"
         # output_path = "./final_result_adam_lr0.08.jpg"
         Image.fromarray(pred_img).save(output_path)
         break
