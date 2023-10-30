@@ -23,9 +23,9 @@ from torch.autograd import Variable
 # # b_w_l_path = "./testImg2/test2AndLabel.jpg"
 # b_w_l_path = "./testImg2/blurred_adam_lr0.08.jpg"
 # labelMask_path = "./testImg2/test2AndLabel_mask.jpg"
-b_path = "./testImg2/test2.jpg"
-b_w_l_path = "./testGrey/blurredBG_lr0.08.jpg"
-labelMask_path = "./testGrey/greyBarsMask.jpg"
+b_path = "./testRiver/river.jpg"
+b_w_l_path = "./testRiver/riverAndLabel.jpg"
+labelMask_path = "./testRiver/riverMask.jpg"
 labelMaskImg = (1/255)*np.asarray(Image.open(labelMask_path))
 
 
@@ -43,10 +43,11 @@ maskOrigFlat = labelMaskOrigAsTensor.view(1,3,-1) #[1,3,524288], rgb values
 maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,524288], true or false values
 imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1)
 
-backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, 30, 30), radius=None)
+sigma = 30
+backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
 backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 pred_img = lpips.tensor2im(backgroundImgAsTensor.data)
-output_path = "./tests/testblur_r30.jpg"
+output_path = "./tests/river_blur_r15.jpg"
 Image.fromarray(pred_img).save(output_path)
 
 # # ---------------------Try blurring the label-------------------------------------------
