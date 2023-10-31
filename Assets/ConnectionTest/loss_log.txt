@@ -41,3 +41,25 @@ iter 1600, dist 0.373
 iter 1700, dist 0.373
 iter 1800, dist 0.373
 iter 1900, dist 0.373
+---------------------------------
+beach, lr=0.08, itr=2000
+iter 0, dist 0.152
+iter 100, dist 0.249
+iter 200, dist 0.258
+iter 300, dist 0.261
+iter 400, dist 0.264
+iter 500, dist 0.265
+iter 600, dist 0.267
+iter 700, dist 0.268
+iter 800, dist 0.269
+iter 900, dist 0.269
+iter 1000, dist 0.27
+iter 1100, dist 0.271
+iter 1200, dist 0.272
+iter 1300, dist 0.272
+iter 1400, dist 0.273
+iter 1500, dist 0.273
+iter 1600, dist 0.274
+iter 1700, dist 0.274
+iter 1800, dist 0.274
+iter 1900, dist 0.274
