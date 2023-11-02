@@ -12,6 +12,7 @@ import torchvision
 import argparse
 import datetime
 from torch.autograd import Variable
+from torchmetrics.image import StructuralSimilarityIndexMeasure
 from matplotlib import pyplot as plt # for debugging purposes
 
 
@@ -20,14 +21,32 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.08, help='Learning rate')
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
-    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg', './testRiver/river.jpg'], help='Paths to input images')
-    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg', './testRiver/riverAndLabel.jpg'], help='Paths to input images with labels')
-    parser.add_argument('--mask_paths', nargs='+',         default=['./testCurry/curryMask.jpg', './testRiver/riverMask.jpg'], help='Paths to masks for input images')
+    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg',           
+                                                                     './testRiver/river.jpg',
+                                                                     './testSingleColor/blue.jpg',
+                                                                     './testRainbow/rainbow.jpg' ], 
+                                                                     help='Paths to input images')
+    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg', 
+                                                                     './testRiver/riverAndLabel.jpg',
+                                                                     './testSingleColor/blueAndLabel.jpg',
+                                                                     './testRainbow/rainbowAndLabel.jpg'], 
+                                                                     help='Paths to input images with labels')
+    parser.add_argument('--mask_paths', nargs='+',          default=['./testCurry/curryMask.jpg',        
+                                                                     './testRiver/riverMask.jpg',
+                                                                     './testSingleColor/mask.jpg',
+                                                                     './testRainbow/rainbowMask.jpg'], 
+                                                                     help='Paths to masks for input images')
     parser.add_argument('--blur', action='store_true', default=False, help='Apply blur to background')
+    parser.add_argument('--metric', choices=['lpips', 'ssim'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
 
-    loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
-    loss_fn.cuda()
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if args.metric == 'lpips':
+        loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
+        loss_fn.cuda()
+    elif args.metric == 'ssim':
+        ssim = StructuralSimilarityIndexMeasure().to(device)
+
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     log_file_name = f"./log_files/loss_log_{timestamp}.txt"
@@ -105,10 +124,16 @@ if __name__ == '__main__':
             full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape
             full_img.data = torch.clamp(full_img.data, -1, 1)
 
-            # Calculate the LPIPS loss: LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
-            LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
-            # Negate the loss to make the image more and more different from the original one
-            neg_loss = - LPIPSLoss
+            if args.metric == 'lpips': 
+                # LPIPS loss: LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
+                LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
+                # Negate the loss to make the image more and more different from the original one
+                neg_loss = - LPIPSLoss
+            elif args.metric == 'ssim':
+                # SSIM loss
+                ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
+                neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
+
             # Clear the gradient for a new calculation
             optimizer.zero_grad()
             # Do backpropagation based on the LPIPS loss above
@@ -121,13 +146,22 @@ if __name__ == '__main__':
 
             # Print out losses/distances
             if iter % 100 == 0:
-                loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+                if args.metric == 'lpips':
+                    loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+                elif args.metric == 'ssim':
+                    loss = ssim_loss.item()
                 print('iter %d, dist %.3g' % (iter, loss)) 
                 log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
 
             # Save the output image
             if (iter == MAX_ITER - 1): 
-                print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
+                if args.metric == 'lpips':
+                    loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+                elif args.metric == 'ssim':
+                    loss = ssim_loss.item()
+                print('Final iteration: iter %d, dist %.3g' % (iter, loss))
+                log_file.write(f'iter {iter}, dist {loss: .3g}\n')
+                # print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
                 # Get the unblurred background + overlay with label
                 full_img = imageFlat # a tensor
                 full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
@@ -138,9 +172,9 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/{image_name}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}.jpg"
+                    output_path = f"./testResults/{image_name}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}.jpg"
                 else:
-                    output_path = f"./testResults/{image_name}_unblurredBG_itr{args.itr}_lr{args.lr}.jpg"
+                    output_path = f"./testResults/{image_name}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
