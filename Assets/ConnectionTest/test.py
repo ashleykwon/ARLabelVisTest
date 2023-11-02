@@ -43,7 +43,7 @@ maskOrigFlat = labelMaskOrigAsTensor.view(1,3,-1) #[1,3,524288], rgb values
 maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,524288], true or false values
 imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1)
 
-sigma = 30
+sigma = 15
 backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
 backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 pred_img = lpips.tensor2im(backgroundImgAsTensor.data)

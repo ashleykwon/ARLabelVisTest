@@ -1,4 +1,4 @@
-# 1. Library imports
+# Library imports
 import torch
 import io, json
 import base64
@@ -7,10 +7,158 @@ import numpy as np
 import lpips
 import cv2
 import scipy
+import os
 import torchvision
+import argparse
+import datetime
 from torch.autograd import Variable
 from matplotlib import pyplot as plt # for debugging purposes
 
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Label color generation')
+    parser.add_argument('--lr', type=float, default=0.08, help='Learning rate')
+    parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
+    parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
+    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg', './testRiver/river.jpg'], help='Paths to input images')
+    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg', './testRiver/riverAndLabel.jpg'], help='Paths to input images with labels')
+    parser.add_argument('--mask_paths', nargs='+',         default=['./testCurry/curryMask.jpg', './testRiver/riverMask.jpg'], help='Paths to masks for input images')
+    parser.add_argument('--blur', action='store_true', default=False, help='Apply blur to background')
+    args = parser.parse_args()
+
+    loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
+    loss_fn.cuda()
+
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file_name = f"./log_files/loss_log_{timestamp}.txt"
+    log_file = open(log_file_name, "w") # use "a" to append instead of overwritting
+
+    for image_path, imageAndLabel_path, mask_path in zip(args.image_paths, args.imageAndLabel_paths, args.mask_paths):
+        b_path = image_path
+        b_w_l_path = imageAndLabel_path  # Adjust this as needed
+        labelMask_path = mask_path
+        labelMaskImg = (1/255) * np.asarray(Image.open(labelMask_path))
+    
+        sigma = args.sigma
+
+        # Header for log file
+        image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
+        if args.blur:
+            log_file.write(f"-----------{image_name}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}---------------\n")
+        else:
+            log_file.write(f"-----------{image_name}_unblurredBG_itr{args.itr}_lr{args.lr}---------------\n")
+
+        # # --------------Load images and convert them to tensors-----------------------------------------------------
+        # Convert the images to tensors
+        backgroundImgAsTensor = lpips.im2tensor(lpips.load_image(b_path))
+        backgroundAndLabelImgAsTensor = lpips.im2tensor(lpips.load_image(b_w_l_path))
+        height = backgroundImgAsTensor.size(2)
+        width = backgroundImgAsTensor.size(3)
+        numPixels = height * width  # 512*1024 for AR screenshots
+
+        # # --------------Separate label and background and set different requires_grad values for them -> only gradient descent on label pixels-------------------------
+        # create label mask (boolean mask with True where label pixels are)
+        labelMaskAsTensor = lpips.im2tensor(lpips.load_image(labelMask_path)) > 0
+        numLabelPixels = labelMaskAsTensor[0,0].sum().item() # number of label pixels
+
+        # Flatten image and mask to apply the mask
+        imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+        maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
+
+        # Separate background and label pixels
+        labelFlat = imageFlat[:, maskFlat[0]] #[1,numLabelPixels]
+        # backgroundFlat = imageFlat[ :, ~maskFlat[0]] # not used
+
+        # Set them to torch variables for back-propagation
+        labelVar = Variable(labelFlat, requires_grad=True)
+        # backgroundVar = Variable(imageFlat, requires_grad=False) # not used
+
+        # Get indices of label pixels as a tuple of d tensors where d is the number of dimensions -> ([x1, x2, x3, ..., xn], [y1, y2, y3, ..., yn], ...)
+        labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*numLabelPixels
+
+        # # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
+        if args.blur:
+            backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
+            backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
+
+            imgReshaped = imageFlat.view(1,3,height,width)
+            imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, sigma, sigma), radius=None)
+            imgReshaped = torch.from_numpy(imgReshaped)
+            imageBlurred = imgReshaped.view(1,3,-1)
+        
+        # # --------------Set optimizer and start iterating--------------------------------------------------------------------------
+        optimizer = torch.optim.Adam([labelVar,], lr=args.lr, betas=(0.9, 0.999))
+
+        distanceThreshold = 0.23
+        MAX_ITER = args.itr
+        costList = []
+
+        for iter in range(MAX_ITER): 
+            # initialize to the origianl full image (does not matter what the pixels in label region are bc they will be overwritten later)
+            if args.blur:
+                full_img = imageBlurred  # torch.Size([1, 3, 524288])
+            else: 
+                full_img = imageFlat # background not blurred
+
+            # Overwrite the label pixels using the updated results
+            full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
+            full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape
+            full_img.data = torch.clamp(full_img.data, -1, 1)
+
+            # Calculate the LPIPS loss: LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
+            LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
+            # Negate the loss to make the image more and more different from the original one
+            neg_loss = - LPIPSLoss
+            # Clear the gradient for a new calculation
+            optimizer.zero_grad()
+            # Do backpropagation based on the LPIPS loss above
+            neg_loss.backward(retain_graph=True)
+
+            # append the current loss term to costList to plot them later
+            # costList.append(LPIPSLoss[0][0][0][0].item())
+
+            optimizer.step() # based on backpropagation implemented in lpips_loss.py
+
+            # Print out losses/distances
+            if iter % 100 == 0:
+                loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+                print('iter %d, dist %.3g' % (iter, loss)) 
+                log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
+
+            # Save the output image
+            if (iter == MAX_ITER - 1): 
+                print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
+                # Get the unblurred background + overlay with label
+                full_img = imageFlat # a tensor
+                full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
+                full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape -- this is unblurred label with unblurred background
+                full_img.data = torch.clamp(full_img.data, -1, 1)
+
+                # Save the final result
+                pred_img = lpips.tensor2im(full_img.data)
+                image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
+                if args.blur:
+                    output_path = f"./testResults/{image_name}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}.jpg"
+                else:
+                    output_path = f"./testResults/{image_name}_unblurredBG_itr{args.itr}_lr{args.lr}.jpg"
+                Image.fromarray(pred_img).save(output_path)
+                break
+
+    
+    log_file.close()                        
+
+
+
+
+
+
+
+
+
+
+
+"""
+######-------------------------Original code------------------------------------------------
 loss_fn = lpips.LPIPS(net='vgg',version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
 loss_fn.cuda()
 
@@ -79,7 +227,7 @@ backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
 
 imgReshaped = imageFlat.view(1,3,height,width)
 imgReshaped = scipy.ndimage.gaussian_filter(imgReshaped, sigma=(0, 0, sigma, sigma), radius=None)
-print(type(imgReshaped))
+# print(type(imgReshaped))
 imgReshaped = torch.from_numpy(imgReshaped)
 imageBlurred = imgReshaped.view(1,3,-1)
 
@@ -170,3 +318,6 @@ for iter in range(MAX_ITER):
         #  # Check the size of the image after backpropping
         #  width, height = Image.open(output_path).size
         #  print(f"Image width: {width}px, Image height: {height}px")
+
+
+"""
