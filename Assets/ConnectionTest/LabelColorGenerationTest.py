@@ -12,8 +12,52 @@ import torchvision
 import argparse
 import datetime
 from torch.autograd import Variable
+from skimage import color
 from torchmetrics.image import StructuralSimilarityIndexMeasure
+from colormath.color_objects import LabColor
+from colormath.color_diff import delta_e_cie1976
 from matplotlib import pyplot as plt # for debugging purposes
+
+def delta_e_cie76(lab1, lab2):
+    l1, a1, b1 = lab1
+    l2, a2, b2 = lab2
+    deltaL = l2-l1
+    deltaB = b2-b1
+    deltaA = a2-a1
+    return torch.sqrt(deltaA**2 + deltaB**2 + deltaL**2)
+
+def avg_delta_e(image):
+    image = image.detach().numpy()
+    image = ((image + 1) / 2) 
+    # print("image range: ", np.min(image), np.max(image))
+    image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
+    image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
+    mean_lab = np.mean(image_lab, axis = 0)
+    # print("mean_lab: ", mean_lab)
+    deltaE = [delta_e_cie76(mean_lab, lab) for lab in image_lab]
+    mean_deltaE = np.mean(deltaE)
+    # print("mean_deltaE: ", mean_deltaE)
+    return mean_deltaE
+
+
+class DeltaELoss(torch.nn.Module):
+    def __init__(self):
+        super(DeltaELoss, self).__init__()
+    
+    def forward(self, image):
+        image = image.detach().numpy()
+        image = ((image + 1) / 2) 
+        # print("image range: ", np.min(image), np.max(image))
+        image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
+        image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
+        image_lab = torch.tensor(image_lab)
+        mean_lab = torch.mean(image_lab, axis = 0)
+        # print("mean_lab: ", mean_lab)
+        deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
+        mean_deltaE = torch.mean(deltaE)
+        # print("mean_deltaE: ", mean_deltaE)
+        return mean_deltaE
+
 
 
 if __name__ == '__main__':
@@ -21,22 +65,27 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.08, help='Learning rate')
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
-    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg',           
-                                                                     './testRiver/river.jpg',
-                                                                     './testSingleColor/blue.jpg',
-                                                                     './testRainbow/rainbow.jpg' ], 
+    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg'          
+                                                                     ,'./testRiver/river.jpg'
+                                                                    #  ,'./testSingleColor/blue.jpg'
+                                                                    #  ,'./testRainbow/rainbow.jpg' 
+                                                                    ], 
                                                                      help='Paths to input images')
-    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg', 
-                                                                     './testRiver/riverAndLabel.jpg',
-                                                                     './testSingleColor/blueAndLabel.jpg',
-                                                                     './testRainbow/rainbowAndLabel.jpg'], 
+    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg'
+                                                                     ,'./testRiver/riverAndLabel.jpg'
+                                                                    #  ,'./testSingleColor/blueAndLabel.jpg'
+                                                                    #  ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                    ], 
                                                                      help='Paths to input images with labels')
-    parser.add_argument('--mask_paths', nargs='+',          default=['./testCurry/curryMask.jpg',        
-                                                                     './testRiver/riverMask.jpg',
-                                                                     './testSingleColor/mask.jpg',
-                                                                     './testRainbow/rainbowMask.jpg'], 
+    parser.add_argument('--mask_paths', nargs='+',          default=['./testCurry/curryMask.jpg'        
+                                                                     ,'./testRiver/riverMask.jpg'
+                                                                    #  ,'./testSingleColor/mask.jpg'
+                                                                    #  ,'./testRainbow/rainbowMask.jpg'
+                                                                    ], 
                                                                      help='Paths to masks for input images')
-    parser.add_argument('--blur', action='store_true', default=False, help='Apply blur to background')
+    parser.add_argument('--blur',  default=False, help='Apply blur to background')
+    parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
+
     parser.add_argument('--metric', choices=['lpips', 'ssim'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
 
@@ -46,6 +95,9 @@ if __name__ == '__main__':
         loss_fn.cuda()
     elif args.metric == 'ssim':
         ssim = StructuralSimilarityIndexMeasure().to(device)
+
+    if args.deltaE:
+        deltaE_loss = DeltaELoss()
 
 
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -67,13 +119,14 @@ if __name__ == '__main__':
         else:
             log_file.write(f"-----------{image_name}_unblurredBG_itr{args.itr}_lr{args.lr}---------------\n")
 
-        # # --------------Load images and convert them to tensors-----------------------------------------------------
+        # # --------------Load images and convert them to tensors---------------------------------------------------------------------------------
         # Convert the images to tensors
         backgroundImgAsTensor = lpips.im2tensor(lpips.load_image(b_path))
         backgroundAndLabelImgAsTensor = lpips.im2tensor(lpips.load_image(b_w_l_path))
         height = backgroundImgAsTensor.size(2)
         width = backgroundImgAsTensor.size(3)
         numPixels = height * width  # 512*1024 for AR screenshots
+        # print("numPixels:", numPixels)
 
         # # --------------Separate label and background and set different requires_grad values for them -> only gradient descent on label pixels-------------------------
         # create label mask (boolean mask with True where label pixels are)
@@ -82,10 +135,12 @@ if __name__ == '__main__':
 
         # Flatten image and mask to apply the mask
         imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+        # print("shape of imageFlat:", imageFlat.size())
         maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
         # Separate background and label pixels
-        labelFlat = imageFlat[:, maskFlat[0]] #[1,numLabelPixels]
+        labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
+        labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
         # backgroundFlat = imageFlat[ :, ~maskFlat[0]] # not used
 
         # Set them to torch variables for back-propagation
@@ -95,7 +150,7 @@ if __name__ == '__main__':
         # Get indices of label pixels as a tuple of d tensors where d is the number of dimensions -> ([x1, x2, x3, ..., xn], [y1, y2, y3, ..., yn], ...)
         labelIndices = torch.nonzero(maskFlat, as_tuple=True) # Here, d = 3 and n = 3*numLabelPixels
 
-        # # --------------Try blurring the background image -- Gaussian blur ---------------------------------------------------------
+        # # --------------Try blurring the background image -- Gaussian blur --------------------------------------------------------------------
         if args.blur:
             backgroundImgAsTensor = scipy.ndimage.gaussian_filter(backgroundImgAsTensor, sigma=(0, 0, sigma, sigma), radius=None)
             backgroundImgAsTensor = torch.from_numpy(backgroundImgAsTensor)
@@ -105,7 +160,7 @@ if __name__ == '__main__':
             imgReshaped = torch.from_numpy(imgReshaped)
             imageBlurred = imgReshaped.view(1,3,-1)
         
-        # # --------------Set optimizer and start iterating--------------------------------------------------------------------------
+        # # --------------Set optimizer and start iterating---------------------------------------------------------------------------------------
         optimizer = torch.optim.Adam([labelVar,], lr=args.lr, betas=(0.9, 0.999))
 
         distanceThreshold = 0.23
@@ -121,7 +176,8 @@ if __name__ == '__main__':
 
             # Overwrite the label pixels using the updated results
             full_img.index_put_(labelIndices, labelVar.reshape(labelVar.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()
-            full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape
+            full_img_flat = full_img # still flat: [1, 3, numPixels]
+            full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape : [1, 3, width, height]
             full_img.data = torch.clamp(full_img.data, -1, 1)
 
             if args.metric == 'lpips': 
@@ -133,6 +189,14 @@ if __name__ == '__main__':
                 # SSIM loss
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
+            
+            if args.deltaE:
+                # add delta-E to the loss term
+                labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
+                delta_e = deltaE_loss(labelFlat2) # want to minimize this average delta_e within the label region
+                delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
+                neg_loss = neg_loss + delta_e_tensor.cuda()
+        
 
             # Clear the gradient for a new calculation
             optimizer.zero_grad()
@@ -150,7 +214,9 @@ if __name__ == '__main__':
                     loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
                 elif args.metric == 'ssim':
                     loss = ssim_loss.item()
-                print('iter %d, dist %.3g' % (iter, loss)) 
+                print('iter %d, dist %.3g' % (iter, loss))
+                if args.deltaE:
+                     print('deltaE' , delta_e)
                 log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
 
             # Save the output image
@@ -172,9 +238,9 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/{image_name}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}.jpg"
+                    output_path = f"./testResults/{image_name}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    output_path = f"./testResults/{image_name}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}.jpg"
+                    output_path = f"./testResults/{image_name}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
