@@ -27,6 +27,10 @@ Shader "Unlit/InverseCullCubeMapShader"
         _GranularityMethod("Granularity Method", Int) = 0 // 0 for default, 1 for background
         
 
+        _Background_sum_r("Background_sum_r", Range(0,1)) = 0.1
+        _Background_sum_g("Background_sum_g", Range(0,1)) = 0.1
+        _Background_sum_b("Background_sum_b", Range(0,1)) = 0.1
+
     }
     SubShader
     {
@@ -86,6 +90,10 @@ Shader "Unlit/InverseCullCubeMapShader"
             
              //sum_all result
             StructuredBuffer<float> sum_all_results;
+
+            float _Background_sum_r;
+            float _Background_sum_g;
+            float _Background_sum_b;
 
            
            
@@ -550,6 +558,11 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float isSample = hash(sample_x, sample_y, offset);
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
+                if (_GranularityMethod == 1)
+                {
+                    bgSample = float4(_Background_sum_r, _Background_sum_g, _Background_sum_b,1);
+                }
+
 
                 float _sampled_prob = 0.2;
                 int _neighborhoodSize= 5;
@@ -562,10 +575,6 @@ Shader "Unlit/InverseCullCubeMapShader"
 
                 float4 local_backgroundAvg = float4(sum_all_results[1]/sum_all_results[0], sum_all_results[2]/sum_all_results[0], sum_all_results[3]/sum_all_results[0], 1);
                 // local_backgroundAvg = float4(1,1,1,1);
-
-                // if _GranularityMethod = 0, do per-pixel color assignment
-                if (_GranularityMethod == 0)
-                {
                     // //Label color and outline assignment
                     if (labelTex[3] != 0) // is a label pixel
                     {
@@ -664,67 +673,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                             }
                         }
                     }
-                }
-
-                // if _GranularityMethod == 1, assign the same color to all label pixels and apply outline if selected
-                else if (_GranularityMethod == 1)
-                {
-                    if (labelTex[3] != 0)
-                    {
-                        col = function_f(_ColorMethod, local_backgroundAvg);
-
-                        // Apply outline if selected
-                        if (_EnableOutline == 1)
-                        {
-                            // Applying sobel filter
-                            float2 delta = float2(0.0075, 0.0015);
-                            // float2 delta = float2(1,1);
-                            
-                            float4 hr = float4(0, 0, 0, 0);
-                            float4 vt = float4(0, 0, 0, 0);
-
-                            float filter[3][3] = {
-                                {-1, 0, 1},
-                                {-2, 0, 2},
-                                {-1, 0, 1}
-                            };
-
-                            for (int i = -1; i <= 1; i++){
-                                for (int j = -1; j <= 1; j++){
-                                    float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
-                                    float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
-                                    float4 pix = texCUBE(_LabelCubeMap, coords);
-                                    if (pix[0] == 1 && pix[1] == 1 && pix[2] == 1 && pix[3] == 1) // is a label pixel
-                                    {
-                                        hr += pix *  filter[i + 1][j + 1];
-                                        vt += pix *  filter[j + 1][i + 1];
-                                    }
-                                    else
-                                    {
-                                        hr += float4(0,0,0,0)*  filter[i + 1][j + 1];
-                                        vt += float4(0,0,0,0)*  filter[j + 1][i + 1];
-                                    }
-                                    // hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
-                                    // vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
-                                }
-                            }
-
-
-                            float edges =  sqrt(hr * hr + vt * vt);
-                            // sobel(_LabelTex, vdata.uv);
-
-                            
-                            if(edges != 0){ //Outline the edges
-                                if (col.r + col.g + col.b < 0.5){
-                                    col = float4(1, 1, 1, 1); // White outline if low grayscale value
-                                }else{
-                                col = float4(0, 0, 0, 1); // black outline if high grayscale value
-                                } 
-                            }
-                        }
-                    }      
-                }
-                    
+                
                 
 
                 // Render billboard if _BillboardColorMethod != 0

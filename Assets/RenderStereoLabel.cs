@@ -44,6 +44,7 @@ public class RenderStereoLabel : MonoBehaviour
 
 
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
+        // backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 1);
 
         // initialRotation = Quaternion.Euler (180f, 270f, 0f); //Should place the label in the middle of the view
        

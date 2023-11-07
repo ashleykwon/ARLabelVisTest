@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/TestScenes/360/MansonBayPier_360_Day.unity
     guid: dd4a62cb3c75449d68e60025e987af78
   - enabled: 1
+    path: Assets/TestScenes/360/PracchoWalking_360_Timelapse.unity
+    guid: e44ed8d3460243e4ca8aaffd9233fccf
+  - enabled: 1
     path: Assets/TestScenes/360/Taipei_360_Timelapse.unity
     guid: 5fe9e391faad74f2e949de1b5be259f4
   - enabled: 1
