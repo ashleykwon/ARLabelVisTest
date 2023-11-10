@@ -32,7 +32,6 @@ public class CameraFinder : MonoBehaviour
         // Locate all three cameras (left, right, center eye anchors)
         allCameras = FindObjectsOfType<Camera>();
 
-        
         // Right eye anchor: Make sure that the background screenshot camera doesn't capture the black sphere and the label 
         allCameras[0].cullingMask &=  ~(1 << LayerMask.NameToLayer("UI"));
         allCameras[0].cullingMask &=  ~(1 << LayerMask.NameToLayer("Label"));
@@ -52,16 +51,17 @@ public class CameraFinder : MonoBehaviour
 
     
 
-    // Update is called once per frame
-    void Update()
+    //Update is called once per frame
+    void LateUpdate()
     {
-        StartCoroutine(PostScreenshots());
+       StartCoroutine(PostScreenshots());
     }
 
     IEnumerator PostScreenshots(){
         // Wait until the current frame is fully rendered
         yield return new WaitForEndOfFrame();
 
+        // Get the container that contains the three screenshots from this frame
         ScreenshotData screenshotContainer = takePics();
 
         // Convert screenshotContainer to a JSON object and send it to the server
@@ -116,9 +116,7 @@ public class CameraFinder : MonoBehaviour
         for (int i = 0; i < allCameras.Length; i++)
         {
             // get the current camera
-            Camera currentCamera = allCameras[i].GetComponent<Camera>();
-
-            
+            Camera currentCamera = allCameras[i].GetComponent<Camera>();  
             
             currentCamera.targetTexture = rt;
 
