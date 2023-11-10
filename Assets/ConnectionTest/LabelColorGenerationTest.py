@@ -14,6 +14,7 @@ import datetime
 from torch.autograd import Variable
 from skimage import color
 from torchmetrics.image import StructuralSimilarityIndexMeasure
+from torchmetrics.image import MultiScaleStructuralSimilarityIndexMeasure
 from colormath.color_objects import LabColor
 from colormath.color_diff import delta_e_cie1976
 from matplotlib import pyplot as plt # for debugging purposes
@@ -85,18 +86,19 @@ class DeltaELoss(torch.nn.Module):
         super(DeltaELoss, self).__init__()
     
     def forward(self, image):
-        image = image.detach().numpy()
-        image = ((image + 1) / 2) 
+        # image = image.detach().numpy()
+        image = ((image + 1) / 2)  # range [0,1]
         # print("image range: ", np.min(image), np.max(image))
         image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
         image = torch.tensor(image)
-        # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
-        image_lab = rgb_to_lab(image)
-        mean_lab = torch.mean(image_lab, axis = 0)
-        # print("mean_lab: ", mean_lab)
-        deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
-        mean_deltaE = torch.mean(deltaE)
-        # print("mean_deltaE: ", mean_deltaE)
+        mean_deltaE = torch.mean(image) # try just taking the mean without using other functions
+        # # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
+        # image_lab = rgb_to_lab(image) # This step takes a long time
+        # mean_lab = torch.mean(image_lab, axis = 0)
+        # # print("mean_lab: ", mean_lab)
+        # deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
+        # mean_deltaE = torch.mean(deltaE)
+        # # print("mean_deltaE: ", mean_deltaE)
         return mean_deltaE
 
 
@@ -125,9 +127,9 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
-    parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
+    parser.add_argument('--deltaE',  default=True, help='Add delta E to loss')
 
-    parser.add_argument('--metric', choices=['lpips', 'ssim'], default='lpips', help='Distance calculation method')
+    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim'], default='ssim', help='Distance calculation method')
     args = parser.parse_args()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -136,6 +138,8 @@ if __name__ == '__main__':
         loss_fn.cuda()
     elif args.metric == 'ssim':
         ssim = StructuralSimilarityIndexMeasure().to(device)
+    elif args.metric == 'mssim':
+        mssim = MultiScaleStructuralSimilarityIndexMeasure().to(device)
 
     if args.deltaE:
         deltaE_loss = DeltaELoss()
@@ -230,19 +234,26 @@ if __name__ == '__main__':
                 # SSIM loss
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
+            elif args.metric == 'mssim':
+                # SSIM loss
+                mssim_loss = mssim(full_img.cuda(), backgroundImgAsTensor.cuda())
+                neg_loss = mssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
             
             if args.deltaE:
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
-                # labelVar2 = Variable(labelFlat2, requires_grad=True)
-                delta_e = deltaE_loss(labelFlat2) # want to minimize this average delta_e within the label region
-                # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
+                labelVar2 = Variable(labelFlat2, requires_grad=True)
+                delta_e = deltaE_loss(labelVar2) # want to minimize this average delta_e within the label region
+                delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
                 # neg_loss = neg_loss + delta_e
-                neg_loss = delta_e
+                neg_loss = delta_e_tensor
+                print('deltaE:' , delta_e)
         
 
             # Clear the gradient for a new calculation
             optimizer.zero_grad()
+
+            # neg_loss.backward()
             # Do backpropagation based on the LPIPS loss above
             neg_loss.backward(retain_graph=True)
 
@@ -257,6 +268,8 @@ if __name__ == '__main__':
                     loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
                 elif args.metric == 'ssim':
                     loss = ssim_loss.item()
+                elif args.metric == 'mssim':
+                    loss = mssim_loss.item()
                 print('iter %d, dist %.3g' % (iter, loss))
                 if args.deltaE:
                      print('deltaE:' , delta_e)
@@ -268,6 +281,8 @@ if __name__ == '__main__':
                     loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
                 elif args.metric == 'ssim':
                     loss = ssim_loss.item()
+                elif args.metric == 'mssim':
+                    loss = mssim_loss.item()
                 print('Final iteration: iter %d, dist %.3g' % (iter, loss))
                 log_file.write(f'iter {iter}, dist {loss: .3g}\n')
                 # print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
