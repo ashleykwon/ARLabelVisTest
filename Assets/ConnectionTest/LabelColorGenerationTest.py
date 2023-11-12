@@ -15,6 +15,7 @@ from torch.autograd import Variable
 from skimage import color
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from torchmetrics.image import MultiScaleStructuralSimilarityIndexMeasure
+from torchmetrics.image import PeakSignalNoiseRatio
 from colormath.color_objects import LabColor
 from colormath.color_diff import delta_e_cie1976
 from matplotlib import pyplot as plt # for debugging purposes
@@ -110,26 +111,26 @@ if __name__ == '__main__':
     parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
     parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg'          
                                                                      ,'./testRiver/river.jpg'
-                                                                    #  ,'./testSingleColor/blue.jpg'
-                                                                    #  ,'./testRainbow/rainbow.jpg' 
+                                                                     ,'./testSingleColor/blue.jpg'
+                                                                     ,'./testRainbow/rainbow.jpg' 
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg'
                                                                      ,'./testRiver/riverAndLabel.jpg'
-                                                                    #  ,'./testSingleColor/blueAndLabel.jpg'
-                                                                    #  ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                     ,'./testSingleColor/blueAndLabel.jpg'
+                                                                     ,'./testRainbow/rainbowAndLabel.jpg'
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=['./testCurry/curryMask.jpg'        
                                                                      ,'./testRiver/riverMask.jpg'
-                                                                    #  ,'./testSingleColor/mask.jpg'
-                                                                    #  ,'./testRainbow/rainbowMask.jpg'
+                                                                     ,'./testSingleColor/mask.jpg'
+                                                                     ,'./testRainbow/rainbowMask.jpg'
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
-    parser.add_argument('--deltaE',  default=True, help='Add delta E to loss')
+    parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
 
-    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim'], default='ssim', help='Distance calculation method')
+    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr'], default='ssim', help='Distance calculation method')
     args = parser.parse_args()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -140,6 +141,8 @@ if __name__ == '__main__':
         ssim = StructuralSimilarityIndexMeasure().to(device)
     elif args.metric == 'mssim':
         mssim = MultiScaleStructuralSimilarityIndexMeasure().to(device)
+    elif args.metric == 'psnr':
+        psnr = PeakSignalNoiseRatio().to(device)
 
     if args.deltaE:
         deltaE_loss = DeltaELoss()
@@ -235,9 +238,13 @@ if __name__ == '__main__':
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
             elif args.metric == 'mssim':
-                # SSIM loss
+                # MSSIM loss
                 mssim_loss = mssim(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = mssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
+            elif args.metric == 'psnr':
+                # PSNR loss
+                psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
+                neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
             
             if args.deltaE:
                 # add delta-E to the loss term
@@ -247,7 +254,7 @@ if __name__ == '__main__':
                 delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
                 # neg_loss = neg_loss + delta_e
                 neg_loss = delta_e_tensor
-                print('deltaE:' , delta_e)
+                # print('deltaE:' , delta_e)
         
 
             # Clear the gradient for a new calculation
@@ -270,6 +277,8 @@ if __name__ == '__main__':
                     loss = ssim_loss.item()
                 elif args.metric == 'mssim':
                     loss = mssim_loss.item()
+                elif args.metric == 'psnr':
+                    loss = psnr_loss.item()
                 print('iter %d, dist %.3g' % (iter, loss))
                 if args.deltaE:
                      print('deltaE:' , delta_e)
@@ -283,6 +292,8 @@ if __name__ == '__main__':
                     loss = ssim_loss.item()
                 elif args.metric == 'mssim':
                     loss = mssim_loss.item()
+                elif args.metric == 'psnr':
+                    loss = psnr_loss.item()
                 print('Final iteration: iter %d, dist %.3g' % (iter, loss))
                 log_file.write(f'iter {iter}, dist {loss: .3g}\n')
                 # print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
