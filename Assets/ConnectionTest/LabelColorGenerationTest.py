@@ -66,20 +66,20 @@ def delta_e_cie76(lab1, lab2):
     deltaA = a2-a1
     return torch.sqrt(deltaA**2 + deltaB**2 + deltaL**2)
 
-def avg_delta_e(image):
-    image = image.detach().numpy()
-    image = ((image + 1) / 2) 
-    # print("image range: ", np.min(image), np.max(image))
-    image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
-    image = torch.tensor(image).cuda()
-    # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
-    image_lab = rgb_to_lab(image)
-    mean_lab = torch.mean(image_lab, axis = 0).cuda()
-    # print("mean_lab: ", mean_lab)
-    deltaE = [delta_e_cie76(mean_lab, lab) for lab in image_lab]
-    mean_deltaE = torch.mean(deltaE).cuda()
-    # print("mean_deltaE: ", mean_deltaE)
-    return mean_deltaE
+# def avg_delta_e(image):
+#     image = image.detach().numpy()
+#     image = ((image + 1) / 2) 
+#     # print("image range: ", np.min(image), np.max(image))
+#     image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
+#     image = torch.tensor(image).cuda()
+#     # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
+#     image_lab = rgb_to_lab(image)
+#     mean_lab = torch.mean(image_lab, axis = 0).cuda()
+#     # print("mean_lab: ", mean_lab)
+#     deltaE = [delta_e_cie76(mean_lab, lab) for lab in image_lab]
+#     mean_deltaE = torch.mean(deltaE).cuda()
+#     # print("mean_deltaE: ", mean_deltaE)
+#     return mean_deltaE
 
 
 class DeltaELoss(torch.nn.Module):
@@ -88,11 +88,16 @@ class DeltaELoss(torch.nn.Module):
     
     def forward(self, image):
         # image = image.detach().numpy()
-        image = ((image + 1) / 2)  # range [0,1]
+        image = 0.5*torch.add(image, torch.ones(image.shape))
+        # ((image + 1) / 2)  # range [0,1]
         # print("image range: ", np.min(image), np.max(image))
-        image = image.reshape(3,-1).T # reshape the image to be (3, numPixels)
-        image = torch.tensor(image)
-        mean_deltaE = torch.mean(image) # try just taking the mean without using other functions
+        # image = torch.resh
+        # image.reshape(3,-1).T # reshape the image to be (3, numPixels)
+        # image = torch.tensor(image)
+
+        distanceAsTensor = torch.square(torch.sub(image, torch.ones(image.shape)*torch.mean(image)))
+
+        # mean_deltaE = torch.mean(image) # try just taking the mean without using other functions
         # # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
         # image_lab = rgb_to_lab(image) # This step takes a long time
         # mean_lab = torch.mean(image_lab, axis = 0)
@@ -100,7 +105,7 @@ class DeltaELoss(torch.nn.Module):
         # deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
         # mean_deltaE = torch.mean(deltaE)
         # # print("mean_deltaE: ", mean_deltaE)
-        return mean_deltaE
+        return torch.mean(distanceAsTensor)
 
 
 
@@ -109,28 +114,33 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=0.08, help='Learning rate')
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
-    parser.add_argument('--image_paths', nargs='+',         default=['./testCurry/curry.jpg'          
+    parser.add_argument('--image_paths', nargs='+',         default=[
+                                                                    './testCurry/curry.jpg'          
                                                                      ,'./testRiver/river.jpg'
                                                                      ,'./testSingleColor/blue.jpg'
                                                                      ,'./testRainbow/rainbow.jpg' 
                                                                     ], 
                                                                      help='Paths to input images')
-    parser.add_argument('--imageAndLabel_paths', nargs='+', default=['./testCurry/curryAndLabel_white.jpg'
+    parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
+                                                                    './testCurry/curryAndLabel_white.jpg'
                                                                      ,'./testRiver/riverAndLabel.jpg'
                                                                      ,'./testSingleColor/blueAndLabel.jpg'
                                                                      ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                    #  './testSingleColor/blueAndRGLabel.jpg'
                                                                     ], 
                                                                      help='Paths to input images with labels')
-    parser.add_argument('--mask_paths', nargs='+',          default=['./testCurry/curryMask.jpg'        
+    parser.add_argument('--mask_paths', nargs='+',          default=[
+                                                                    './testCurry/curryMask.jpg'        
                                                                      ,'./testRiver/riverMask.jpg'
                                                                      ,'./testSingleColor/mask.jpg'
                                                                      ,'./testRainbow/rainbowMask.jpg'
+                                                                    # ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
-    parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
+    parser.add_argument('--deltaE',  default=True, help='Add delta E to loss')
 
-    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr'], default='ssim', help='Distance calculation method')
+    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -189,7 +199,6 @@ if __name__ == '__main__':
         # Separate background and label pixels
         labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
-        # backgroundFlat = imageFlat[ :, ~maskFlat[0]] # not used
 
         # Set them to torch variables for back-propagation
         labelVar = Variable(labelFlat, requires_grad=True)
@@ -233,6 +242,8 @@ if __name__ == '__main__':
                 LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
                 # Negate the loss to make the image more and more different from the original one
                 neg_loss = - LPIPSLoss
+                if iter%100 == 0:
+                    print("LPIPS loss:" , neg_loss.item())
             elif args.metric == 'ssim':
                 # SSIM loss
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
@@ -250,17 +261,20 @@ if __name__ == '__main__':
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
                 labelVar2 = Variable(labelFlat2, requires_grad=True)
-                delta_e = deltaE_loss(labelVar2) # want to minimize this average delta_e within the label region
-                delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
-                # neg_loss = neg_loss + delta_e
-                neg_loss = delta_e_tensor
-                # print('deltaE:' , delta_e)
+                delta_e = deltaE_loss(labelVar) # want to minimize this average delta_e within the label region
+                # delta_e.requires_grad = True
+                # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
+                neg_loss += delta_e*10 # this *10 here is to give more weight to the delta e loss, but this can change
+                # neg_loss = delta_e
+                if iter%100 == 0:
+                    print('delta e loss:', delta_e.item())
+                    # print('total loss:' , neg_loss.item())
+                    print('\n')
         
 
             # Clear the gradient for a new calculation
             optimizer.zero_grad()
 
-            # neg_loss.backward()
             # Do backpropagation based on the LPIPS loss above
             neg_loss.backward(retain_graph=True)
 
@@ -270,19 +284,19 @@ if __name__ == '__main__':
             optimizer.step() # based on backpropagation implemented in lpips_loss.py
 
             # Print out losses/distances
-            if iter % 100 == 0:
-                if args.metric == 'lpips':
-                    loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
-                elif args.metric == 'ssim':
-                    loss = ssim_loss.item()
-                elif args.metric == 'mssim':
-                    loss = mssim_loss.item()
-                elif args.metric == 'psnr':
-                    loss = psnr_loss.item()
-                print('iter %d, dist %.3g' % (iter, loss))
-                if args.deltaE:
-                     print('deltaE:' , delta_e)
-                log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
+            # if iter % 100 == 0:
+            #     if args.metric == 'lpips':
+            #         loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+            #     elif args.metric == 'ssim':
+            #         loss = ssim_loss.item()
+            #     elif args.metric == 'mssim':
+            #         loss = mssim_loss.item()
+            #     elif args.metric == 'psnr':
+            #         loss = psnr_loss.item()
+            #     print('iter %d, dist %.3g' % (iter, loss))
+            #     if args.deltaE:
+            #          print('deltaE:' , delta_e)
+            #     log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
 
             # Save the output image
             if (iter == MAX_ITER - 1): 

@@ -1,0 +1,10 @@
+-----------blue_unblurredBG_itr800_lr0.08---------------
+iter 0, dist  0.807
+iter 100, dist  0.807
+iter 200, dist  0.807
+iter 300, dist  0.807
+iter 400, dist  0.807
+iter 500, dist  0.807
+iter 600, dist  0.807
+iter 700, dist  0.807
+iter 799, dist  0.807
