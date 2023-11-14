@@ -119,6 +119,7 @@ if __name__ == '__main__':
                                                                      ,'./testRiver/river.jpg'
                                                                      ,'./testSingleColor/blue.jpg'
                                                                      ,'./testRainbow/rainbow.jpg' 
+                                                                     ,'./testSingleColor/blueRG.jpg'
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
@@ -126,7 +127,7 @@ if __name__ == '__main__':
                                                                      ,'./testRiver/riverAndLabel.jpg'
                                                                      ,'./testSingleColor/blueAndLabel.jpg'
                                                                      ,'./testRainbow/rainbowAndLabel.jpg'
-                                                                    #  './testSingleColor/blueAndRGLabel.jpg'
+                                                                     ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
@@ -134,11 +135,11 @@ if __name__ == '__main__':
                                                                      ,'./testRiver/riverMask.jpg'
                                                                      ,'./testSingleColor/mask.jpg'
                                                                      ,'./testRainbow/rainbowMask.jpg'
-                                                                    # ,'./testSingleColor/blueAndRGLabelMask.jpg'
+                                                                     ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
-    parser.add_argument('--deltaE',  default=True, help='Add delta E to loss')
+    parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
 
     parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
@@ -257,6 +258,7 @@ if __name__ == '__main__':
                 psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
             
+            weight = 1
             if args.deltaE:
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
@@ -264,7 +266,7 @@ if __name__ == '__main__':
                 delta_e = deltaE_loss(labelVar) # want to minimize this average delta_e within the label region
                 # delta_e.requires_grad = True
                 # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
-                neg_loss += delta_e*10 # this *10 here is to give more weight to the delta e loss, but this can change
+                neg_loss += delta_e*weight # this *10 here is to give more weight to the delta e loss, but this can change
                 # neg_loss = delta_e
                 if iter%100 == 0:
                     print('delta e loss:', delta_e.item())
@@ -321,9 +323,9 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/{image_name}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    output_path = f"./testResults/{image_name}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 

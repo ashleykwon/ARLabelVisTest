@@ -1,0 +1,10 @@
+-----------curry_unblurredBG_itr800_lr0.08---------------
+iter 799, dist  0.138
+-----------river_unblurredBG_itr800_lr0.08---------------
+iter 799, dist  0.114
+-----------blue_unblurredBG_itr800_lr0.08---------------
+iter 799, dist  0.338
+-----------rainbow_unblurredBG_itr800_lr0.08---------------
+iter 799, dist  0.184
+-----------blueRG_unblurredBG_itr800_lr0.08---------------
+iter 799, dist  0.309
