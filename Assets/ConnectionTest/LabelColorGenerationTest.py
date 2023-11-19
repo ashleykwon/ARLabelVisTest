@@ -117,14 +117,17 @@ if __name__ == '__main__':
     parser.add_argument('--image_paths', nargs='+',         default=[
                                                                     './testCurry/curry.jpg'          
                                                                      ,'./testRiver/river.jpg'
+                                                                     ,'./testRiver/river_white.jpg'
                                                                      ,'./testSingleColor/blue.jpg'
                                                                      ,'./testRainbow/rainbow.jpg' 
                                                                      ,'./testSingleColor/blueRG.jpg'
+
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
                                                                     './testCurry/curryAndLabel_white.jpg'
                                                                      ,'./testRiver/riverAndLabel.jpg'
+                                                                     ,'./testRiver/riverAndLabel_white.jpg'
                                                                      ,'./testSingleColor/blueAndLabel.jpg'
                                                                      ,'./testRainbow/rainbowAndLabel.jpg'
                                                                      ,'./testSingleColor/blueAndRGLabel.jpg'
@@ -132,6 +135,7 @@ if __name__ == '__main__':
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
                                                                     './testCurry/curryMask.jpg'        
+                                                                     ,'./testRiver/riverMask.jpg'
                                                                      ,'./testRiver/riverMask.jpg'
                                                                      ,'./testSingleColor/mask.jpg'
                                                                      ,'./testRainbow/rainbowMask.jpg'
@@ -144,12 +148,15 @@ if __name__ == '__main__':
     parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
 
+    ssim_sigma = 1.5 # default 1.5
+    k1 = 0.3 # default 0.01
+    k2 = 0.03 # default 0.03
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     if args.metric == 'lpips':
         loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
         loss_fn.cuda()
     elif args.metric == 'ssim':
-        ssim = StructuralSimilarityIndexMeasure().to(device)
+        ssim = StructuralSimilarityIndexMeasure(sigma=ssim_sigma, k1=k1, k2=k2).to(device)
     elif args.metric == 'mssim':
         mssim = MultiScaleStructuralSimilarityIndexMeasure().to(device)
     elif args.metric == 'psnr':
@@ -243,8 +250,8 @@ if __name__ == '__main__':
                 LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
                 # Negate the loss to make the image more and more different from the original one
                 neg_loss = - LPIPSLoss
-                if iter%100 == 0:
-                    print("LPIPS loss:" , neg_loss.item())
+                # if iter%100 == 0:
+                #     print("LPIPS loss:" , neg_loss.item())
             elif args.metric == 'ssim':
                 # SSIM loss
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
@@ -258,7 +265,7 @@ if __name__ == '__main__':
                 psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
             
-            weight = 1
+            weight = 100
             if args.deltaE:
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
@@ -268,10 +275,10 @@ if __name__ == '__main__':
                 # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
                 neg_loss += delta_e*weight # this *10 here is to give more weight to the delta e loss, but this can change
                 # neg_loss = delta_e
-                if iter%100 == 0:
-                    print('delta e loss:', delta_e.item())
+                # if iter%100 == 0:
+                    # print('delta e loss:', delta_e.item())
                     # print('total loss:' , neg_loss.item())
-                    print('\n')
+                    # print('\n')
         
 
             # Clear the gradient for a new calculation
@@ -286,19 +293,22 @@ if __name__ == '__main__':
             optimizer.step() # based on backpropagation implemented in lpips_loss.py
 
             # Print out losses/distances
-            # if iter % 100 == 0:
-            #     if args.metric == 'lpips':
-            #         loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
-            #     elif args.metric == 'ssim':
-            #         loss = ssim_loss.item()
-            #     elif args.metric == 'mssim':
-            #         loss = mssim_loss.item()
-            #     elif args.metric == 'psnr':
-            #         loss = psnr_loss.item()
-            #     print('iter %d, dist %.3g' % (iter, loss))
-            #     if args.deltaE:
-            #          print('deltaE:' , delta_e)
-            #     log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
+            if iter % 100 == 0:
+                if args.metric == 'lpips':
+                    loss = LPIPSLoss.view(-1).data.cpu().numpy()[0]
+                elif args.metric == 'ssim':
+                    loss = ssim_loss.item()
+                elif args.metric == 'mssim':
+                    loss = mssim_loss.item()
+                elif args.metric == 'psnr':
+                    loss = psnr_loss.item()
+                print('iter %d, dist %.3g' % (iter, loss))
+                if args.deltaE:
+                     print('deltaE:' , delta_e.item())
+                     print('total loss:' , neg_loss.item())
+                     log_file.write(f'iter {iter}, dist {loss: .3g}, deltaE {delta_e.item()}\n')
+                else:
+                    log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
 
             # Save the output image
             if (iter == MAX_ITER - 1): 
@@ -310,8 +320,12 @@ if __name__ == '__main__':
                     loss = mssim_loss.item()
                 elif args.metric == 'psnr':
                     loss = psnr_loss.item()
-                print('Final iteration: iter %d, dist %.3g' % (iter, loss))
-                log_file.write(f'iter {iter}, dist {loss: .3g}\n')
+                if args.deltaE:
+                    print('Final iteration: iter %d, dist %.3g, deltaE %.4g' % (iter, loss, delta_e.item()))
+                    log_file.write(f'iter {iter}, dist {loss: .3g}, deltaE {delta_e.item()}\n')
+                else:
+                    print('Final iteration: iter %d, dist %.3g' % (iter, loss))
+                    log_file.write(f'iter {iter}, dist {loss: .3g}\n')
                 # print('Final iteration: iter %d, dist %.3g' % (iter, LPIPSLoss.view(-1).data.cpu().numpy()[0]))
                 # Get the unblurred background + overlay with label
                 full_img = imageFlat # a tensor
@@ -325,7 +339,10 @@ if __name__ == '__main__':
                 if args.blur:
                     output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    if args.metric == 'ssim':
+                        output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    else:
+                        output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 

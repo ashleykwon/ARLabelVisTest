@@ -1,0 +1,24 @@
+-----------curry_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.119, deltaE 0.0012053255923092365
+iter 100, dist  0.137, deltaE 8.969468035502359e-05
+iter 199, dist  0.137, deltaE 9.755312203196809e-05
+-----------river_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.106, deltaE 0.005657699424773455
+iter 100, dist  0.122, deltaE 9.29176458157599e-05
+iter 199, dist  0.122, deltaE 9.470481745665893e-05
+-----------river_white_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.104, deltaE 0.0021015694364905357
+iter 100, dist  0.122, deltaE 9.458055137656629e-05
+iter 199, dist  0.122, deltaE 0.0001014805820886977
+-----------blue_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.167, deltaE 0.02937118522822857
+iter 100, dist  0.298, deltaE 0.00037372231599874794
+iter 199, dist  0.299, deltaE 0.0004028612747788429
+-----------rainbow_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.11, deltaE 0.000612729461863637
+iter 100, dist  0.15, deltaE 0.00017195678083226085
+iter 199, dist  0.151, deltaE 0.0001700387365417555
+-----------blueRG_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.221, deltaE 0.21869583427906036
+iter 100, dist  0.266, deltaE 0.00012977026926819235
+iter 199, dist  0.266, deltaE 0.00014546622696798295
