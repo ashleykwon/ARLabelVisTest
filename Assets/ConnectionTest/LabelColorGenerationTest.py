@@ -13,6 +13,8 @@ import argparse
 import datetime
 from torch.autograd import Variable
 from skimage import color
+
+from ssim import ssim, ms_ssim, SSIM, MS_SSIM
 from torchmetrics.image import StructuralSimilarityIndexMeasure
 from torchmetrics.image import MultiScaleStructuralSimilarityIndexMeasure
 from torchmetrics.image import PeakSignalNoiseRatio
@@ -113,7 +115,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Label color generation')
     parser.add_argument('--lr', type=float, default=0.08, help='Learning rate')
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
-    parser.add_argument('--itr', type=int, default=800, help='Number of iterations')
+    parser.add_argument('--itr', type=int, default=200, help='Number of iterations')
     parser.add_argument('--image_paths', nargs='+',         default=[
                                                                     './testCurry/curry.jpg'          
                                                                      ,'./testRiver/river.jpg'
@@ -149,14 +151,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
-    k1 = 0.3 # default 0.01
-    k2 = 0.03 # default 0.03
+    k1 = 0.01 ; k2 = 0.03 # default 0.01, 0.03
+    alpha = 1; beta = 1; gamma = 1
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     if args.metric == 'lpips':
         loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
         loss_fn.cuda()
     elif args.metric == 'ssim':
-        ssim = StructuralSimilarityIndexMeasure(sigma=ssim_sigma, k1=k1, k2=k2).to(device)
+        pass
+        # ssim = StructuralSimilarityIndexMeasure(sigma=ssim_sigma, k1=k1, k2=k2).to(device)
     elif args.metric == 'mssim':
         mssim = MultiScaleStructuralSimilarityIndexMeasure().to(device)
     elif args.metric == 'psnr':
@@ -254,7 +258,7 @@ if __name__ == '__main__':
                 #     print("LPIPS loss:" , neg_loss.item())
             elif args.metric == 'ssim':
                 # SSIM loss
-                ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda())
+                ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda(), data_range=2.0, exp=(alpha, beta, gamma))
                 neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
             elif args.metric == 'mssim':
                 # MSSIM loss
@@ -265,7 +269,7 @@ if __name__ == '__main__':
                 psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
             
-            weight = 100
+            weight = 10
             if args.deltaE:
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
@@ -337,12 +341,13 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
-                        output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./testResults/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
