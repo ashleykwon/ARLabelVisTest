@@ -1,0 +1,2 @@
+-----------curry_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.854
