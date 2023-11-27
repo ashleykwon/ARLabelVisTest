@@ -225,6 +225,8 @@ if __name__ == '__main__':
         MAX_ITER = args.itr
         costList = []
 
+        # imageFlat = Variable(imageFlat, requires_grad=True)
+
         for iter in range(MAX_ITER): 
             # initialize to the origianl full image (does not matter what the pixels in label region are bc they will be overwritten later)
             if args.blur:
@@ -238,6 +240,8 @@ if __name__ == '__main__':
             full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape : [1, 3, width, height]
             full_img.data = torch.clamp(full_img.data, -1, 1)
 
+            print(full_img.requires_grad)
+
             if args.metric == 'lpips': 
                 # LPIPS loss: LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
                 LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
@@ -249,6 +253,7 @@ if __name__ == '__main__':
                 # SSIM loss
                 ssim_loss = ssim(full_img.cuda(), backgroundImgAsTensor.cuda(), data_range=2.0, K=(k1, k2), exp=(alpha, beta, gamma))
                 neg_loss = ssim_loss  # use 1 - ssim for decreasing the distance (denoising), so just ssim for our purposes
+                
             elif args.metric == 'mssim':
                 # MSSIM loss
                 mssim_loss = mssim(full_img.cuda(), backgroundImgAsTensor.cuda())
@@ -284,6 +289,10 @@ if __name__ == '__main__':
             # costList.append(LPIPSLoss[0][0][0][0].item())
 
             optimizer.step() # based on backpropagation implemented in lpips_loss.py
+            print(torch.all(torch.isfinite(labelVar.grad)))
+            # for name, param in ssim.named_parameters():
+            #     print(name, torch.isfinite(param.grad).all())
+            
 
             # Print out losses/distances
             if iter % 100 == 0:
@@ -330,13 +339,13 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./test20231127/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
                         # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231127/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231127/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
