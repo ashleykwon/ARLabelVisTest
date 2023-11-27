@@ -1,0 +1,2 @@
+-----------curry_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.856, deltaE 0.0012053255923092365

@@ -1,0 +1,32 @@
+-----------curry_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.843
+iter 100, dist  0.824
+iter 199, dist  0.824
+-----------river_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.918
+iter 100, dist  0.881
+iter 199, dist  0.88
+-----------river_white_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.912
+iter 100, dist  0.882
+iter 199, dist  0.881
+-----------blue_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.919
+iter 100, dist  0.789
+iter 199, dist  0.771
+-----------red_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.937
+iter 100, dist  0.81
+iter 199, dist  0.81
+-----------rainbow_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.92
+iter 100, dist  0.901
+iter 199, dist  0.901
+-----------blueRG_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.812
+iter 100, dist  0.765
+iter 199, dist  0.765
+-----------beach_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.9
+iter 100, dist  0.825
+iter 199, dist  0.823

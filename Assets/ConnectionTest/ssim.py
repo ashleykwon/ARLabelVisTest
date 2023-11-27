@@ -108,13 +108,13 @@ def _ssim(
     denominator = (sigma1_sq + sigma2_sq + C2)
     denominator = torch.where(denominator < epsilon, epsilon, denominator)  # To avoid division by zero
 
-    print(torch.isnan(sigma1_sq).any())
-    print(torch.isnan(sigma2_sq).any())
-    print(torch.isnan(numerator).any())
+    # print(torch.isnan(sigma1_sq).any())
+    # print(torch.isnan(sigma2_sq).any())
+    # print(torch.isnan(numerator).any())
     # print(torch.isinf(numerator).any())
     # print(torch.isnan(denominator).any())
     # print(torch.isnan(sigma1_sq + sigma2_sq + C2).any())
-    print('------------------')
+    # print('------------------')
 
     # c_map =  numerator /  denominator
     # s_map = (2 * sigma12 + C2) / numerator
@@ -133,7 +133,7 @@ def _ssim(
     ssim_per_channel_orig = torch.flatten(ssim_map_orig, 2).mean(-1)
     cs_orig = torch.flatten(cs_map_orig, 2).mean(-1)
  
-    return ssim_per_channel, cs
+    return ssim_per_channel_orig, cs_orig
 
 
 def ssim(
