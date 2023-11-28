@@ -1,0 +1,20 @@
+-----------city_rgb_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.077, deltaE 0.2169913351535797
+iter 100, dist  0.0882, deltaE 0.0015551846008747816
+iter 199, dist  0.089, deltaE 0.0016450555995106697
+-----------city_black_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.0567, deltaE 0.0012307552387937903
+iter 100, dist  0.0825, deltaE 0.006324400193989277
+iter 199, dist  0.081, deltaE 0.009691706858575344
+-----------city_white_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.0617, deltaE 0.0010554433101788163
+iter 100, dist  0.0799, deltaE 0.0032916953787207603
+iter 199, dist  0.0791, deltaE 0.004393640905618668
+-----------classroom_white_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.0373, deltaE 0.002370592672377825
+iter 100, dist  0.051, deltaE 0.0027678138576447964
+iter 199, dist  0.0483, deltaE 0.00449380511417985
+-----------classroom_bw_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.0373, deltaE 0.23417457938194275
+iter 100, dist  0.055, deltaE 0.001078046509064734
+iter 199, dist  0.0552, deltaE 0.0011012307368218899
