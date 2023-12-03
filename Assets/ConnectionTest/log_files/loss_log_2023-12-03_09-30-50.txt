@@ -1,0 +1,2 @@
+-----------city_rgb_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.077, deltaE 20.610437393188477
