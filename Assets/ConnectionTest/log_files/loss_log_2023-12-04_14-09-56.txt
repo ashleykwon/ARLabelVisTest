@@ -1,0 +1,15 @@
+-----------city_black_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  4.09e-07
+iter 19, dist  0.0456
+-----------city_white_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  4.09e-07
+iter 19, dist  0.0453
+-----------city_rgb_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  4.09e-07
+iter 19, dist  0.047
+-----------classroom_white_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  2.36e-07
+iter 19, dist  0.00928
+-----------classroom_bw_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  2.36e-07
+iter 19, dist  0.011

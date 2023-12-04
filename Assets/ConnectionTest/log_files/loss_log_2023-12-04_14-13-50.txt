@@ -1,0 +1,6 @@
+-----------city_black_unblurredBG_itr400_lr0.08---------------
+iter 0, dist  4.09e-07
+iter 100, dist  0.107
+iter 200, dist  0.126
+iter 300, dist  0.138
+iter 399, dist  0.15

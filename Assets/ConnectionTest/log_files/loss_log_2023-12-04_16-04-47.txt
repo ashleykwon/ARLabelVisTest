@@ -1,0 +1,14 @@
+-----------city_black_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0567, deltaE 0.0012307552387937903
+iter 9, dist  0.0768, deltaE 0.016518138349056244
+-----------city_white_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0617, deltaE 0.0010554433101788163
+iter 9, dist  0.0777, deltaE 0.015679210424423218
+-----------city_rgb_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.077, deltaE 0.2169913351535797
+iter 9, dist  0.0853, deltaE 0.061145324259996414
+-----------classroom_white_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0373, deltaE 0.002370592672377825
+iter 9, dist  0.0521, deltaE 0.014425084926187992
+-----------classroom_bw_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0373, deltaE 0.23417457938194275

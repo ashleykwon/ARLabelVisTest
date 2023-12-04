@@ -1,0 +1,8 @@
+-----------city_black_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0631, deltaE 0.0
+iter 9, dist  0.0634, deltaE 9.08725357055664
+-----------city_white_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.0628, deltaE 0.0
+iter 9, dist  0.0632, deltaE 9.129927635192871
+-----------city_rgb_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  0.063, deltaE 0.0

@@ -67,38 +67,33 @@ def delta_e_cie76(lab1, lab2):
     deltaL = l2-l1
     deltaB = b2-b1
     deltaA = a2-a1
-    return torch.sqrt(deltaA**2 + deltaB**2 + deltaL**2)
+    
+    return (deltaA**2 + deltaB**2 + deltaL**2)
 
 class DeltaELoss(torch.nn.Module):
     def __init__(self):
         super(DeltaELoss, self).__init__()
     
     def forward(self, image):
-        # image = image.detach().numpy()
-        # print("image within DeltaEloss: ", image)
         image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
         # image = image.squeeze(0).T  # torch.Size([21504, 3])
         image = image.unsqueeze(-1) # add one dimension to make the tensor [1,3,numLabelPixels,1]
-        # print("image shape: ", image.shape)
-
-        # mean_deltaE = torch.mean(image) # try just taking the mean without using other functions
-        # # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
         # input image size : [1,3,H,W] in range of [0,1] --> now the input labelVar is of size [1,3,numLabelPixels]
         image_lab = rgb_to_lab(image) # This step takes a long time # The L channel values are in the range 0..100. a and b are in the range -128..127
 
         mean_lab = torch.mean(image_lab, dim = 2).squeeze()
         image_lab = image_lab.squeeze(-1) # now image_lab has size [1,3,numLabelPixels]
-        print(torch.min(image_lab), torch.max(image_lab))
-        print(torch.min(image), torch.max(image))
-        print("image_lab shape: ", image_lab.shape)
-        # print("image_lab: ", image_lab)
-        print("mean_lab shape: ", mean_lab.shape) # torch.Size([3])
+        # print(torch.min(image_lab), torch.max(image_lab))
+        # print(torch.min(image), torch.max(image))
+        # print("image_lab shape: ", image_lab.shape)
+        # # print("image_lab: ", image_lab)
+        # print("mean_lab shape: ", mean_lab.shape) # torch.Size([3])
         # print("Gradient tracking enabled:", image_lab.requires_grad)
 
         individual_results = torch.zeros(image_lab.size(2)) 
         # Loop through the entries of the image tensor
         for i in range(image.size(2)):  # This dimension is the number of pixels
-            lab = image[:, :, i].squeeze()
+            lab = image_lab[:, :, i].squeeze()
             # print("lab shape: ", lab.shape)
             result = delta_e_cie76(mean_lab, lab)
             # print(mean_lab, lab)
@@ -108,11 +103,13 @@ class DeltaELoss(torch.nn.Module):
         # deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
         # mean_deltaE = torch.mean(deltaE)
         # # print("mean_deltaE: ", mean_deltaE)
-        print("mean_result: ", mean_result)
+        # print("mean_result: ", mean_result)
         return mean_result
 
-        # # rgb version of deltaE
+        # # # rgb version of deltaE
+        # image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
         # distanceAsTensor = torch.square(torch.sub(image, torch.ones(image.shape)*torch.mean(image)))
+        # print("result ", torch.mean(distanceAsTensor))
         # return torch.mean(distanceAsTensor)
 
 
@@ -240,7 +237,7 @@ if __name__ == '__main__':
         # Separate background and label pixels
         labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
-        # labelFlat2.fill_(-1.0) # fill with all black values
+        labelFlat2.fill_(1.0) # fill with all white values
 
         # Set them to torch variables for back-propagation
         labelVar = Variable(labelFlat2, requires_grad=True) # now labelVar size is [1,3,numLabelPixels]
@@ -377,19 +374,20 @@ if __name__ == '__main__':
                 full_img = imageFlat # a tensor
                 labelVarFlat = labelVar.view(1,-1) # [1,3,numPixels] -> [1, numLabelPixels]
                 full_img.index_put_(labelIndices, labelVar.view(1,-1).reshape(labelVarFlat.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()                full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape -- this is unblurred label with unblurred background
+                full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape
                 full_img.data = torch.clamp(full_img.data, -1, 1)
 
                 # Save the final result
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
                         # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 

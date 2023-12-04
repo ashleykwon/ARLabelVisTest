@@ -133,11 +133,11 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueRG.jpg'
                                                                     #  ,'./testBeach/beach.jpg'
                                                                     #  ,
-                                                                     './testCluttered/city_black.jpg'
-                                                                     ,'./testCluttered/city_white.jpg'
-                                                                     ,'./testCluttered/city_rgb.jpg'
-                                                                     ,'./testCluttered/classroom_white.jpg'
-                                                                     ,'./testCluttered/classroom_bw.jpg'
+                                                                    #  './testCluttered/city_black.jpg'
+                                                                     './testCluttered/city_white.jpg'
+                                                                    #  ,'./testCluttered/city_rgb.jpg'
+                                                                    #  ,'./testCluttered/classroom_white.jpg'
+                                                                    #  ,'./testCluttered/classroom_bw.jpg'
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
@@ -150,11 +150,11 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
                                                                     #  ,
-                                                                     './testCluttered/cityAndLabel_black.jpg'
-                                                                     ,'./testCluttered/cityAndLabel_white.jpg'
-                                                                     ,'./testCluttered/cityAndLabel_rgb.jpg'
-                                                                     ,'./testCluttered/classroomAndLabel_white.jpg'
-                                                                     ,'./testCluttered/classroomAndLabel_bw.jpg'
+                                                                    #  './testCluttered/cityAndLabel_black.jpg'
+                                                                     './testCluttered/cityAndLabel_white.jpg'
+                                                                    #  ,'./testCluttered/cityAndLabel_rgb.jpg'
+                                                                    #  ,'./testCluttered/classroomAndLabel_white.jpg'
+                                                                    #  ,'./testCluttered/classroomAndLabel_bw.jpg'
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
@@ -167,11 +167,11 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
                                                                     #  ,
+                                                                    #  './testCluttered/cityMask.jpg'
                                                                      './testCluttered/cityMask.jpg'
-                                                                     ,'./testCluttered/cityMask.jpg'
-                                                                     ,'./testCluttered/cityMask.jpg'
-                                                                     ,'./testCluttered/classroomMask.jpg'
-                                                                     ,'./testCluttered/classroomMask.jpg'
+                                                                    #  ,'./testCluttered/cityMask.jpg'
+                                                                    #  ,'./testCluttered/classroomMask.jpg'
+                                                                    #  ,'./testCluttered/classroomMask.jpg'
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
@@ -283,8 +283,6 @@ if __name__ == '__main__':
             full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape : [1, 3, width, height]
             full_img.data = torch.clamp(full_img.data, -1, 1)
 
-            # print(full_img.requires_grad)
-
             if args.metric == 'lpips': 
                 # LPIPS loss: LPIPS distance between the current backgroundAndLabelImage and the backgroundImage
                 LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
@@ -318,10 +316,6 @@ if __name__ == '__main__':
                 # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
                 neg_loss += delta_e*weight # this *10 here is to give more weight to the delta e loss, but this can change
                 # neg_loss = delta_e
-                # if iter%100 == 0:
-                    # print('delta e loss:', delta_e.item())
-                    # print('total loss:' , neg_loss.item())
-                    # print('\n')
         
 
             # Clear the gradient for a new calculation
@@ -378,19 +372,20 @@ if __name__ == '__main__':
                 full_img = imageFlat # a tensor
                 labelVarFlat = labelVar.view(1,-1) # [1,3,numPixels] -> [1, numLabelPixels]
                 full_img.index_put_(labelIndices, labelVar.view(1,-1).reshape(labelVarFlat.size()[1]))  # labelVar size: torch.Size([1, numLabelPixels]) -> reshape it to [numLabelPixels] to fit in index_put_()                full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape -- this is unblurred label with unblurred background
+                full_img = full_img.view(1,3,height,width) # restore its shape to match the original image's shape
                 full_img.data = torch.clamp(full_img.data, -1, 1)
 
                 # Save the final result
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
                         # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./test20231203/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
