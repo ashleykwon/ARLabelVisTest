@@ -1,3 +1,4 @@
+# use only the label region to do lpips first, do not assign a color to the label from the beginning
 # Library imports
 import torch
 import io, json
