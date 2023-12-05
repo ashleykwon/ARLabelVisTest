@@ -1,0 +1,3 @@
+-----------city_white_unblurredBG_itr10_lr0.08---------------
+iter 0, dist  4.09e-07, deltaE 806.1967163085938
+iter 9, dist  4.08e-07, deltaE 98.97114562988281

@@ -100,41 +100,30 @@ def _ssim(
     cs_map_orig = (2 * sigma12 + C2) / (sigma1_sq + sigma2_sq + C2)  # set alpha=beta=gamma=1
     ssim_map_orig = ((2 * mu1_mu2 + C1) / (mu1_sq + mu2_sq + C1)) * cs_map_orig  # alpha=beta=gamma=1
 
+    epsilon = 1e-8  # A small value to prevent division by zero or square root of zero
+    sigma1_sq = torch.where(sigma1_sq < epsilon, epsilon, sigma1_sq)  # To avoid division by zero
+    sigma2_sq = torch.where(sigma2_sq < epsilon, epsilon, sigma2_sq)  # To avoid division by zero
+
     # numerator = torch.tensor(2 * torch.pow(sigma1_sq, 0.5) * torch.pow(sigma2_sq, 0.5) + C2)
     # numerator = 2 * torch.sqrt(sigma1_sq.clamp(min=0)) * torch.sqrt(sigma2_sq.clamp(min=0)) + C2
     numerator = 2 * torch.sqrt(sigma1_sq) * torch.sqrt(sigma2_sq) + C2
 
-    # epsilon = 1e-8  # A small value to prevent division by zero
-    # numerator = torch.where(numerator < epsilon, epsilon, numerator)  # To avoid division by zero
-
     denominator = (sigma1_sq + sigma2_sq + C2)
     # denominator = torch.where(denominator < epsilon, epsilon, denominator)  # To avoid division by zero
-
-    
-    # print(torch.isnan(X).sum().item())
-    # print(X.shape)
-    # print(torch.isnan(gaussian_filter(X * X, win)).any())
-    # print(torch.isnan(mu1_sq).any())
-
     # print(torch.isnan(sigma2_sq).any())
+    # print(torch.isnan(sigma1_sq).any())
     # print(torch.isnan(numerator).any())
-    # print(torch.isinf(numerator).any())
-    # print(torch.isnan(denominator).any())
-    # print(torch.isnan(sigma1_sq + sigma2_sq + C2).any())
-    
 
     c_map =  numerator /  denominator
     s_map = (2 * sigma12 + C2) / numerator
     # print(torch.isnan(s_map).any())
     # print(torch.min(numerator), torch.max(numerator))
-    print('------------------')
-    # c_map =  1 /  denominator
-    # s_map = (2 * sigma12 + C2) / 1
+    # print('------------------')
 
     cs_map = c_map * s_map
     l_map = (2 * mu1_mu2 + C1) / (mu1_sq + mu2_sq + C1)
-    # ssim_map = torch.pow(l_map, alpha) * torch.pow(c_map, beta) * torch.pow(s_map, gamma)
-    ssim_map = torch.pow(l_map, 0.3) * torch.pow(c_map, 1) * torch.pow(s_map, 0.3)
+    ssim_map = torch.pow(l_map, alpha) * torch.pow(c_map, beta) * torch.pow(s_map, gamma)
+    # ssim_map = torch.pow(l_map, 1) * torch.pow(c_map, 2) * torch.pow(s_map, 1)
     # ssim_map = c_map * s_map * l_map
     
     ssim_per_channel = torch.flatten(ssim_map, 2).mean(-1)
@@ -142,7 +131,8 @@ def _ssim(
 
     ssim_per_channel_orig = torch.flatten(ssim_map_orig, 2).mean(-1)
     cs_orig = torch.flatten(cs_map_orig, 2).mean(-1)
-    print(ssim_per_channel)
+    # print("beta: ", beta)
+    # print(ssim_per_channel)
  
     return ssim_per_channel, cs
 

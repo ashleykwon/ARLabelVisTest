@@ -1,0 +1,5 @@
+-----------city_white_unblurredBG_itr300_lr0.08---------------
+iter 0, dist  4.09e-07, deltaE 0.0598311647772789
+iter 100, dist  3.92e-07, deltaE 6.644435757152678e-07
+iter 200, dist  3.92e-07, deltaE 6.143334285724222e-09
+iter 299, dist  3.91e-07, deltaE 8.13339351424247e-09

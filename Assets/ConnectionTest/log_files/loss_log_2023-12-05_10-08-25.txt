@@ -1,0 +1,21 @@
+-----------curry_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.854
+iter 99, dist  0.823
+-----------rainbow_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.902
+iter 99, dist  0.873
+-----------city_black_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.943
+iter 99, dist  0.919
+-----------city_white_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.928
+iter 99, dist  0.909
+-----------city_rgb_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.937
+iter 99, dist  0.915
+-----------classroom_white_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.961
+iter 99, dist  0.954
+-----------classroom_bw_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.961
+iter 99, dist  0.953

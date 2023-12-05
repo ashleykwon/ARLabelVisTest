@@ -76,7 +76,6 @@ class DeltaELoss(torch.nn.Module):
     
     def forward(self, image):
         image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
-        # image = image.squeeze(0).T  # torch.Size([21504, 3])
         image = image.unsqueeze(-1) # add one dimension to make the tensor [1,3,numLabelPixels,1]
         # input image size : [1,3,H,W] in range of [0,1] --> now the input labelVar is of size [1,3,numLabelPixels]
         image_lab = rgb_to_lab(image) # This step takes a long time # The L channel values are in the range 0..100. a and b are in the range -128..127
@@ -120,15 +119,15 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=200, help='Number of iterations')
     parser.add_argument('--image_paths', nargs='+',         default=[
-                                                                    # './testCurry/curry.jpg'          
+                                                                    './testCurry/curry.jpg'          
                                                                     #  ,'./testRiver/river.jpg'
                                                                     #  ,'./testRiver/river_white.jpg'
                                                                     #  ,'./testSingleColor/blue.jpg'
                                                                     #  ,'./testSingleColor/red.jpg'
-                                                                    #  ,'./testRainbow/rainbow.jpg' 
+                                                                     ,'./testRainbow/rainbow.jpg' 
                                                                     #  ,'./testSingleColor/blueRG.jpg'
                                                                     #  ,'./testBeach/beach.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                      './testCluttered/city_black.jpg'
                                                                      ,'./testCluttered/city_white.jpg'
                                                                      ,'./testCluttered/city_rgb.jpg'
@@ -137,15 +136,15 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
-                                                                    # './testCurry/curryAndLabel_white.jpg'
+                                                                    './testCurry/curryAndLabel_white.jpg'
                                                                     #  ,'./testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
                                                                     #  ,'./testSingleColor/blueAndLabel.jpg'
                                                                     #  ,'./testSingleColor/redAndLabel.jpg'
-                                                                    #  ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                     ,'./testRainbow/rainbowAndLabel.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                      './testCluttered/cityAndLabel_black.jpg'
                                                                      ,'./testCluttered/cityAndLabel_white.jpg'
                                                                      ,'./testCluttered/cityAndLabel_rgb.jpg'
@@ -154,15 +153,15 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
-                                                                    # './testCurry/curryMask.jpg'        
+                                                                    './testCurry/curryMask.jpg'        
                                                                     #  ,'./testRiver/riverMask.jpg'
                                                                     #  ,'./testRiver/riverMask.jpg'
                                                                     #  ,'./testSingleColor/mask.jpg'
                                                                     #  ,'./testSingleColor/mask.jpg'
-                                                                    #  ,'./testRainbow/rainbowMask.jpg'
+                                                                     ,'./testRainbow/rainbowMask.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                      './testCluttered/cityMask.jpg'
                                                                      ,'./testCluttered/cityMask.jpg'
                                                                      ,'./testCluttered/cityMask.jpg'
@@ -177,8 +176,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
-    k1 = 0.1 ; k2 = 0.1 # default 0.01, 0.03
-    alpha = 1; beta = 1; gamma = 1
+    k1 = 0.01 ; k2 = 0.03 # default 0.01, 0.03
+    alpha = 3; beta = 1; gamma = 3
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     if args.metric == 'lpips':
@@ -237,7 +236,7 @@ if __name__ == '__main__':
         # Separate background and label pixels
         labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
-        labelFlat2.fill_(1.0) # fill with all white values
+        # labelFlat2.fill_(1.0) # fill with all white values
 
         # Set them to torch variables for back-propagation
         labelVar = Variable(labelFlat2, requires_grad=True) # now labelVar size is [1,3,numLabelPixels]
@@ -305,8 +304,8 @@ if __name__ == '__main__':
             weight = 1
             if args.deltaE:
                 # add delta-E to the loss term
-                labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
-                labelVar2 = Variable(labelFlat2, requires_grad=True)
+                # labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
+                # labelVar2 = Variable(labelFlat2, requires_grad=True)
 
                 # print("labelVar: ", labelVar)
                 delta_e = deltaE_loss(labelVar) # want to minimize this average delta_e within the label region
@@ -314,10 +313,6 @@ if __name__ == '__main__':
                 # delta_e_tensor = torch.tensor(delta_e, dtype=torch.float, requires_grad=True)
                 neg_loss += delta_e*weight # this *10 here is to give more weight to the delta e loss, but this can change
                 # neg_loss = delta_e
-                # if iter%100 == 0:
-                    # print('delta e loss:', delta_e.item())
-                    # print('total loss:' , neg_loss.item())
-                    # print('\n')
         
 
             # Clear the gradient for a new calculation
@@ -381,13 +376,13 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
-                        # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        # output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 

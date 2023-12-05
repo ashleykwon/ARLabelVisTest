@@ -1,0 +1,2 @@
+-----------city_black_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  nan

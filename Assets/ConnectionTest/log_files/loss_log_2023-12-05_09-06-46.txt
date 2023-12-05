@@ -1,0 +1,4 @@
+-----------city_black_unblurredBG_itr20_lr0.08---------------
+iter 0, dist  0.93
+iter 19, dist  0.908
+-----------city_white_unblurredBG_itr20_lr0.08---------------

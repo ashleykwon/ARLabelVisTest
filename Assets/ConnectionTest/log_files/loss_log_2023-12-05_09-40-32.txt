@@ -1,0 +1,9 @@
+-----------curry_unblurredBG_itr40_lr0.08---------------
+iter 0, dist  1
+iter 39, dist  1
+-----------rainbow_unblurredBG_itr40_lr0.08---------------
+iter 0, dist  1
+iter 39, dist  1
+-----------city_white_unblurredBG_itr40_lr0.08---------------
+iter 0, dist  1
+iter 39, dist  1

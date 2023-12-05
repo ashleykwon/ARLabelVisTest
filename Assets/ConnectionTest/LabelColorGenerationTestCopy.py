@@ -68,51 +68,38 @@ def delta_e_cie76(lab1, lab2):
     deltaL = l2-l1
     deltaB = b2-b1
     deltaA = a2-a1
-    return torch.sqrt(deltaA**2 + deltaB**2 + deltaL**2)
+    return (deltaA**2 + deltaB**2 + deltaL**2)
 
 class DeltaELoss(torch.nn.Module):
     def __init__(self):
         super(DeltaELoss, self).__init__()
     
     def forward(self, image):
-        # image = image.detach().numpy()
-        # print("image within DeltaEloss: ", image)
+        # # ------LAB version of deltaE-------------
         image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
-        # image = image.squeeze(0).T  # torch.Size([21504, 3])
         image = image.unsqueeze(-1) # add one dimension to make the tensor [1,3,numLabelPixels,1]
-        # print("image shape: ", image.shape)
-
-        # mean_deltaE = torch.mean(image) # try just taking the mean without using other functions
-        # # image_lab = color.rgb2lab(image) # all colors are in lab for image_lab
         # input image size : [1,3,H,W] in range of [0,1] --> now the input labelVar is of size [1,3,numLabelPixels]
         image_lab = rgb_to_lab(image) # This step takes a long time # The L channel values are in the range 0..100. a and b are in the range -128..127
 
         mean_lab = torch.mean(image_lab, dim = 2).squeeze()
         image_lab = image_lab.squeeze(-1) # now image_lab has size [1,3,numLabelPixels]
-        print(torch.min(image_lab), torch.max(image_lab))
-        print(torch.min(image), torch.max(image))
-        print("image_lab shape: ", image_lab.shape)
-        # print("image_lab: ", image_lab)
-        print("mean_lab shape: ", mean_lab.shape) # torch.Size([3])
-        # print("Gradient tracking enabled:", image_lab.requires_grad)
+        # print(torch.min(image_lab), torch.max(image_lab))
+        # print(torch.min(image), torch.max(image))
 
         individual_results = torch.zeros(image_lab.size(2)) 
         # Loop through the entries of the image tensor
         for i in range(image.size(2)):  # This dimension is the number of pixels
-            lab = image[:, :, i].squeeze()
-            # print("lab shape: ", lab.shape)
+            lab = image_lab[:, :, i].squeeze()
             result = delta_e_cie76(mean_lab, lab)
             # print(mean_lab, lab)
             individual_results[i] = result  # Store the individual result
         # Calculate the mean of the individual results
         mean_result = individual_results.mean()
-        # deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
-        # mean_deltaE = torch.mean(deltaE)
-        # # print("mean_deltaE: ", mean_deltaE)
-        print("mean_result: ", mean_result)
+        # print("mean_result: ", mean_result)
         return mean_result
 
-        # # rgb version of deltaE
+        # # # ------------ rgb version of deltaE-----------------
+        # image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
         # distanceAsTensor = torch.square(torch.sub(image, torch.ones(image.shape)*torch.mean(image)))
         # return torch.mean(distanceAsTensor)
 
@@ -124,15 +111,15 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=200, help='Number of iterations')
     parser.add_argument('--image_paths', nargs='+',         default=[
-                                                                    # './testCurry/curry.jpg'          
+                                                                    './testCurry/curry.jpg'          
                                                                     #  ,'./testRiver/river.jpg'
                                                                     #  ,'./testRiver/river_white.jpg'
                                                                     #  ,'./testSingleColor/blue.jpg'
                                                                     #  ,'./testSingleColor/red.jpg'
-                                                                    #  ,'./testRainbow/rainbow.jpg' 
+                                                                     ,'./testRainbow/rainbow.jpg' 
                                                                     #  ,'./testSingleColor/blueRG.jpg'
                                                                     #  ,'./testBeach/beach.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                     #  './testCluttered/city_black.jpg'
                                                                      './testCluttered/city_white.jpg'
                                                                     #  ,'./testCluttered/city_rgb.jpg'
@@ -141,15 +128,15 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
-                                                                    # './testCurry/curryAndLabel_white.jpg'
+                                                                    './testCurry/curryAndLabel_white.jpg'
                                                                     #  ,'./testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
                                                                     #  ,'./testSingleColor/blueAndLabel.jpg'
                                                                     #  ,'./testSingleColor/redAndLabel.jpg'
-                                                                    #  ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                     ,'./testRainbow/rainbowAndLabel.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                     #  './testCluttered/cityAndLabel_black.jpg'
                                                                      './testCluttered/cityAndLabel_white.jpg'
                                                                     #  ,'./testCluttered/cityAndLabel_rgb.jpg'
@@ -158,15 +145,15 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
-                                                                    # './testCurry/curryMask.jpg'        
+                                                                    './testCurry/curryMask.jpg'        
                                                                     #  ,'./testRiver/riverMask.jpg'
                                                                     #  ,'./testRiver/riverMask.jpg'
                                                                     #  ,'./testSingleColor/mask.jpg'
                                                                     #  ,'./testSingleColor/mask.jpg'
-                                                                    #  ,'./testRainbow/rainbowMask.jpg'
+                                                                     ,'./testRainbow/rainbowMask.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
-                                                                    #  ,
+                                                                     ,
                                                                     #  './testCluttered/cityMask.jpg'
                                                                      './testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/cityMask.jpg'
@@ -181,7 +168,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
-    k1 = 0.1 ; k2 = 0.1 # default 0.01, 0.03
+    k1 = 0.01 ; k2 = 0.03 # default 0.01, 0.03
     alpha = 1; beta = 1; gamma = 1
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -234,7 +221,7 @@ if __name__ == '__main__':
         numLabelPixels = labelMaskAsTensor[0,0].sum().item() # number of label pixels
 
         # Flatten image and mask to apply the mask
-        imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+        imageFlat = backgroundImgAsTensor.view(1,3,-1) #[1,3,numPixels]
         # print("shape of imageFlat:", imageFlat.size())
         maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
@@ -304,7 +291,7 @@ if __name__ == '__main__':
                 psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
             
-            weight = 1
+            weight = 0.05
             if args.deltaE:
                 # add delta-E to the loss term
                 labelFlat2 = full_img_flat[:, :, maskFlat[0][0]] #[1,3,numLabelPixelsPerChannel]
@@ -379,13 +366,13 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
-                        # output_path = f"./testResults_20231121/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        # output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
