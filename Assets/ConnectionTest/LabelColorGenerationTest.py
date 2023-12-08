@@ -23,6 +23,10 @@ from colormath.color_diff import delta_e_cie1976
 from matplotlib import pyplot as plt # for debugging purposes
 from kornia.color import rgb_to_lab
 
+from sklearn.cluster import KMeans
+import warnings
+warnings.simplefilter('ignore', UserWarning)
+
 def rgb_to_lab_own(srgb): # srgb: an image of size [..., 3]
 	srgb_pixels = torch.reshape(srgb, [-1, 3]).cuda()
 
@@ -59,7 +63,6 @@ def rgb_to_lab_own(srgb): # srgb: an image of size [..., 3]
 	lab_pixels = torch.mm(fxfyfz_pixels, fxfyfz_to_lab) + torch.tensor([-16.0, 0.0, 0.0]).type(torch.FloatTensor).cuda()
 	#return tf.reshape(lab_pixels, tf.shape(srgb))
 	return torch.reshape(lab_pixels, srgb.shape)
-
 
 def delta_e_cie76(lab1, lab2):
     l1, a1, b1 = lab1
@@ -111,6 +114,117 @@ class DeltaELoss(torch.nn.Module):
         # print("result ", torch.mean(distanceAsTensor))
         # return torch.mean(distanceAsTensor)
 
+
+
+# Starts palette loss code
+
+def create_tensor_image(color):
+  image = np.zeros((height, width, 3), dtype=np.uint8)
+
+  # Fill the image with the specified color
+  image[:] = color
+  image_tensor = lpips.im2tensor(image)
+  image_tensor = image_tensor.to(labelMaskAsTensor.cuda().device)
+  return image_tensor
+
+def find_dominant_colors_tensor(input_image, mask, num_colors=3):
+
+    image = lpips.tensor2im (input_image.data)
+    np_mask = lpips.tensor2im(mask.data)
+    valid_pixels_matrix = np.array(np.where(~np.all(np_mask == [127, 127, 127], axis=2))).T
+    valid_pixels_matrix.shape
+
+    pixels = image[valid_pixels_matrix[:,0], valid_pixels_matrix[:,1]]
+
+    # Use KMeans to find the top 'num_colors' colors
+    kmeans = KMeans(n_clusters=num_colors)
+    kmeans.fit(pixels)
+
+    # Get the colors
+    colors = kmeans.cluster_centers_
+
+    # Convert to integers
+    colors = np.round(colors).astype(int)
+
+    return colors
+
+def pallet_color_loss(input_image, mask, alpha = 0.2):
+
+    palettes = []
+    palette_color = find_dominant_colors_tensor(input_image, mask)
+    for col in palette_color:
+      new_tensor = create_tensor_image(col)
+      palettes.append(new_tensor)
+
+    
+    diffs = []
+    for palette in palettes:
+        #shape [1,3,512,1024]
+        diff = abs(input_image - palette)
+
+        #shape [1,512,1024]
+        diff_summed = torch.sum(diff, dim=1)
+        diffs.append(diff_summed)
+
+    min_diffs = diffs[0]
+
+    # Get the smallest diffs
+    for diff in diffs[1:]:
+      min_diffs = torch.min(min_diffs, diff)
+
+    valid_mask = torch.sum(mask, dim=1) > 0
+    num_valid_pixels = torch.sum(valid_mask)
+
+    # Calculate loss
+    loss = torch.sum(min_diffs[valid_mask])
+    loss = alpha * loss / num_valid_pixels
+
+    return loss
+
+def match_palette(input_image, mask, palette):
+
+    image = lpips.tensor2im (input_image.data)
+    np_mask = lpips.tensor2im(mask.data)
+    valid_pixels_matrix = np.array(np.where(~np.all(np_mask == [127, 127, 127], axis=2))).T
+
+    diff = np.abs(image[:, :, np.newaxis, :] - palette)
+    diff_sum = np.sum(diff, axis=3)
+
+    # Find the index of the nearest color in the palette
+    min_indices = np.argmin(diff_sum, axis=2)
+    # valid_min_indice = min_indices[valid_pixels_matrix[:,0], valid_pixels_matrix[:,1]]
+
+    # Map the nearest palette colors to the image shape
+    nearest_colors = palette[min_indices]
+    valid_nearest_colors = nearest_colors[valid_pixels_matrix[:,0], valid_pixels_matrix[:,1]]
+
+    # Apply mask
+    for x, y in valid_pixels_matrix:
+      image[x, y] = nearest_colors[x, y]
+
+    return image
+
+def plot_colors(colors):
+    """
+    Plots a list of colors as separate patches.
+
+    Parameters:
+    - colors: A list of colors, where each color is represented as [R, G, B].
+    """
+    n = len(colors)
+    fig, axs = plt.subplots(1, n, figsize=(n * 2, 2))
+
+    for i, color in enumerate(colors):
+      color=np.array(color)/255.0
+      print("color", color)
+      axs[i].add_patch(plt.Rectangle((0, 0), 1, 1, color = color))
+
+      axs[i].axis('off')
+
+    plt.show()
+
+
+# End palette loss code
 
 
 if __name__ == '__main__':
@@ -300,7 +414,11 @@ if __name__ == '__main__':
                 # PSNR loss
                 psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                 neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
-            
+            elif args.metric == 'palette':
+                LPIPSLoss = loss_fn.forward(full_img.cuda(), backgroundImgAsTensor.cuda())
+                pallet_loss = pallet_color_loss(full_img.cuda(), labelMaskAsTensor.cuda())
+                neg_loss = pallet_loss -LPIPSLoss
+
             weight = 1
             if args.deltaE:
                 # add delta-E to the loss term
