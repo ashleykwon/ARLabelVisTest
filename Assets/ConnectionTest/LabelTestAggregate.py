@@ -8,6 +8,7 @@ import lpips
 import cv2
 import scipy
 import os
+import time
 import torchvision
 import argparse
 import datetime
@@ -23,25 +24,45 @@ from colormath.color_diff import delta_e_cie1976
 from matplotlib import pyplot as plt # for debugging purposes
 from kornia.color import rgb_to_lab
 
-def rgb_to_lab_own(srgb): # srgb: an image of size [..., 3]
-	srgb_pixels = torch.reshape(srgb, [-1, 3]).cuda()
-
-	linear_mask = (srgb_pixels <= 0.04045).type(torch.FloatTensor).cuda()
-	exponential_mask = (srgb_pixels > 0.04045).type(torch.FloatTensor).cuda()
-	rgb_pixels = (srgb_pixels / 12.92 * linear_mask) + (((srgb_pixels + 0.055) / 1.055) ** 2.4) * exponential_mask
-	
-	rgb_to_xyz = torch.tensor([
+RGB_TO_XYZ = torch.tensor([
 				#    X        Y          Z
 				[0.412453, 0.212671, 0.019334], # R
 				[0.357580, 0.715160, 0.119193], # G
 				[0.180423, 0.072169, 0.950227], # B
 			]).type(torch.FloatTensor).cuda()
-	
+
+FXFYFZ_TO_LAB =  torch.tensor([
+		#  l       a       b
+		[  0.0,  500.0,    0.0], # fx
+		[116.0, -500.0,  200.0], # fy
+		[  0.0,    0.0, -200.0], # fz
+	]).type(torch.FloatTensor).cuda()
+
+C1 = torch.tensor([1/0.950456, 1.0, 1/1.088754]).type(torch.FloatTensor).cuda()
+C2 = torch.tensor([-16.0, 0.0, 0.0]).type(torch.FloatTensor).cuda()
+
+def rgb_to_lab_own(srgb): # srgb: an image of size [..., 3]
+	srgb_pixels = torch.reshape(srgb, [-1, 3]).cuda()
+
+	linear_mask = (srgb_pixels <= 0.04045).type(torch.FloatTensor).cuda()
+
+	exponential_mask = (srgb_pixels > 0.04045).type(torch.FloatTensor).cuda()
+	rgb_pixels = (srgb_pixels / 12.92 * linear_mask) + (((srgb_pixels + 0.055) / 1.055) ** 2.4) * exponential_mask
+
+	# rgb_to_xyz = torch.tensor([
+	# 			#    X        Y          Z
+	# 			[0.412453, 0.212671, 0.019334], # R
+	# 			[0.357580, 0.715160, 0.119193], # G
+	# 			[0.180423, 0.072169, 0.950227], # B
+	# 		]).type(torch.FloatTensor).cuda()
+
+	rgb_to_xyz = RGB_TO_XYZ
+
 	xyz_pixels = torch.mm(rgb_pixels, rgb_to_xyz)
 	
 	# XYZ to Lab
-	xyz_normalized_pixels = torch.mul(xyz_pixels, torch.tensor([1/0.950456, 1.0, 1/1.088754]).type(torch.FloatTensor).cuda())
-
+	# xyz_normalized_pixels = torch.mul(xyz_pixels, torch.tensor([1/0.950456, 1.0, 1/1.088754]).type(torch.FloatTensor).cuda())
+	xyz_normalized_pixels = torch.mul(xyz_pixels, C1)
 	epsilon = 6.0/29.0
 
 	linear_mask = (xyz_normalized_pixels <= (epsilon**3)).type(torch.FloatTensor).cuda()
@@ -49,20 +70,23 @@ def rgb_to_lab_own(srgb): # srgb: an image of size [..., 3]
 	exponential_mask = (xyz_normalized_pixels > (epsilon**3)).type(torch.FloatTensor).cuda()
 
 	fxfyfz_pixels = (xyz_normalized_pixels / (3 * epsilon**2) + 4.0/29.0) * linear_mask + ((xyz_normalized_pixels+0.000001) ** (1.0/3.0)) * exponential_mask
-	# convert to lab
-	fxfyfz_to_lab = torch.tensor([
-		#  l       a       b
-		[  0.0,  500.0,    0.0], # fx
-		[116.0, -500.0,  200.0], # fy
-		[  0.0,    0.0, -200.0], # fz
-	]).type(torch.FloatTensor).cuda()
-	lab_pixels = torch.mm(fxfyfz_pixels, fxfyfz_to_lab) + torch.tensor([-16.0, 0.0, 0.0]).type(torch.FloatTensor).cuda()
+    # convert to lab
+	# fxfyfz_to_lab = torch.tensor([
+	# 	#  l       a       b
+	# 	[  0.0,  500.0,    0.0], # fx
+	# 	[116.0, -500.0,  200.0], # fy
+	# 	[  0.0,    0.0, -200.0], # fz
+	# ]).type(torch.FloatTensor).cuda()
+
+	fxfyfz_to_lab = FXFYFZ_TO_LAB
+	# lab_pixels = torch.mm(fxfyfz_pixels, fxfyfz_to_lab) + torch.tensor([-16.0, 0.0, 0.0]).type(torch.FloatTensor).cuda()
+	lab_pixels = torch.mm(fxfyfz_pixels, fxfyfz_to_lab) + C2
 	#return tf.reshape(lab_pixels, tf.shape(srgb))
 	return torch.reshape(lab_pixels, srgb.shape)
 
 def delta_e_cie76(lab1, lab2):
-    l1, a1, b1 = lab1
-    l2, a2, b2 = lab2
+    l1, a1, b1 = lab1.unbind(1)  # Unbind along dimension 1 to get individual LAB components
+    l2, a2, b2 = lab2.unbind(1)
     deltaL = l2-l1
     deltaB = b2-b1
     deltaA = a2-a1
@@ -77,37 +101,46 @@ class DeltaELoss(torch.nn.Module):
         image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
         image = image.unsqueeze(-1) # add one dimension to make the tensor [1,3,numLabelPixels,1]
         # input image size : [1,3,H,W] in range of [0,1] --> now the input labelVar is of size [1,3,numLabelPixels]
-        image_lab = rgb_to_lab(image) # This step takes a long time # The L channel values are in the range 0..100. a and b are in the range -128..127
-
+        start_time2 = time.time()
+        image_lab = rgb_to_lab_own(image) # This step takes a long time # The L channel values are in the range 0..100. a and b are in the range -128..127
+        
         mean_lab = torch.mean(image_lab, dim = 2).squeeze()
+        print(mean_lab.shape)
         image_lab = image_lab.squeeze(-1) # now image_lab has size [1,3,numLabelPixels]
-        # print(torch.min(image_lab), torch.max(image_lab))
-        # print(torch.min(image), torch.max(image))
-        # print("image_lab shape: ", image_lab.shape)
-        # # print("image_lab: ", image_lab)
-        # print("mean_lab shape: ", mean_lab.shape) # torch.Size([3])
-        # print("Gradient tracking enabled:", image_lab.requires_grad)
 
-        individual_results = torch.zeros(image_lab.size(2)) 
-        # Loop through the entries of the image tensor
-        for i in range(image.size(2)):  # This dimension is the number of pixels
-            lab = image_lab[:, :, i].squeeze()
-            # print("lab shape: ", lab.shape)
-            result = delta_e_cie76(mean_lab, lab)
-            # print(mean_lab, lab)
-            individual_results[i] = result  # Store the individual result
+       
+        # individual_results = torch.zeros(image_lab.size(2)) 
+        # # Loop through the entries of the image tensor
+        # start_time2 = time.time()
+        # for i in range(image.size(2)):  # This dimension is the number of pixels
+        #     lab = image_lab[:, :, i].squeeze()
+        #     # print("lab shape: ", lab.shape)
+        #     result = delta_e_cie76(mean_lab, lab)
+        #     # print(mean_lab, lab)
+        #     individual_results[i] = result  # Store the individual result
+        # # Calculate the mean of the individual results
+        # mean_result = individual_results.mean()
+        # print(mean_result)
+        # print(f"rgb_to_lab: {time.time() - start_time2} seconds")
+
+        # Reshape mean_lab to have the same shape as image_lab for broadcasting
+        image_lab = image_lab.squeeze(0) # [3, numLabelPixels]
+        mean_lab = mean_lab.unsqueeze(-1).expand_as(image_lab)
+        print(image_lab.shape, mean_lab.shape)
+        # Calculate Delta E using matrix operations
+        delta_e_matrix = delta_e_cie76(mean_lab, image_lab)
         # Calculate the mean of the individual results
-        mean_result = individual_results.mean()
-        # deltaE = torch.tensor([delta_e_cie76(mean_lab, lab) for lab in image_lab])
-        # mean_deltaE = torch.mean(deltaE)
-        # # print("mean_deltaE: ", mean_deltaE)
-        # print("mean_result: ", mean_result)
-        return mean_result
+        mean_result1 = torch.mean(delta_e_matrix)
+        print(mean_result1)
 
-        # # # rgb version of deltaE
+        return mean_result1
+
+        # # # # rgb version of deltaE
+        # start_time2 = time.time()
         # image = 0.5*torch.add(image, torch.ones(image.shape)) # adjust the image to range [0,1]
         # distanceAsTensor = torch.square(torch.sub(image, torch.ones(image.shape)*torch.mean(image)))
-        # print("result ", torch.mean(distanceAsTensor))
+        # # print("result ", torch.mean(distanceAsTensor))
+        # print(f"rgb only: {time.time() - start_time2} seconds")
         # return torch.mean(distanceAsTensor)
 
 
@@ -120,9 +153,9 @@ if __name__ == '__main__':
                                                                     './testCurry/curry.jpg'          
                                                                      ,'./testRiver/river.jpg'
                                                                     #  ,'./testRiver/river_white.jpg'
-                                                                    #  ,'./testSingleColor/blue.jpg'
+                                                                     ,'./testSingleColor/blue.jpg'
                                                                     #  ,'./testSingleColor/red.jpg'
-                                                                    #  ,'./testRainbow/rainbow.jpg' 
+                                                                     ,'./testRainbow/rainbow.jpg' 
                                                                     #  ,'./testSingleColor/blueRG.jpg'
                                                                     #  ,'./testBeach/beach.jpg'
                                                                     #  ,
@@ -137,9 +170,9 @@ if __name__ == '__main__':
                                                                     './testCurry/curryAndLabel_white.jpg'
                                                                      ,'./testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
-                                                                    #  ,'./testSingleColor/blueAndLabel.jpg'
+                                                                     ,'./testSingleColor/blueAndLabel.jpg'
                                                                     #  ,'./testSingleColor/redAndLabel.jpg'
-                                                                    #  ,'./testRainbow/rainbowAndLabel.jpg'
+                                                                     ,'./testRainbow/rainbowAndLabel.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
                                                                     #  ,
@@ -154,9 +187,9 @@ if __name__ == '__main__':
                                                                     './testCurry/curryMask.jpg'        
                                                                      ,'./testRiver/riverMask.jpg'
                                                                     #  ,'./testRiver/riverMask.jpg'
+                                                                     ,'./testSingleColor/mask.jpg'
                                                                     #  ,'./testSingleColor/mask.jpg'
-                                                                    #  ,'./testSingleColor/mask.jpg'
-                                                                    #  ,'./testRainbow/rainbowMask.jpg'
+                                                                     ,'./testRainbow/rainbowMask.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
                                                                     #  ,
@@ -175,9 +208,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     conditions = [
-        {'metric': 'lpips', 'iterations': 100},
-        {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.03}, # default 0.01, 0.03, default sigma = 1.5
-        {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.03},
+        # LPIPS conditions
+        # {'metric': 'lpips', 'iterations': 100, 'deltaE': False},
+        {'metric': 'lpips', 'iterations': 30, 'deltaE': True, 'weight': 1}, # 'weight' is the weight on deltaE loss
+        {'metric': 'lpips', 'iterations': 200, 'deltaE': False},
+        {'metric': 'lpips', 'iterations': 30, 'deltaE': True, 'weight': 10},
+        # SSIM conditions
+        # {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.03, 'deltaE': False}, # default 0.01, 0.03, default sigma = 1.5
+        # {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.03, 'deltaE': False},
+        # {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.3, 'deltaE': False}, # default 0.01, 0.03, default sigma = 1.5
+        # {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.3, 'deltaE': False},
         # Add more conditions as needed
     ]
     alpha = 1; beta = 1; gamma = 1 # need to be included into the conditions later
@@ -186,11 +226,16 @@ if __name__ == '__main__':
     for condition in conditions:
         metric = condition['metric']
         iterations = condition['iterations']
-        condition_key = f"{metric}_itr_{iterations}"
+        useDeltaE = condition['deltaE']
+        condition_key = f"{metric}_itr_{iterations}_dE_{useDeltaE}"
+        if 'weight' in condition:
+            weight = condition['weight']
+            condition_key += f"_w_{weight}"
         if 'k1' in condition and 'k2' in condition:
             k1 = condition['k1']
             k2 = condition['k2']
             condition_key += f"_k1_{k1}_k2_{k2}"
+        
 
         results_map[condition_key] = {'losses': [], 'images': []}
 
@@ -206,7 +251,7 @@ if __name__ == '__main__':
         elif metric == 'psnr':
             psnr = PeakSignalNoiseRatio().to(device)
 
-        if args.deltaE:
+        if useDeltaE:
             deltaE_loss = DeltaELoss()
 
         for image_path, imageAndLabel_path, mask_path in zip(args.image_paths, args.imageAndLabel_paths, args.mask_paths):
@@ -300,10 +345,9 @@ if __name__ == '__main__':
                     psnr_loss = psnr(full_img.cuda(), backgroundImgAsTensor.cuda())
                     neg_loss = psnr_loss  # want lower signal-noise ratio -- lower quality
                 
-                weight = 1
-                if args.deltaE:
+                # weight = 1
+                if useDeltaE:
                     # add delta-E to the loss term
-        
                     delta_e = deltaE_loss(labelVar) # want to minimize this average delta_e within the label region
                     neg_loss += delta_e*weight # this *10 here is to give more weight to the delta e loss, but this can change
                     # neg_loss = delta_e
@@ -347,7 +391,7 @@ if __name__ == '__main__':
                         loss = mssim_loss.item()
                     elif metric == 'psnr':
                         loss = psnr_loss.item()
-                    if args.deltaE:
+                    if useDeltaE:
                         print('Final iteration: iter %d, dist %.3g, deltaE %.4g' % (iter, loss, delta_e.item()))
                     else:
                         print('Final iteration: iter %d, dist %.3g' % (iter, loss))
@@ -379,28 +423,24 @@ if __name__ == '__main__':
                     break
         
     # Plotting results for different conditions and input images
-    num_images = len(args.image_paths) #2
-    num_conditions = len(conditions) #3
+    num_images = len(args.image_paths) 
+    num_conditions = len(conditions) 
 
-    fig, axes = plt.subplots(num_conditions, num_images * 2, figsize=(10, 8))
+    fig, axes = plt.subplots(num_conditions, num_images, figsize=(8, 6))
 
     for idx, (condition_key, results) in enumerate(results_map.items()):
-        row = idx // num_images
-        col_start = idx % num_images * 2
+        row = idx
+        col_start = 0
 
         losses = results['losses']
         images = results['images']
 
         for i, (loss, image) in enumerate(zip(losses, images)):
-            col = col_start + i * 2
-            print(row, col)
+            col = col_start + i 
 
             axes[row, col].imshow(image)  # Assuming image is a valid array/image
             axes[row, col].axis('off')
-            axes[row, col].set_title(f'{args.metric} - Loss: {loss:.2f}')
-
-            # You might need to adjust spacing or other configurations here
-            # This example assumes images are numpy arrays or PIL Images
+            axes[row, col].set_title(f'{condition_key} \nLoss: {loss:.2f}', fontsize=6.0)
 
     plt.tight_layout()
     plt.show()
