@@ -141,56 +141,56 @@ if __name__ == '__main__':
     parser.add_argument('--sigma', type=float, default=10, help='Gaussian Blur sigma')
     parser.add_argument('--itr', type=int, default=200, help='Number of iterations')
     parser.add_argument('--image_paths', nargs='+',         default=[
-                                                                     './testSingleColor/blue.jpg'
-                                                                     ,'./testSingleColor/red.jpg'
-                                                                     ,'./testRainbow/rainbow.jpg' 
-                                                                     ,'./testCurry/curry.jpg'          
-                                                                     ,'./testRiver/river.jpg'
-                                                                     #  ,'./testRiver/river_white.jpg'
-                                                                     ,'./testBeach/beach.jpg'
-                                                                    #  ,'./testSingleColor/blueRG.jpg'
+                                                                     './testImages/testSingleColor/blue.jpg'
+                                                                     ,'./testImages/testSingleColor/red.jpg'
+                                                                     ,'./testImages/testRainbow/rainbow.jpg' 
+                                                                     ,'./testImages/testCurry/curry.jpg'          
+                                                                     ,'./testImages/testRiver/river.jpg'
+                                                                     #  ,'./testImages/testRiver/river_white.jpg'
+                                                                     ,'./testImages/testBeach/beach.jpg'
+                                                                    #  ,'./testImages/testSingleColor/blueRG.jpg'
                                                                      ,
-                                                                     './testCluttered/city_black.jpg'
-                                                                     ,'./testCluttered/city_white.jpg'
-                                                                    #  ,'./testCluttered/city_rgb.jpg'
-                                                                     ,'./testCluttered/classroom_white.jpg'
-                                                                    #  ,'./testCluttered/classroom_bw.jpg'
+                                                                     './testImages/testCluttered/city_black.jpg'
+                                                                     ,'./testImages/testCluttered/city_white.jpg'
+                                                                    #  ,'./testImages/testCluttered/city_rgb.jpg'
+                                                                     ,'./testImages/testCluttered/classroom_white.jpg'
+                                                                    #  ,'./testImages/testCluttered/classroom_bw.jpg'
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
-                                                                    './testSingleColor/blueAndLabel.jpg'
-                                                                     ,'./testSingleColor/redAndLabel.jpg'
-                                                                     ,'./testRainbow/rainbowAndLabel.jpg'
-                                                                     ,'./testCurry/curryAndLabel_white.jpg'
-                                                                     ,'./testRiver/riverAndLabel.jpg'
-                                                                    #  ,'./testRiver/riverAndLabel_white.jpg'
-                                                                     ,'./testBeach/beachAndLabel_purple.jpg'
-                                                                    #  ,'./testSingleColor/blueAndRGLabel.jpg'
+                                                                    './testImages/testSingleColor/blueAndLabel.jpg'
+                                                                     ,'./testImages/testSingleColor/redAndLabel.jpg'
+                                                                     ,'./testImages/testRainbow/rainbowAndLabel.jpg'
+                                                                     ,'./testImages/testCurry/curryAndLabel_white.jpg'
+                                                                     ,'./testImages/testRiver/riverAndLabel.jpg'
+                                                                    #  ,'./testImages/testRiver/riverAndLabel_white.jpg'
+                                                                     ,'./testImages/testBeach/beachAndLabel_purple.jpg'
+                                                                    #  ,'./testImages/testSingleColor/blueAndRGLabel.jpg'
                                                                     
                                                                      ,
-                                                                     './testCluttered/cityAndLabel_black.jpg'
-                                                                     ,'./testCluttered/cityAndLabel_white.jpg'
-                                                                    #  ,'./testCluttered/cityAndLabel_rgb.jpg'
-                                                                     ,'./testCluttered/classroomAndLabel_white.jpg'
-                                                                    #  ,'./testCluttered/classroomAndLabel_bw.jpg'
+                                                                     './testImages/testCluttered/cityAndLabel_black.jpg'
+                                                                     ,'./testImages/testCluttered/cityAndLabel_white.jpg'
+                                                                    #  ,'./testImages/testCluttered/cityAndLabel_rgb.jpg'
+                                                                     ,'./testImages/testCluttered/classroomAndLabel_white.jpg'
+                                                                    #  ,'./testImages/testCluttered/classroomAndLabel_bw.jpg'
                                                                     ], 
                                                                      help='Paths to input images with labels')
     parser.add_argument('--mask_paths', nargs='+',          default=[
-                                                                    './testSingleColor/mask.jpg'
-                                                                     ,'./testSingleColor/mask.jpg'
-                                                                     ,'./testRainbow/rainbowMask.jpg'
-                                                                     ,'./testCurry/curryMask.jpg'        
-                                                                     ,'./testRiver/riverMask.jpg'
-                                                                    #  ,'./testRiver/riverMask.jpg'
-                                                                      ,'./testBeach/beachMask.jpg'
-                                                                    #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
+                                                                    './testImages/testSingleColor/mask.jpg'
+                                                                     ,'./testImages/testSingleColor/mask.jpg'
+                                                                     ,'./testImages/testRainbow/rainbowMask.jpg'
+                                                                     ,'./testImages/testCurry/curryMask.jpg'        
+                                                                     ,'./testImages/testRiver/riverMask.jpg'
+                                                                    #  ,'./testImages/testRiver/riverMask.jpg'
+                                                                      ,'./testImages/testBeach/beachMask.jpg'
+                                                                    #  ,'./testImages/testSingleColor/blueAndRGLabelMask.jpg'
                                                                    
                                                                      ,
-                                                                     './testCluttered/cityMask.jpg'
-                                                                     ,'./testCluttered/cityMask.jpg'
-                                                                    #  ,'./testCluttered/cityMask.jpg'
-                                                                     ,'./testCluttered/classroomMask.jpg'
-                                                                    #  ,'./testCluttered/classroomMask.jpg'
+                                                                     './testImages/testCluttered/cityMask.jpg'
+                                                                     ,'./testImages/testCluttered/cityMask.jpg'
+                                                                    #  ,'./testImages/testCluttered/cityMask.jpg'
+                                                                     ,'./testImages/testCluttered/classroomMask.jpg'
+                                                                    #  ,'./testImages/testCluttered/classroomMask.jpg'
                                                                     ], 
                                                                      help='Paths to masks for input images')
     parser.add_argument('--blur',  default=False, help='Apply blur to background')
@@ -201,20 +201,38 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     conditions = [
-        # LPIPS conditions
-        {'metric': 'lpips', 'iterations': 50, 'deltaE': False},
-        {'metric': 'lpips', 'iterations': 200, 'deltaE': False},
-        {'metric': 'lpips', 'iterations': 50, 'deltaE': True, 'weight': 1}, # 'weight' is the weight on deltaE loss
-        {'metric': 'lpips', 'iterations': 50, 'deltaE': True, 'weight': 5},
-        # SSIM conditions
+        # # ----LPIPS condition set 1: change #iterations and deltaE------
+        # {'metric': 'lpips', 'iterations': 50, 'deltaE': False},
+        # {'metric': 'lpips', 'iterations': 200, 'deltaE': False},
+        # {'metric': 'lpips', 'iterations': 200, 'deltaE': True, 'weight': 1}, # 'weight' is the weight on deltaE loss
+        # {'metric': 'lpips', 'iterations': 200, 'deltaE': True, 'weight': 5},
+        # # ----LPIPS condition set 2: with and without initial label color----
+        # {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': True}, # 'ini_color'=True -> has initial label color
+        # {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': False},
+        # {'metric': 'lpips', 'iterations': 1000, 'deltaE': False, 'init_color': False},
+        # # ----SSIM condition set 1: change k1, k2----
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.03, 'deltaE': False}, # default 0.01, 0.03, default sigma = 1.5
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.03, 'deltaE': False},
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.3, 'deltaE': False}, # default 0.01, 0.03, default sigma = 1.5
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.3, 'deltaE': False},
+        # # ----SSIM condition set 2: change alpha, beta, gamma----
+        # {'metric': 'ssim', 'iterations': 100, 'alpha': 1, 'beta': 1, 'gamma': 1, 'deltaE': False}, # default 1, 1, 1
+        # {'metric': 'ssim', 'iterations': 100, 'alpha': 1, 'beta': 10, 'gamma': 1, 'deltaE': False},
+        # {'metric': 'ssim', 'iterations': 100, 'alpha': 1, 'beta': 1, 'gamma': 10, 'deltaE': False},
+        # {'metric': 'ssim', 'iterations': 100, 'alpha': 10, 'beta': 1, 'gamma': 10, 'deltaE': False},
+        # #----SSIM condition set 3: with or withour deltaE, and with mssim----
+        {'metric': 'ssim', 'iterations': 100, 'deltaE': False},
+        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 0.1},
+        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
+        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 5},
+        {'metric': 'mssim', 'iterations': 100, 'deltaE': False}, 
+        {'metric': 'mssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
         # Add more conditions as needed
     ]
-    alpha = 1; beta = 1; gamma = 1 # need to be included into the conditions later
-            
+    k1 = 0.01; k2 = 0.03 # default values
+    alpha = 1; beta = 1; gamma = 1 
+    init_color = True # default is to use the color designated by the backgroundAndLabel image
+    useDeltaE = False # default to not use DeltaE
     results_map = {}
     for condition in conditions:
         metric = condition['metric']
@@ -228,7 +246,18 @@ if __name__ == '__main__':
             k1 = condition['k1']
             k2 = condition['k2']
             condition_key += f"_k1_{k1}_k2_{k2}"
+        if 'alpha' in condition:
+            alpha = condition['alpha']
+            beta = condition['beta']
+            gamma = condition['gamma']
+            condition_key += f"_a_{alpha}_b_{beta}_c_{gamma}"
+        if 'init_color' in condition:
+            init_color = condition['init_color'] # Set to True or False
+            condition_key += f"_initLabelColor_{init_color}"
         
+        results_map['Initial Images'] =  {'losses': [], 'images': []}
+        for imageAndLabel_path in args.imageAndLabel_paths:
+            results_map['Initial Images']['images'].append(np.array(Image.open(imageAndLabel_path)))
 
         results_map[condition_key] = {'losses': [], 'images': []}
 
@@ -271,7 +300,10 @@ if __name__ == '__main__':
             numLabelPixels = labelMaskAsTensor[0,0].sum().item() # number of label pixels
 
             # Flatten image and mask to apply the mask
-            imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+            if init_color: # if use the initial color designated by backgroundAndLabelImg
+                imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+            else: # if use the background pixels as original label color
+                imageFlat = backgroundImgAsTensor.view(1,3,-1) #[1,3,numPixels]
             # print("shape of imageFlat:", imageFlat.size())
             maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
@@ -417,9 +449,9 @@ if __name__ == '__main__':
         
     # Plotting results for different conditions and input images
     num_images = len(args.image_paths) 
-    num_conditions = len(conditions) 
+    num_conditions = len(conditions) + 1
 
-    fig, axes = plt.subplots(num_conditions, num_images, figsize=(8, 6))
+    fig, axes = plt.subplots(num_conditions, num_images, figsize=(10, 6))
 
     for idx, (condition_key, results) in enumerate(results_map.items()):
         row = idx
@@ -428,15 +460,22 @@ if __name__ == '__main__':
         losses = results['losses']
         images = results['images']
 
-        for i, (loss, image) in enumerate(zip(losses, images)):
-            col = col_start + i 
+        if idx == 0:
+            for i, image in enumerate(images):
+                col = col_start + i 
+                axes[row, col].imshow(image)  # Assuming image is a valid array/image
+                axes[row, col].axis('off')
+                axes[row, col].set_title(f'Initial Image', fontsize=4.0)
+        else:
+            for i, (loss, image) in enumerate(zip(losses, images)):
+                col = col_start + i 
 
-            axes[row, col].imshow(image)  # Assuming image is a valid array/image
-            axes[row, col].axis('off')
-            axes[row, col].set_title(f'{condition_key} \nLoss: {loss:.2f}', fontsize=4.0)
+                axes[row, col].imshow(image)  # Assuming image is a valid array/image
+                axes[row, col].axis('off')
+                axes[row, col].set_title(f'{condition_key} \nLoss: {loss:.2f}', fontsize=3.0)
 
     plt.tight_layout()
-    plt.savefig('./test20231210/plot_LPIPS', dpi=1200)
+    plt.savefig('./testResults/test20231210/plot_SSIM_3', dpi=2000)
     plt.show()
 
     
