@@ -206,10 +206,10 @@ if __name__ == '__main__':
         # {'metric': 'lpips', 'iterations': 200, 'deltaE': False},
         # {'metric': 'lpips', 'iterations': 200, 'deltaE': True, 'weight': 1}, # 'weight' is the weight on deltaE loss
         # {'metric': 'lpips', 'iterations': 200, 'deltaE': True, 'weight': 5},
-        # # ----LPIPS condition set 2: with and without initial label color----
-        # {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': True}, # 'ini_color'=True -> has initial label color
-        # {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': False},
-        # {'metric': 'lpips', 'iterations': 1000, 'deltaE': False, 'init_color': False},
+        # ----LPIPS condition set 2: with and without initial label color----
+        {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': True}, # 'ini_color'=True -> has initial label color
+        {'metric': 'lpips', 'iterations': 200, 'deltaE': False, 'init_color': False},
+        {'metric': 'lpips', 'iterations': 1000, 'deltaE': False, 'init_color': False},
         # # ----SSIM condition set 1: change k1, k2----
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.01, 'k2': 0.03, 'deltaE': False}, # default 0.01, 0.03, default sigma = 1.5
         # {'metric': 'ssim', 'iterations': 100, 'k1': 0.3, 'k2': 0.03, 'deltaE': False},
@@ -220,13 +220,13 @@ if __name__ == '__main__':
         # {'metric': 'ssim', 'iterations': 100, 'alpha': 1, 'beta': 10, 'gamma': 1, 'deltaE': False},
         # {'metric': 'ssim', 'iterations': 100, 'alpha': 1, 'beta': 1, 'gamma': 10, 'deltaE': False},
         # {'metric': 'ssim', 'iterations': 100, 'alpha': 10, 'beta': 1, 'gamma': 10, 'deltaE': False},
-        # #----SSIM condition set 3: with or withour deltaE, and with mssim----
-        {'metric': 'ssim', 'iterations': 100, 'deltaE': False},
-        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 0.1},
-        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
-        {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 5},
-        {'metric': 'mssim', 'iterations': 100, 'deltaE': False}, 
-        {'metric': 'mssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
+        # # #----SSIM condition set 3: with or without deltaE, and with mssim----
+        # {'metric': 'ssim', 'iterations': 100, 'deltaE': False},
+        # {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 0.1},
+        # {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
+        # {'metric': 'ssim', 'iterations': 100, 'deltaE': True, 'weight': 5},
+        # {'metric': 'mssim', 'iterations': 100, 'deltaE': False}, 
+        # {'metric': 'mssim', 'iterations': 100, 'deltaE': True, 'weight': 1},
         # Add more conditions as needed
     ]
     k1 = 0.01; k2 = 0.03 # default values
@@ -475,7 +475,7 @@ if __name__ == '__main__':
                 axes[row, col].set_title(f'{condition_key} \nLoss: {loss:.2f}', fontsize=3.0)
 
     plt.tight_layout()
-    plt.savefig('./testResults/test20231210/plot_SSIM_3', dpi=2000)
+    plt.savefig('./testResults/test20231210/plot_LPIPS_2', dpi=2000)
     plt.show()
 
     
