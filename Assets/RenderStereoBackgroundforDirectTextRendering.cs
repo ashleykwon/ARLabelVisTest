@@ -86,8 +86,11 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
 
         yield return frameEnd;
-        screenshotForSum.ReadPixels(ScreenshotCamera.pixelRect, 0, 0);
+       
+        Rect regionToReadFrom = new Rect(0, 0, w-1, h-1);
+        screenshotForSum.ReadPixels(regionToReadFrom, 0, 0); //ScreenshotCamera.pixelRect
 
+        Debug.Log("pixel read");
         // Update_getSum();
 
         // int[] bk_sum = {0,0,0,0};
@@ -148,33 +151,6 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         RenderTexture.active = null;
 
     }
-
-    // IEnumerator PostScreenshot(RenderTexture screenshot) {
-    //     // time += Time.deltaTime*1;
-
-    //     // while (time > timeLimit)
-    //     // {
-    //         // var tempRend = RenderTexture.GetTemporary(screenshot.width, screenshot.height);
-    //         // Graphics.Blit(screenshot, tempRend);
-    //         Texture2D tempText = new Texture2D(screenshot.width, screenshot.height, TextureFormat.RGBA32, false);
-    //         Rect rect = new Rect(0, 0, screenshot.width, screenshot.height);
-
-    //         yield return new WaitForEndOfFrame();
-
-    //         tempText.ReadPixels(rect, 0, 0, false);
-    //         tempText.Apply();
-    //         tempText.Compress(false);
-    //         RenderTexture.ReleaseTemporary(tempRend);
-    //         byte[] bytes = tempText.EncodeToJPG();
-            
-    //         string img_base64 = Convert.ToBase64String(bytes);
-
-
-            
-    //     //     time = 0;
-    //     // }
-    // }
-
 
     private void SetUp_getSum(){
         kernelID_main = cShader.FindKernel("CSMain");
