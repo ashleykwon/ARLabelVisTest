@@ -1,0 +1,32 @@
+-----------rainbow_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.679
+iter 100, dist  9.77e-06
+iter 199, dist  9.77e-06
+-----------curry_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  4.69
+iter 100, dist  0.0139
+iter 199, dist  0.0139
+-----------river_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.584
+iter 100, dist  2.73e-05
+iter 199, dist  2.73e-05
+-----------blue_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  47.5
+iter 100, dist  0.00679
+iter 199, dist  0.00679
+-----------red_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  47.5
+iter 100, dist  0.00679
+iter 199, dist  0.00679
+-----------beach_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  1.75
+iter 100, dist  6.27e-05
+iter 199, dist  6.27e-05
+-----------city_black_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  2.16
+iter 100, dist  0.000104
+iter 199, dist  0.000104
+-----------classroom_white_unblurredBG_itr200_lr0.08---------------
+iter 0, dist  0.504
+iter 100, dist  0.000716
+iter 199, dist  0.000716
