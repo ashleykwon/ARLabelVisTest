@@ -1,0 +1,8 @@
+itr_n : generated using n iterations
+dE_True / dE_False: generated with / without delta E loss
+If dE_True, w_n specifies the weight assigned to delta E loss: 
+total_loss = (metric loss) + n*(delta E loss)
+
+For SSIM experiments:
+Parameters are: k1, k2, alpha (a), beta (b), gamma (c)
+The number following the parameter is the value of that parameter.
