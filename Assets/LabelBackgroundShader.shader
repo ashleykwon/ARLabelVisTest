@@ -36,8 +36,7 @@ Shader "Unlit/LabelBackgroundShader"
 
                 v2f o;
                 o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz; 
-                // * half3(1,-1,1); // mirror so cubemap projects as expected
+                o.uv = v.vertex.xyz * half3(1,-1,1); // mirror so cubemap projects as expected
 
                 return o;
             }
@@ -46,12 +45,7 @@ Shader "Unlit/LabelBackgroundShader"
             {
                 // sample the texture
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                if (col[0] != 0){
-                    col = float4(1, 1, 1, 1);
-                }
-                else{
-                    col = float4(0, 0, 0, 0);
-                }
+                col = float4(0, 0, 0, 0);
                 // apply fog
                 //UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

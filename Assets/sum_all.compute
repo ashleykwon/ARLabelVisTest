@@ -1,0 +1,50 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel CSInit
+
+RWStructuredBuffer<int> _SumBuffer;
+Texture2D<float4> InputImage;
+TextureCube<float4> InputCubeMap;
+SamplerState _LinearClamp;
+
+
+[numthreads(1,1,1)]
+void CSInit (uint3 id : SV_DispatchThreadID)
+{
+    _SumBuffer[0] = 0;
+    _SumBuffer[1] = 0;
+    _SumBuffer[2] = 0;
+    _SumBuffer[3] = 0;
+
+    return;
+
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    //label sample
+    float3 label_sample = InputImage[id.xy];
+
+    //background sample
+    float3 resolution = float3(256,256,256);  //cubemap resolution
+    float3 pixel = float3(id.x, id.y, id.z);  //pixel coordinates
+    float3 uv = pixel / resolution;  //normalized uv coordinates
+    float4 background_sample = InputCubeMap.SampleLevel(_LinearClamp,uv,0);
+
+    //method 1: summ the background
+    //_SumBuffer[0]: total pixels, _SumBuffer[1]:red, _SumBuffer[2]:green, _SumBuffer[3]:blue
+    InterlockedAdd(_SumBuffer[0],1);
+    InterlockedAdd(_SumBuffer[1],background_sample.r);
+    InterlockedAdd(_SumBuffer[2],background_sample.g);
+    InterlockedAdd(_SumBuffer[3],background_sample.b);
+
+    //method 2: sum all the letters
+    //_SumBuffer[0]: total pixels, _SumBuffer[1]:red, _SumBuffer[2]:green, _SumBuffer[3]:blue
+    // InterlockedAdd(_SumBuffer[1],label_sample.r);
+    // InterlockedAdd(_SumBuffer[2],label_sample.g);
+    // InterlockedAdd(_SumBuffer[3],label_sample.b);
+
+    return;
+
+}
