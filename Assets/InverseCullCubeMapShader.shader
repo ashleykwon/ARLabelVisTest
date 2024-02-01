@@ -31,6 +31,8 @@ Shader "Unlit/InverseCullCubeMapShader"
         _Background_sum_g("Background_sum_g", Range(0,1)) = 0.1
         _Background_sum_b("Background_sum_b", Range(0,1)) = 0.1
 
+        _OpacityLevel("Label opacity level", Range(0, 1)) = 1
+
     }
     SubShader
     {
@@ -84,6 +86,8 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _BillboardLightnessContrastThreshold;
 
             int _GranularityMethod;
+
+            float _OpacityLevel;
 
             //rotation matrix - a buffer with 16 floats
             StructuredBuffer<float> rotation_matrix;
@@ -578,8 +582,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                     // //Label color and outline assignment
                     if (labelTex[3] != 0) // is a label pixel
                     {
-                        
-                        
                             //this is a sampled pixel
                             if(isSample < _sampled_prob){
                                 col = function_f(_ColorMethod, bgSample);
@@ -621,6 +623,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                                     //if we are so unlucky that no sample presents in the neighborhood
                                 col = function_f(_ColorMethod, bgSample);
                                 }
+
+                                // set the opacity level
+                                col[3] = _OpacityLevel;
                             }
                     
                         // Apply outline if selected
@@ -666,9 +671,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                             
                             if(edges != 0){ //Outline the edges
                                 if (col.r + col.g + col.b < 0.5){
-                                    col = float4(1, 1, 1, 1); // White outline if low grayscale value
+                                    col = float4(1, 1, 1, _OpacityLevel); // White outline if low grayscale value
                                 }else{
-                                col = float4(0, 0, 0, 1); // black outline if high grayscale value
+                                col = float4(0, 0, 0, _OpacityLevel); // black outline if high grayscale value
                                 } 
                             }
                         }
@@ -677,31 +682,32 @@ Shader "Unlit/InverseCullCubeMapShader"
                 
 
                 // Render billboard if _BillboardColorMethod != 0
-                if (billboardTex[3] != 0)
-                {
-                    if (_BillboardColorMethod == 1) // blue billboard
-                    {
-                        col = float4(0,0,1,1);
-                    }
-                    else if (_BillboardColorMethod == 2) // referenced from the paper by Grasset et al.
-                    {
-                        float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
+                // if (billboardTex[3] != 0)
+                // {
+                //     if (_BillboardColorMethod == 1) // blue billboard
+                //     {
+                //         col = float4(0,0,1,1);
+                //     }
+                //     else if (_BillboardColorMethod == 2) // referenced from the paper by Grasset et al.
+                //     {
+                //         float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
                         
-                        float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10         
-                        float4 billboardHSL = RGB2HSL(defaultBillboardColor);
-                        float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
-                        if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
-                        {
-                            billboardHSL[2] = 1 - backgroundHSL[2];
-                            col = HSL2RGB(billboardHSL);
-                        }
-                    }
-                }
+                //         float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10         
+                //         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
+                //         float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
+                //         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
+                //         {
+                //             billboardHSL[2] = 1 - backgroundHSL[2];
+                //             col = HSL2RGB(billboardHSL);
+                //         }
+                //     }
+                // }
 
                 // Render billboard and label color mode
                 if (modeTex[3] != 0)
                 {
-                    col = float4(1,0,1,1);
+                    col[0] = 1.0;
+                    col[2] = 1.0;
                 }
 
                 // Apply shadow if selected // needs to be debugged.

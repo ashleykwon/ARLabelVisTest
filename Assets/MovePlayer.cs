@@ -14,28 +14,30 @@ public class MovePlayer : MonoBehaviour
     public TMP_Text billboardColorMode;
     public TMP_Text granularitymode;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
-    int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
+    // int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
     // int shadowIntensityIdx;
     public int currentLabelMovementMode;
     //public Vector3 DefaultLabelPosition;
+    public float CurrentOpacityLevel;
     Material labelSphereMaterial; // Doesn't need to be specified at Start
     string[] labelColorModesList;
     string[] billboardColorModesList;
     string[] granularityModesList;
-    
-
+    float[] opacityLevelList;
 
     // Start is called before the first frame update
     void Start()
     {
         CurrentColorAssignmentAlgo = 1;
-        CurrentBillboardColorAssignmentAlgo = 0;
+        // CurrentBillboardColorAssignmentAlgo = 0;
         // shadowIntensityIdx = 0;
         currentLabelMovementMode = 0;
+        CurrentOpacityLevel = 1.0f;
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
         labelColorModesList = new string[] {"Palette", "RGBA reversed", "HSV-based", "CIELAB-based"};
         billboardColorModesList = new string[] {"None", "Blue", "HSV-based"};
         granularityModesList = new string[] {"Per-pixel", "Background"};
+
     }
 
 
@@ -76,13 +78,18 @@ public class MovePlayer : MonoBehaviour
         if (YButtonPressed) // Change billboard color assignment on right trigger 
         {
             Debug.Log("Y button pressed");
-            CurrentBillboardColorAssignmentAlgo += 1;
-            if (CurrentBillboardColorAssignmentAlgo > 2)
-            {
-                CurrentBillboardColorAssignmentAlgo = 0;
+            // CurrentBillboardColorAssignmentAlgo += 1;
+            // if (CurrentBillboardColorAssignmentAlgo > 2)
+            // {
+            //     CurrentBillboardColorAssignmentAlgo = 0;
+            // }
+            // billboardColorMode.text = "Billboard Color: " +  billboardColorModesList[CurrentBillboardColorAssignmentAlgo];
+            // labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
+            CurrentOpacityLevel += 1;
+            if (CurrentOpacityLevel > 5.0){
+                CurrentOpacityLevel = 1.0f;
             }
-            billboardColorMode.text = "Billboard Color: " +  billboardColorModesList[CurrentBillboardColorAssignmentAlgo];
-            labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
+            labelSphereMaterial.SetFloat("_OpacityLevel", CurrentOpacityLevel/5.0f);
         }
 
         if (AButtonPressed) // Toggle outline
