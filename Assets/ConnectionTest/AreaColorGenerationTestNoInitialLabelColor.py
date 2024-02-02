@@ -1,5 +1,5 @@
 # Experiments with area labels
-# This file uses an assigned original label color (in most cases white)
+# This file uses original background color as label color, i.e., do not assign a color to the label from the beginning
 # Library imports
 import torch
 import io, json
@@ -130,8 +130,7 @@ if __name__ == '__main__':
                                                                     ], 
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
-                                                                    # './testImages/testCurry/curryAndLabel_white.jpg'
-                                                                    './testImages/testFruit/fruitAndWhiteArea.jpg' 
+                                                                    './testImages/testCurry/curryAndLabel_white.jpg'
                                                                     #  ,'./testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
                                                                     #  ,'./testSingleColor/blueAndLabel.jpg'
@@ -225,8 +224,7 @@ if __name__ == '__main__':
         numLabelPixels = labelMaskAsTensor[0,0].sum().item() # number of label pixels
 
         # Flatten image and mask to apply the mask
-        backgroundFlat = backgroundImgAsTensor.view(1,3,-1)
-        imageFlat = backgroundAndLabelImgAsTensor.view(1,3,-1) #[1,3,numPixels]
+        imageFlat = backgroundImgAsTensor.view(1,3,-1) #[1,3,numPixels]
         # print("shape of imageFlat:", imageFlat.size())
         maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
@@ -371,13 +369,13 @@ if __name__ == '__main__':
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240201_noInitialColor/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
-                        # output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults/test20240201_noInitialColor/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        # output_path = f"./test20231204/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults/test20240201_noInitialColor/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
