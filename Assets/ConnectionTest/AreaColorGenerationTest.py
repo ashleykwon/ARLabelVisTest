@@ -123,7 +123,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beach.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/city_black.jpg'
-                                                                    #  './testCluttered/city_white.jpg'
+                                                                     ,'./testImages/testCluttered/city_building.jpg'
+                                                                     ,'./testImages/testCluttered/city_board.jpg'
                                                                     #  ,'./testCluttered/city_rgb.jpg'
                                                                     #  ,'./testCluttered/classroom_white.jpg'
                                                                     #  ,'./testCluttered/classroom_bw.jpg'
@@ -141,7 +142,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/cityAndLabel_black.jpg'
-                                                                    #  './testCluttered/cityAndLabel_white.jpg'
+                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_building.jpg'
+                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_board.jpg'
                                                                     #  ,'./testCluttered/cityAndLabel_rgb.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_white.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_bw.jpg'
@@ -158,7 +160,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
                                                                     #  ,
-                                                                    #  './testCluttered/cityMask.jpg'
+                                                                    ,'./testImages/testCluttered/cityAreaMask_building.jpg'
+                                                                    ,'./testImages/testCluttered/cityAreaMask_board.jpg'
                                                                     #  './testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/classroomMask.jpg'
