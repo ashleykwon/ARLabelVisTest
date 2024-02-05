@@ -1,0 +1,9 @@
+-----------fruit_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.757
+iter 99, dist  0.737
+-----------city_building_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.919
+iter 99, dist  0.909
+-----------city_board_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.993
+iter 99, dist  0.993

@@ -175,7 +175,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
-    k1 = 0.01 ; k2 = 0.03 # default 0.01, 0.03
+    k1 = 0.01 ; k2 = 0.8 # default 0.01, 0.03
     alpha = 1; beta = 1; gamma = 1
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
