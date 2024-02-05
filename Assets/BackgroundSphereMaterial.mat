@@ -82,9 +82,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Background_sum_b: 0.3177885
-    - _Background_sum_g: 0.3869865
-    - _Background_sum_r: 0.43297252
+    - _Background_sum_b: 0
+    - _Background_sum_g: 0
+    - _Background_sum_r: 0
     - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
@@ -97,12 +97,12 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GranularityMethod: 1
+    - _GranularityMethod: 0
     - _LabelRotationMatrix: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OpacityLevel: 0.57
+    - _OpacityLevel: 1
     - _Parallax: 0.02
     - _SampleBoost: 0
     - _SampleKernelSize: 87.3

@@ -562,7 +562,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float isSample = hash(sample_x, sample_y, offset);
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
-                if (_GranularityMethod == 1)
+                if (_GranularityMethod != 0)
                 {
                     bgSample = float4(_Background_sum_r, _Background_sum_g, _Background_sum_b,1);
                 }

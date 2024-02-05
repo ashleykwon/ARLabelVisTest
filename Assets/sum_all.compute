@@ -32,7 +32,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float3 uv = pixel / resolution;  //normalized uv coordinates
     float4 background_sample = InputCubeMap.SampleLevel(_LinearClamp,uv,0);
 
-    //method 1: summ the background
+    //method 1: sum the background
     //_SumBuffer[0]: total pixels, _SumBuffer[1]:red, _SumBuffer[2]:green, _SumBuffer[3]:blue
     InterlockedAdd(_SumBuffer[0],1);
     InterlockedAdd(_SumBuffer[1],background_sample.r);
