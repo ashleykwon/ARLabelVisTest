@@ -175,7 +175,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
-    k1 = 0.01 ; k2 = 0.8 # default 0.01, 0.03
+    k1 = 0.01 ; k2 = 0.03 # default 0.01, 0.03
     alpha = 1; beta = 1; gamma = 1
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -234,9 +234,9 @@ if __name__ == '__main__':
         maskFlat = labelMaskAsTensor.view(1,3,-1) #[1,3,numPixels]
 
         # Separate background and label pixels
-        labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
+        # labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
-        # labelFlat2.fill_(-1.0) # fill with all black values
+        labelFlat2[:, 2, :].fill_(1.0) # fill with blue initial color
 
         # Set them to torch variables for back-propagation
         labelVar = Variable(labelFlat2, requires_grad=True) # now labelVar size is [1,3,numLabelPixels]
@@ -373,14 +373,12 @@ if __name__ == '__main__':
                 # Save the final result
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
-                if args.blur:
-                    output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                
+                if args.metric == 'ssim':
+                    # output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240207_initialBlue/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    if args.metric == 'ssim':
-                        # output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                        output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                    else:
-                        output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240207_initialBlue/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
