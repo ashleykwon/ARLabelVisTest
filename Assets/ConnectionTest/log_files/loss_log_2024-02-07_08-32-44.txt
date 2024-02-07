@@ -1,0 +1,3 @@
+-----------fruit_unblurredBG_itr100_lr0.08---------------
+iter 0, dist  0.819
+iter 99, dist  0.716

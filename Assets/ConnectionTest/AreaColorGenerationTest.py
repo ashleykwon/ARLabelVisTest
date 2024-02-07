@@ -123,8 +123,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beach.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/city_black.jpg'
-                                                                     ,'./testImages/testCluttered/city_building.jpg'
-                                                                     ,'./testImages/testCluttered/city_board.jpg'
+                                                                    #  ,'./testImages/testCluttered/city_building.jpg'
+                                                                    #  ,'./testImages/testCluttered/city_board.jpg'
                                                                     #  ,'./testCluttered/city_rgb.jpg'
                                                                     #  ,'./testCluttered/classroom_white.jpg'
                                                                     #  ,'./testCluttered/classroom_bw.jpg'
@@ -132,7 +132,7 @@ if __name__ == '__main__':
                                                                      help='Paths to input images')
     parser.add_argument('--imageAndLabel_paths', nargs='+', default=[
                                                                     # './testImages/testCurry/curryAndLabel_white.jpg'
-                                                                    './testImages/testFruit/fruitAndWhiteArea.jpg' 
+                                                                    './testImages/testFruit/fruitAndBlueArea.jpg' 
                                                                     #  ,'./testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
                                                                     #  ,'./testSingleColor/blueAndLabel.jpg'
@@ -142,8 +142,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/cityAndLabel_black.jpg'
-                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_building.jpg'
-                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_board.jpg'
+                                                                    #  ,'./testImages/testCluttered/cityAndWhiteArea_building.jpg'
+                                                                    #  ,'./testImages/testCluttered/cityAndWhiteArea_board.jpg'
                                                                     #  ,'./testCluttered/cityAndLabel_rgb.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_white.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_bw.jpg'
@@ -160,8 +160,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
                                                                     #  ,
-                                                                    ,'./testImages/testCluttered/cityAreaMask_building.jpg'
-                                                                    ,'./testImages/testCluttered/cityAreaMask_board.jpg'
+                                                                    # ,'./testImages/testCluttered/cityAreaMask_building.jpg'
+                                                                    # ,'./testImages/testCluttered/cityAreaMask_board.jpg'
                                                                     #  './testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/classroomMask.jpg'
