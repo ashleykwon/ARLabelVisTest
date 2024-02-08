@@ -37,6 +37,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         RenderTexture.active = rTex;
         screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
         screenshot.Apply();
+        // RenderTexture.active = null;
     }
 
     // Start is called before the first frame update
@@ -134,10 +135,10 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             b = b/numSampledPixels;
         }
       
-        byte[] bytes = labelScreenshotForSum.EncodeToPNG();
 
-        // For testing purposes, also write to a file in the project folder
-        File.WriteAllBytes(Application.dataPath + "/../DebuggingScreenshot_" + numSampledPixels + ".png", bytes);
+        // Save images for debugging purposes only
+        // byte[] bytes = labelScreenshotForSum.EncodeToPNG();
+        // File.WriteAllBytes(Application.dataPath + "/../DebuggingScreenshot_" + numSampledPixels + ".png", bytes);
         
         // Derive the average pixel value
         // if (granularityMethod == 1){ // area-bsed

@@ -521,22 +521,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         finalPixVal = float4(1,1,1,1);
                     }
                 }
-                else if (componentIdx == 1) //should be a billboard
-                {
-                    if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 1 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
-                    {
-                        finalPixVal = float4(0,0,0,0);
-                    }
-                    else if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] != 0)
-                    { 
-                        finalPixVal = float4(0,0,1,1); // should fill in the shadow part
-                    }
-                    else if (nonBackgroundPixVal[0] == 0 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
-                    {
-                        finalPixVal = float4(0,0,1,1);
-                    }
-                }
-                else if (componentIdx == 2) // should be a shadow
+                else
                 {
                     if (nonBackgroundPixVal[0] == 1 && nonBackgroundPixVal[1] == 0 && nonBackgroundPixVal[2] == 1 && nonBackgroundPixVal[3] == 1)
                     {

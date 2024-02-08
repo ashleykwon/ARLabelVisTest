@@ -82,13 +82,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Background_sum_b: 0.2793754
-    - _Background_sum_g: 0.4247641
-    - _Background_sum_r: 0.3783951
+    - _Background_sum_b: 0.2708842
+    - _Background_sum_g: 0.41331857
+    - _Background_sum_r: 0.35542
     - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
-    - _ColorMethod: 3
+    - _ColorMethod: 2
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0

@@ -36,7 +36,7 @@ public class MovePlayer : MonoBehaviour
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
         labelColorModesList = new string[] {"Palette", "RGBA reversed", "HSV-based", "CIELAB-based"};
         billboardColorModesList = new string[] {"None", "Blue", "HSV-based"};
-        granularityModesList = new string[] {"Per-pixel", "Background"};
+        granularityModesList = new string[] {"Per-pixel", "Per-area", "Background"};
 
     }
 
@@ -109,17 +109,13 @@ public class MovePlayer : MonoBehaviour
         if (joystickPressed) // Change granularity
         {
             int currentInt = labelSphereMaterial.GetInt("_GranularityMethod");
-            if (currentInt == 1)
+            currentInt += 1;
+            if (currentInt > 2) 
             {
-                labelSphereMaterial.SetInt("_GranularityMethod", 0);
-                granularitymode.text = "Granularity Mode: "  + granularityModesList[0];
+                currentInt = 0;
             }
-            else
-            {
-                labelSphereMaterial.SetInt("_GranularityMethod", 1);
-                granularitymode.text = "Granularity Mode: "  + granularityModesList[1];
-            }
-            
+            labelSphereMaterial.SetInt("_GranularityMethod", currentInt);
+            granularitymode.text = "Granularity Mode: "  + granularityModesList[currentInt];
         }
 
         if (rightJoystickPressed)

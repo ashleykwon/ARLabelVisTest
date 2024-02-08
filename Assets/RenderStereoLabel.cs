@@ -13,17 +13,17 @@ public class RenderStereoLabel : MonoBehaviour
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture labelRenderTexture;
-    Quaternion initialRotation;
-    Matrix4x4 m;
+    // Quaternion initialRotation;
+    // Matrix4x4 m;
 
     public Shader surface_shader;
     //public Cubemap backgroundCubeMap; 
-    private ComputeBuffer rotation_matrix_buffer;
+    // private ComputeBuffer rotation_matrix_buffer;
 
-    public ComputeShader cShader;
-    private ComputeBuffer sumBuffer;
-    private int kernelID_main;
-    private int kernelID_init;
+    // public ComputeShader cShader;
+    // private ComputeBuffer sumBuffer;
+    // private int kernelID_main;
+    // private int kernelID_init;
   
     //sum a character
     private TMP_Text m_TextComponent;
@@ -61,16 +61,16 @@ public class RenderStereoLabel : MonoBehaviour
 
         LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
 
-        sumBuffer = new ComputeBuffer(4, 16);
+        // sumBuffer = new ComputeBuffer(4, 16);
 
 
 
         //sum_all
-        Debug.Log("SetUp get_sum");
-        // SetUp_getSum();
+        // Debug.Log("SetUp get_sum");
+        // // SetUp_getSum();
 
-        Sum_Single_Letter();
-        backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
+        // Sum_Single_Letter();
+        // backgroundAndLabelSphereMaterial.SetBuffer("sum_all_results", sumBuffer);
 
     }
 
@@ -101,151 +101,151 @@ public class RenderStereoLabel : MonoBehaviour
         // Update_getSum();
     }
 
-    private void SetUp_getSum(){
-        kernelID_main = cShader.FindKernel("CSMain");
-        kernelID_init = cShader.FindKernel("CSInit");
+    // private void SetUp_getSum(){
+    //     kernelID_main = cShader.FindKernel("CSMain");
+    //     kernelID_init = cShader.FindKernel("CSInit");
 
-        cShader.SetTexture(kernelID_main, "InputImage", labelRenderTexture);
-        cShader.SetTexture(kernelID_init, "InputImage", labelRenderTexture);
-        // cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
-        // cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
+    //     cShader.SetTexture(kernelID_main, "InputImage", labelRenderTexture);
+    //     cShader.SetTexture(kernelID_init, "InputImage", labelRenderTexture);
+    //     // cShader.SetTexture(kernelID_main, "InputCubeMap", backgroundCubeMap);
+    //     // cShader.SetTexture(kernelID_init, "InputCubeMap", backgroundCubeMap);
 
-        // Debug.Log(sumBuffer);
+    //     // Debug.Log(sumBuffer);
 
-        cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
-        cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
+    //     cShader.SetBuffer(kernelID_main, "_SumBuffer", sumBuffer); //sumBuffer is null somehow
+    //     cShader.SetBuffer(kernelID_init, "_SumBuffer", sumBuffer);
 
-        // cShader.Dispatch(kernelID_init, 1, 1, 1);
-    }
+    //     // cShader.Dispatch(kernelID_init, 1, 1, 1);
+    // }
 
-    private void Update_getSum(){  
+    // private void Update_getSum(){  
         
-        // Debug.Log("Update get_sum");
-        cShader.Dispatch(kernelID_main, 16, 1, 1);
-        int[] results = new int[4];
-        sumBuffer.GetData(results);
+    //     // Debug.Log("Update get_sum");
+    //     cShader.Dispatch(kernelID_main, 16, 1, 1);
+    //     int[] results = new int[4];
+    //     sumBuffer.GetData(results);
 
-    }
+    // }
 
 
-    //method 3: sum only from a letter
-    private void Sum_Single_Letter(){
+    // //method 3: sum only from a letter
+    // private void Sum_Single_Letter(){
         
-        //this method uses dfs 
-        Debug.Log("method3!");
-        float sum_r = 0.0F;
-        float sum_g = 0.0F;
-        float sum_b = 0.0F;
+    //     //this method uses dfs 
+    //     Debug.Log("method3!");
+    //     float sum_r = 0.0F;
+    //     float sum_g = 0.0F;
+    //     float sum_b = 0.0F;
 
-        Texture2D label_texture = getRTPixels(labelRenderTexture);
+    //     Texture2D label_texture = getRTPixels(labelRenderTexture);
 
-        int x = 200;
-        int y = 200;
-        Coordination start_coords = new Coordination(x, y);
-        Result_color letter_sum = dfs(label_texture, start_coords);
+    //     int x = 200;
+    //     int y = 200;
+    //     Coordination start_coords = new Coordination(x, y);
+    //     Result_color letter_sum = dfs(label_texture, start_coords);
 
-        float count = letter_sum.count;
-        sum_r = letter_sum.r;
-        sum_g = letter_sum.g;
-        sum_b = letter_sum.b;
+    //     float count = letter_sum.count;
+    //     sum_r = letter_sum.r;
+    //     sum_g = letter_sum.g;
+    //     sum_b = letter_sum.b;
 
-        float[] single_letter_sum = {count, sum_r, sum_g, sum_b};
-        sumBuffer.SetData(single_letter_sum);
+    //     float[] single_letter_sum = {count, sum_r, sum_g, sum_b};
+    //     sumBuffer.SetData(single_letter_sum);
 
-        //this method uses TMP tools
-        //input: target character id
-        //Example: "helloworld", the id of "h" is 0; id of "e" is 1
+    //     //this method uses TMP tools
+    //     //input: target character id
+    //     //Example: "helloworld", the id of "h" is 0; id of "e" is 1
         
-        // int target_char = 0;
-        // TMP_TextInfoDebugTool.ShowCharacters = true;
-        // m_TextComponent = gameObject.GetComponent<TMP_Text>();
-        // TMP_TextInfo textInfo = m_TextComponent.textInfo;
-        // TMP_CharacterInfo cInfo = textInfo.characterInfo[target_char];
-        // public Color32 character_color = cInfo.color;
+    //     // int target_char = 0;
+    //     // TMP_TextInfoDebugTool.ShowCharacters = true;
+    //     // m_TextComponent = gameObject.GetComponent<TMP_Text>();
+    //     // TMP_TextInfo textInfo = m_TextComponent.textInfo;
+    //     // TMP_CharacterInfo cInfo = textInfo.characterInfo[target_char];
+    //     // public Color32 character_color = cInfo.color;
 
-    }
+    // }
 
-    //method 4: sum a kernel,  which is in the label
-    private void Sum_A_Kernel(int kernel_size){
-        float sum_r = 0.0F;
-        float sum_g = 0.0F;
-        float sum_b = 0.0F;
+    // //method 4: sum a kernel,  which is in the label
+    // private void Sum_A_Kernel(int kernel_size){
+    //     float sum_r = 0.0F;
+    //     float sum_g = 0.0F;
+    //     float sum_b = 0.0F;
 
-        int x = 200;
-        int y = 200;
-        Texture2D label_texture = getRTPixels(labelRenderTexture);
+    //     int x = 200;
+    //     int y = 200;
+    //     Texture2D label_texture = getRTPixels(labelRenderTexture);
 
-        for(int i = -kernel_size/2; i<kernel_size/2; i++){
-            for(int j = -kernel_size/2; j<kernel_size/2; j++){
-                int cur_x = x + i;
-                int cur_y = y + j;
+    //     for(int i = -kernel_size/2; i<kernel_size/2; i++){
+    //         for(int j = -kernel_size/2; j<kernel_size/2; j++){
+    //             int cur_x = x + i;
+    //             int cur_y = y + j;
 
-                sum_r += label_texture.GetPixel(cur_x, cur_y).r;
-                sum_g += label_texture.GetPixel(cur_x, cur_y).g;
-                sum_b += label_texture.GetPixel(cur_x, cur_y).b;
+    //             sum_r += label_texture.GetPixel(cur_x, cur_y).r;
+    //             sum_g += label_texture.GetPixel(cur_x, cur_y).g;
+    //             sum_b += label_texture.GetPixel(cur_x, cur_y).b;
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
 
-    //this function gets pixel values from renderTexture
-    //this is a helper function
-    private Texture2D getRTPixels(RenderTexture rt){
-        RenderTexture currentActiveRT = RenderTexture.active;
-        RenderTexture.active = rt;
+    // //this function gets pixel values from renderTexture
+    // //this is a helper function
+    // private Texture2D getRTPixels(RenderTexture rt){
+    //     RenderTexture currentActiveRT = RenderTexture.active;
+    //     RenderTexture.active = rt;
 
-        // Create a new Texture2D and read the RenderTexture image into it
-        Texture2D tex = new Texture2D(rt.width, rt.height);
-        tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
+    //     // Create a new Texture2D and read the RenderTexture image into it
+    //     Texture2D tex = new Texture2D(rt.width, rt.height);
+    //     tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
 
-        // Restorie previously active render texture
-        RenderTexture.active = currentActiveRT;
-        return tex;
+    //     // Restorie previously active render texture
+    //     RenderTexture.active = currentActiveRT;
+    //     return tex;
 
-    }
+    // }
 
-    private Result_color dfs(Texture2D label_texture, Coordination start_coords){
+    // private Result_color dfs(Texture2D label_texture, Coordination start_coords){
         
-        float count = 1.0F;
-        float r = 0.0F;
-        float g = 0.0F;
-        float b = 0.0F;
+    //     float count = 1.0F;
+    //     float r = 0.0F;
+    //     float g = 0.0F;
+    //     float b = 0.0F;
 
-        Stack<Coordination> myStack = new Stack<Coordination>();
-        myStack.Push(start_coords);
+    //     Stack<Coordination> myStack = new Stack<Coordination>();
+    //     myStack.Push(start_coords);
 
-        while(myStack.Count != 0){
-            Coordination cur = myStack.Pop();
+    //     while(myStack.Count != 0){
+    //         Coordination cur = myStack.Pop();
 
-            int cur_x = cur.x;
-            int cur_y = cur.y;
+    //         int cur_x = cur.x;
+    //         int cur_y = cur.y;
 
-            float cur_r = label_texture.GetPixel(cur.x, cur.y).r;
-            float cur_g = label_texture.GetPixel(cur.x, cur.y).g;
-            float cur_b = label_texture.GetPixel(cur.x, cur.y).b;
-            count += 1.0F;
-            r += cur_r;
-            g += cur_g;
-            b += cur_b;
+    //         float cur_r = label_texture.GetPixel(cur.x, cur.y).r;
+    //         float cur_g = label_texture.GetPixel(cur.x, cur.y).g;
+    //         float cur_b = label_texture.GetPixel(cur.x, cur.y).b;
+    //         count += 1.0F;
+    //         r += cur_r;
+    //         g += cur_g;
+    //         b += cur_b;
 
-            if (cur_r!=0 || cur_g!=0 || cur_g!=0){
-                //if this pixel is a label pixel, continue the search
-                Coordination top = new Coordination(cur_x, cur_y+1);
-                Coordination bot = new Coordination(cur_x, cur_y-1);
-                Coordination left = new Coordination(cur_x-1, cur_y);
-                Coordination right = new Coordination(cur_x+1, cur_y);
-                myStack.Push(top);
-                myStack.Push(bot);
-                myStack.Push(left);
-                myStack.Push(right);
-            }
+    //         if (cur_r!=0 || cur_g!=0 || cur_g!=0){
+    //             //if this pixel is a label pixel, continue the search
+    //             Coordination top = new Coordination(cur_x, cur_y+1);
+    //             Coordination bot = new Coordination(cur_x, cur_y-1);
+    //             Coordination left = new Coordination(cur_x-1, cur_y);
+    //             Coordination right = new Coordination(cur_x+1, cur_y);
+    //             myStack.Push(top);
+    //             myStack.Push(bot);
+    //             myStack.Push(left);
+    //             myStack.Push(right);
+    //         }
 
-        }
+    //     }
 
-        return new Result_color(count,r,g,b);
+    //     return new Result_color(count,r,g,b);
 
-    }
+    // }
 
 }
 
@@ -260,16 +260,16 @@ public struct Coordination{
     }
 
 
-public struct Result_color{
-        public float count;
-        public float r;
-        public float g;
-        public float b;
+// public struct Result_color{
+//         public float count;
+//         public float r;
+//         public float g;
+//         public float b;
 
-        public Result_color(float count, float r, float g, float b){
-            this.count = count;
-            this.r = r;
-            this.g = g;
-            this.b = b;
-        }
-    }
+//         public Result_color(float count, float r, float g, float b){
+//             this.count = count;
+//             this.r = r;
+//             this.g = g;
+//             this.b = b;
+//         }
+//     }
