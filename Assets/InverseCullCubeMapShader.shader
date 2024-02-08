@@ -562,9 +562,10 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float isSample = hash(sample_x, sample_y, offset);
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
-                if (_GranularityMethod != 0)
+                if (_GranularityMethod != 0) 
                 {
-                    bgSample = float4(_Background_sum_r, _Background_sum_g, _Background_sum_b,1);
+                    // if we're not using the per-pixel assignment mode, then use average background or label area pixel value
+                    bgSample = float4(_Background_sum_r, _Background_sum_g, _Background_sum_b, 1);
                 }
 
 
@@ -621,7 +622,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                                     col = float4(top_r,top_g,top_b,top_a);
                                 }else{
                                     //if we are so unlucky that no sample presents in the neighborhood
-                                col = function_f(_ColorMethod, bgSample);
+                                    col = function_f(_ColorMethod, bgSample);
                                 }
 
                                 // set the opacity level
@@ -707,7 +708,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                 if (modeTex[3] != 0)
                 {
                     col[0] = 1.0;
+                    col[1] = 0.0;
                     col[2] = 1.0;
+                    col[3] = 1.0;
                 }
 
                 // Apply shadow if selected // needs to be debugged.
