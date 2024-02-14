@@ -86,19 +86,10 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         labelScreenshotCamera.Render();
     }
     void LateUpdate()
-    {
-        // StartCoroutine(ComputeSum());
-        
-        
-        // Wait for the current frame to finish rendering
-        // WaitForEndOfFrame frameEnd = new WaitForEndOfFrame();
-        // yield return frameEnd;
-
+    {  
         // Convert the screenshot from the background and the label cameras to texture2D for sum calculation 
         toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
         toTexture2D(labelRT, labelScreenshotForSum, w, h);
-       
-        // Update_getSum();
 
         // Calculate background pixel average for an area or the entire background
         float r = 0.0f;
@@ -139,21 +130,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Save images for debugging purposes only
         // byte[] bytes = labelScreenshotForSum.EncodeToPNG();
         // File.WriteAllBytes(Application.dataPath + "/../DebuggingScreenshot_" + numSampledPixels + ".png", bytes);
-        
-        // Derive the average pixel value
-        // if (granularityMethod == 1){ // area-bsed
-        //     // Debug.Log(numPixelsInArea);
-        //     r = r / numPixelsInArea;
-        //     g = g / numPixelsInArea;
-        //     b = b / numPixelsInArea;
-        // }
-        // else if (granularityMethod == 2){ // entire background
-        //     // r = (r*100) / (w*h); // why is this multiplied by 100?
-        //     // g = (g*100) / (w*h);
-        //     // b = (b*100) / (w*h);
-
-        // }
-
 
         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", r);
         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", g);
