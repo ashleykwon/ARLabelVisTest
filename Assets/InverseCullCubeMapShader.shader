@@ -610,10 +610,11 @@ Shader "Unlit/InverseCullCubeMapShader"
                                     col = function_f(_ColorMethod, bgSample);
                                 }
 
-                                // set the opacity level
-                                col[3] = _OpacityLevel;
+                                
+                                
                             }
-                    
+                            // set the opacity level
+                            col[3] = _OpacityLevel;
                         // Apply outline if selected
                         if (_EnableOutline == 1)
                         {

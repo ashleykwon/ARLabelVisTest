@@ -108,8 +108,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         int numSampledPixels = 0;
 
         if (granularityMethod != 0){
-            for(int i = 0; i<w-10; i+=10){
-                for(int j = 0; j<h-10; j+=10){
+            for(int i = 0; i<w; i++){
+                for(int j = 0; j<h; j++){
                     if (granularityMethod == 1){ // area-based
                         if (labelScreenshotForSum.GetPixel(i,j)[0] == 1 && labelScreenshotForSum.GetPixel(i,j)[1] == 1 && labelScreenshotForSum.GetPixel(i,j)[2] == 1){
                             r += backgroundScreenshotForSum.GetPixel(i,j)[0];
