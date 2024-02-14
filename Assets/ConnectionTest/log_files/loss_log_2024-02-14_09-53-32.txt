@@ -1,0 +1,7 @@
+-----------fruit_unblurredBG_itr500_lr0.08---------------
+iter 0, dist  0.0948
+iter 100, dist  0.275
+iter 200, dist  0.299
+iter 300, dist  0.308
+iter 400, dist  0.312
+iter 499, dist  0.314
