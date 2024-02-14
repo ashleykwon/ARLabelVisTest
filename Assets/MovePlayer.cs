@@ -11,7 +11,7 @@ public class MovePlayer : MonoBehaviour
     public GameObject BackgroundAndLabelSphere;
     public GameObject LabelContainer;
     public TMP_Text labelColorMode;
-    public TMP_Text billboardColorMode;
+    public TMP_Text opacityLevel;
     public TMP_Text granularitymode;
     int CurrentColorAssignmentAlgo; // Doesn't need to be specified at Start
     // int CurrentBillboardColorAssignmentAlgo; // Doesn't need to be specified at Start
@@ -38,6 +38,10 @@ public class MovePlayer : MonoBehaviour
         billboardColorModesList = new string[] {"None", "Blue", "HSV-based"};
         granularityModesList = new string[] {"Per-pixel", "Per-area", "Background"};
 
+        // Display initial setting
+        labelColorMode.text = "Label Color: " + labelColorModesList[labelSphereMaterial.GetInt("_ColorMethod")];
+        granularitymode.text = "Granularity Mode: "  + granularityModesList[labelSphereMaterial.GetInt("_GranularityMethod")];
+        opacityLevel.text = "Opacity Level: " + string.Format("{0:N2}", labelSphereMaterial.GetFloat("_OpacityLevel")/5.0f);
     }
 
 
@@ -75,21 +79,15 @@ public class MovePlayer : MonoBehaviour
             ChangeColorAssignmentAlgo(CurrentColorAssignmentAlgo);
         }
 
-        if (YButtonPressed) // Change billboard color assignment on right trigger 
+        if (YButtonPressed) // Change opacity level 
         {
             Debug.Log("Y button pressed");
-            // CurrentBillboardColorAssignmentAlgo += 1;
-            // if (CurrentBillboardColorAssignmentAlgo > 2)
-            // {
-            //     CurrentBillboardColorAssignmentAlgo = 0;
-            // }
-            // billboardColorMode.text = "Billboard Color: " +  billboardColorModesList[CurrentBillboardColorAssignmentAlgo];
-            // labelSphereMaterial.SetInt("_BillboardColorMethod", CurrentBillboardColorAssignmentAlgo);
             CurrentOpacityLevel += 1;
             if (CurrentOpacityLevel > 5.0){
                 CurrentOpacityLevel = 1.0f;
             }
             labelSphereMaterial.SetFloat("_OpacityLevel", CurrentOpacityLevel/5.0f);
+            opacityLevel.text = "Opacity Level: " + string.Format("{0:N2}", CurrentOpacityLevel/5.0f);
         }
 
         if (AButtonPressed) // Toggle outline
@@ -136,31 +134,6 @@ public class MovePlayer : MonoBehaviour
                 currentLabelMovementMode = 0;
             }
         }
-
-        // if (BButtonPressed) // Toggle shadow
-        // {
-        //     Debug.Log("B button pressed");
-        //     int shadowEnabled = labelSphereMaterial.GetInt("_EnableShadow");
-
-        //     if (shadowEnabled == 0)
-        //     {
-        //         labelSphereMaterial.SetInt("_EnableShadow", 1);
-        //     }
-        //     if (shadowEnabled == 1)
-        //     {
-        //         shadowIntensityIdx += 1;
-        //         if (shadowIntensityIdx == 4)
-        //         {
-        //             labelSphereMaterial.SetInt("_EnableShadow", 0);
-        //             shadowIntensityIdx = 0; 
-        //         }
-        //         else 
-        //         {
-        //             labelSphereMaterial.SetFloat("_ShadowMultiplier", shadowIntensityIdx*0.5f);
-        //         }
-                
-        //     }     
-        // }
     }
 
 
