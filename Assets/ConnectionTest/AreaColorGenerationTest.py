@@ -237,7 +237,17 @@ if __name__ == '__main__':
         # Separate background and label pixels
         # labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
-        labelFlat2[:, 2, :].fill_(1.0) # fill with blue initial color
+        # get the average of label color and then reverse it
+        # first try naive RGB reversal -- want a [1,3] tensor
+        avg_label_color = torch.mean(labelFlat2, dim=2)
+        print(avg_label_color)
+        RGB_reverted = - avg_label_color
+        RGB_reverted = RGB_reverted.unsqueeze(2).expand_as(labelFlat2)
+
+        # fill label with the intended initial color
+        labelFlat2[:, :, :] = RGB_reverted
+
+        # labelFlat2[:, 2, :].fill_(1.0) # fill with initial blue color 
 
         # Set them to torch variables for back-propagation
         labelVar = Variable(labelFlat2, requires_grad=True) # now labelVar size is [1,3,numLabelPixels]
@@ -377,9 +387,9 @@ if __name__ == '__main__':
                 
                 if args.metric == 'ssim':
                     # output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                    output_path = f"./testResults/test20240214_initialOpaque/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240220_autoInitLabel/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    output_path = f"./testResults/test20240214_initialOpaque/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240220_autoInitLabel/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
