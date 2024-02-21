@@ -181,6 +181,7 @@ public class SceneCycler : MonoBehaviour
     public void RecordResponse(int idx)
     {
         sceneQuestions[activeScenes[sceneIdx]][qIdx].response = sceneQuestions[activeScenes[sceneIdx]][qIdx].answers[idx];
+        Debug.Log("Recorded response " + sceneQuestions[activeScenes[sceneIdx]][qIdx].answers[idx]);
     }
 
     public void UpdateQuestion()
@@ -219,9 +220,26 @@ public class SceneCycler : MonoBehaviour
         float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
         
-        if (Input.GetKeyDown(KeyCode.R))
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             RecordResponse(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            RecordResponse(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            RecordResponse(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            RecordResponse(3);
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
             WriteResponses();
         }
 
