@@ -73,15 +73,17 @@ except ImportError:
 
 # background = Image.open("./testResults/test20240201/fruit_weight-0.05_ssim_s-0.1k1-0.01k2-0.03_itr100_lr0.08_deltaE-False.jpg")
 # overlay = Image.open("./testResults/test20240201_noInitialColor/fruit_opcityResult.jpg")
+    
 background = Image.open('./testImages/testFruit/fruit.jpg')
-overlay = Image.open('./testResults/test20240214_initialOpaque/edges.png')
+# background = Image.open('./testImages/testCluttered/city_building.jpg')
+overlay = Image.open('./testResults/test20240221_initLabelColor_basedOnBackground/fruit_HSVInverted_ssim_s-1.5k1-0.01k2-0.03_itr100_lr0.08_deltaE-False.jpg')
 
 background = background.convert("RGBA")
 overlay = overlay.convert("RGBA")
 
 ratio = 0.3
 new_img = Image.blend(background, overlay, ratio) # ratio*overlay + (1-ratio)*background
-new_img.save(f"./testResults/test20240214_initialOpaque/overlay_edges_{ratio}.png")
+new_img.save(f"./testResults/test20240221_overlays/fruit_HSV_background_{ratio}.png")
 
 # img = cv2.imread('./testImages/testFruit/fruit.jpg')
 # # Convert to graycsale

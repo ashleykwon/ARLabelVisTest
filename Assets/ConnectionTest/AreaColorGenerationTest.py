@@ -9,6 +9,7 @@ import numpy as np
 import lpips
 import cv2
 import scipy
+import colorsys
 import os
 import torchvision
 import argparse
@@ -123,8 +124,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beach.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/city_black.jpg'
-                                                                    #  ,'./testImages/testCluttered/city_building.jpg'
-                                                                    #  ,'./testImages/testCluttered/city_board.jpg'
+                                                                     ,'./testImages/testCluttered/city_building.jpg'
+                                                                     ,'./testImages/testCluttered/city_board.jpg'
                                                                     #  ,'./testCluttered/city_rgb.jpg'
                                                                     #  ,'./testCluttered/classroom_white.jpg'
                                                                     #  ,'./testCluttered/classroom_bw.jpg'
@@ -143,8 +144,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testBeach/beachAndLabel_purple.jpg'
                                                                     #  ,
                                                                     #  './testCluttered/cityAndLabel_black.jpg'
-                                                                    #  ,'./testImages/testCluttered/cityAndWhiteArea_building.jpg'
-                                                                    #  ,'./testImages/testCluttered/cityAndWhiteArea_board.jpg'
+                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_building.jpg'
+                                                                     ,'./testImages/testCluttered/cityAndWhiteArea_board.jpg'
                                                                     #  ,'./testCluttered/cityAndLabel_rgb.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_white.jpg'
                                                                     #  ,'./testCluttered/classroomAndLabel_bw.jpg'
@@ -161,8 +162,8 @@ if __name__ == '__main__':
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                     #  ,'./testBeach/beachMask.jpg'
                                                                     #  ,
-                                                                    # ,'./testImages/testCluttered/cityAreaMask_building.jpg'
-                                                                    # ,'./testImages/testCluttered/cityAreaMask_board.jpg'
+                                                                    ,'./testImages/testCluttered/cityAreaMask_building.jpg'
+                                                                    ,'./testImages/testCluttered/cityAreaMask_board.jpg'
                                                                     #  './testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/cityMask.jpg'
                                                                     #  ,'./testCluttered/classroomMask.jpg'
@@ -238,14 +239,32 @@ if __name__ == '__main__':
         # labelFlat = imageFlat[:, maskFlat[0]] #[1,3*numLabelPixels] : collapsed 3 color channels
         labelFlat2 = imageFlat[:, :, maskFlat[0][0]] #[1,3,numLabelPixels]
         # get the average of label color and then reverse it
-        # first try naive RGB reversal -- want a [1,3] tensor
-        avg_label_color = torch.mean(labelFlat2, dim=2)
-        print(avg_label_color)
-        RGB_reverted = - avg_label_color
+
+        # whether to use the label area average color as initial color or use the background average
+        init_avg = torch.mean(labelFlat2, dim=2)
+        use_background_area = True
+        if use_background_area:
+            init_avg = torch.mean(backgroundFlat, dim=2)
+
+        # =================first try naive RGB reversal -- want a [1,3] tensor====================
+        print(init_avg)
+        RGB_reverted = - init_avg
         RGB_reverted = RGB_reverted.unsqueeze(2).expand_as(labelFlat2)
 
+        # =================HSV inversion=====================
+        init_avg = (init_avg + 1) / 2.0   # convert to [0,1]
+        init_avg = torch.squeeze(init_avg)
+        hsv =  colorsys.rgb_to_hsv(init_avg[0], init_avg[1], init_avg[2])   # conver to HSV
+        newH = (hsv[0] + 0.5) % 1.0
+        newS = 1.0 - hsv[1]
+        newV = 1.0
+        HSV_reverted = colorsys.hsv_to_rgb(newH, newS, newV)
+        HSV_reverted = torch.tensor([HSV_reverted[0]*2-1.0, HSV_reverted[1]*2-1.0, HSV_reverted[2]*2-1.0])  # convert back to [-1,1]
+        HSV_reverted = HSV_reverted.unsqueeze(1).expand_as(labelFlat2)
+        # print(HSV_reverted)
+
         # fill label with the intended initial color
-        labelFlat2[:, :, :] = RGB_reverted
+        labelFlat2[:, :, :] = HSV_reverted
 
         # labelFlat2[:, 2, :].fill_(1.0) # fill with initial blue color 
 
@@ -387,9 +406,9 @@ if __name__ == '__main__':
                 
                 if args.metric == 'ssim':
                     # output_path = f"./testResults/test20240201/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
-                    output_path = f"./testResults/test20240220_autoInitLabel/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240221_initLabelColor_basedOnBackground/{image_name}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
-                    output_path = f"./testResults/test20240220_autoInitLabel/{image_name}_weight-{weight}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/test20240221_initLabelColor_basedOnBackground/{image_name}_{args.metric}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
