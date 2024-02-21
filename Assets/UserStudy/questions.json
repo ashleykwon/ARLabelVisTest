@@ -1,0 +1,31 @@
+{
+    "sceneQuestions": [
+      {
+        "sceneName": "CityBridge",
+        "question": "Please select the number of edges in the AR polygon label",
+        "answers": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ]
+      },
+      {
+        "sceneName": "HotelParanal",
+        "question": "Please select the number of edges in the AR polygon label",
+        "answers": [
+            "3",
+            "6",
+            "9"
+        ]
+      },
+      {
+        "sceneName": "LaSilla",
+        "question": "Please select the number of edges in the AR polygon label",
+        "answers": [
+            "1",
+            "2"
+        ]
+      }
+    ]
+  }

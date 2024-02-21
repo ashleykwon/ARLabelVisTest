@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,14 +11,26 @@ using TMPro;
 
 public class SceneCycler : MonoBehaviour
 {   
-    private Dictionary<string, List<int>> categoriesDict = new Dictionary<string, List<int>>();
-    private Dictionary<int, string> sceneNames = new Dictionary<int, string>();
-    private List<string> categories;
-    private int categoryIdx = 0;
-    private List<string> activeCategories = new List<string>();
+    public bool randomize = true;
+    
+    private int sceneIdx = 0;
+    private List<int> sceneMap = new List<int>();
     private List<int> allScenes = new List<int>();
     private List<int> activeScenes = new List<int>();
-    private int sceneIdx = 0;
+
+    private int categoryIdx = 0;
+    private List<string> categories;
+    private List<string> activeCategories = new List<string>();
+
+    private Dictionary<string, List<int>> categoriesDict = new Dictionary<string, List<int>>();
+    private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
+
+    private Dictionary<int, List<SceneQuestion>> sceneQuestions = new Dictionary<int, List<SceneQuestion>>();
+    int qIdx = 0;
+
+    public TMP_Text questionText;
+    public List<TMP_Text> answerTexts;
+
     private TMP_Text activeCatsText;
     private TMP_Text curCatText;
     private float vanishTime = 5.0f;
@@ -35,16 +50,74 @@ public class SceneCycler : MonoBehaviour
 
         return tokens;
     }
+
+    private List<int> CreateAndShuffleList(int n)
+    {
+        List<int> list = new List<int>();
+        for (int i = 1; i < n; i++)
+        {
+            list.Add(i);
+        }
+
+        ShuffleList(list);
+        list.Insert(0,0);
+        return list;
+    }
+
+    private void ShuffleList(List<int> list)
+    {
+        System.Random rand = new System.Random();
+        int n = list.Count;
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = rand.Next(i + 1);
+            int temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+
+    private void ParseQuestions()
+    {
+        string filePath = Path.Combine(Application.dataPath, "UserStudy/questions.json");
+        string json = File.ReadAllText(filePath);
+
+        SceneQuestionsList questionsList = JsonUtility.FromJson<SceneQuestionsList>(json);
+        
+        foreach (SceneQuestion question in questionsList.sceneQuestions)
+        {
+            int sceneQIdx = sceneToIdx[question.sceneName];
+
+            if (!sceneQuestions.ContainsKey(sceneQIdx))
+            {
+                sceneQuestions[sceneQIdx] = new List<SceneQuestion>();
+            }
+            sceneQuestions[sceneQIdx].Add(question);
+        }
+    }
+
     void Start()
     {
-        
+
+        List<int> randIndices = CreateAndShuffleList(SceneManager.sceneCountInBuildSettings);
+
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++) 
+        {
+            sceneMap.Add(i);
+        }
+
+        if (randomize)
+        {
+            sceneMap = CreateAndShuffleList(SceneManager.sceneCountInBuildSettings);
+        }
+
         for (int i = 1; i < SceneManager.sceneCountInBuildSettings; i++)
         {
-            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneMap[i]);
             string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-            Debug.Log(sceneName);
             List<string> tokens = ParseName(sceneName);
-            sceneNames.Add(i, tokens[0]);
+            sceneToIdx.Add(tokens[0], i);
             allScenes.Add(i);
             for (int j = 1; j < tokens.Count; j++)
             {
@@ -55,6 +128,8 @@ public class SceneCycler : MonoBehaviour
                categoriesDict[tokens[j]].Add(i);
             }
         }
+
+        ParseQuestions();
         
         categories = new List<string>(categoriesDict.Keys);
         activeScenes.AddRange(allScenes);
@@ -70,7 +145,10 @@ public class SceneCycler : MonoBehaviour
         curCatText.SetText("Cat: " + categories[categoryIdx]);
         //curCatText.color = Color.red;
 
-        SceneManager.LoadScene(activeScenes[sceneIdx]);
+
+        SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+        qIdx = 0;
+        UpdateQuestion();
     }
 
     public void HideSceneContainer()
@@ -78,10 +156,58 @@ public class SceneCycler : MonoBehaviour
         sceneContainer.SetActive(false);
     }
 
+    public async Task WriteResponses()
+    {
+        SceneQuestionsList responses = new SceneQuestionsList();
+
+        foreach (KeyValuePair<int, List<SceneQuestion>> entry in sceneQuestions)
+        {
+            foreach (SceneQuestion question in entry.Value)
+            {
+                responses.sceneQuestions.Add(question);
+            }
+        }
+
+        string json = JsonUtility.ToJson(responses, true);
+        string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+        string outpath = Path.Combine(Application.persistentDataPath, $"UserResponse_{dateString}.json");
+        Debug.Log(outpath);
+        using (StreamWriter writer = new StreamWriter(outpath, false))
+        {
+            await writer.WriteAsync(json);
+        }
+    }
+
+    public void RecordResponse(int idx)
+    {
+        sceneQuestions[activeScenes[sceneIdx]][qIdx].response = sceneQuestions[activeScenes[sceneIdx]][qIdx].answers[idx];
+    }
+
+    public void UpdateQuestion()
+    {
+        SceneQuestion curQ = sceneQuestions[activeScenes[sceneIdx]][qIdx];
+        questionText.SetText(curQ.question);
+
+        for (int i = 0; i < answerTexts.Count; i++)
+        {
+            if (i < curQ.answers.Count)
+            {
+                answerTexts[i].SetText(curQ.answers[i]);
+            }
+            else
+            {
+                answerTexts[i].SetText("");
+            }
+        }
+    }
+
     public void LoadNext()
     {
         sceneIdx = (sceneIdx + 1) % activeScenes.Count;
-        SceneManager.LoadScene(activeScenes[sceneIdx]);
+        SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+
+        qIdx = 0;
+        UpdateQuestion();
     }
 
     //Update is called once per frame
@@ -92,7 +218,12 @@ public class SceneCycler : MonoBehaviour
         float rIndexTrigger = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
         float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
-
+        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RecordResponse(0);
+            WriteResponses();
+        }
 
         if (rIndexTrigger == 0) {
             rIndexTriggerHeld = false;
@@ -106,7 +237,7 @@ public class SceneCycler : MonoBehaviour
             lHandTriggerHeld = false;
         }
 
-        if ((rIndexTrigger > 0) && !rIndexTriggerHeld) 
+        if (((rIndexTrigger > 0) && !rIndexTriggerHeld) || Input.GetKeyDown(KeyCode.N)) 
         {   
             rIndexTriggerHeld = true;
             CancelInvoke();
