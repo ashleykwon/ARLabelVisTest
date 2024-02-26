@@ -59,7 +59,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Initialize variables        
             samplerCUBE _CubeMap;
             samplerCUBE _LabelCubeMap;
-            // samplerCUBE _BlurredLabelTex;
             samplerCUBE _BillboardCubeMap;
             samplerCUBE _ModeCubeMap;
             float _SampleKernelSize;
@@ -98,7 +97,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _Background_sum_r;
             float _Background_sum_g;
             float _Background_sum_b;
-
            
            
             struct v2f 

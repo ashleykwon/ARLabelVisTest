@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BackgroundSphereMaterial
-  m_Shader: {fileID: 4800000, guid: 9f08025f583fb4a4f84a5f62c1057a81, type: 3}
+  m_Name: MaskedBGMaterial
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -20,19 +20,7 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BillboardCubeMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BlurredLabelTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _CubeMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -52,19 +40,11 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _LabelCubeMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _ModeCubeMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -76,52 +56,25 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _ShadowCubeMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Background_sum_b: 67.01993
-    - _Background_sum_g: 63.38063
-    - _Background_sum_r: 62.094955
-    - _BillboardColorMethod: 0
-    - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
-    - _ColorMethod: 3
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EnableOutline: 0
-    - _EnableShadow: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GranularityMethod: 2
-    - _LabelRotationMatrix: 0
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OpacityLevel: 1
     - _Parallax: 0.02
-    - _SampleBoost: 0
-    - _SampleKernelSize: 87.3
-    - _SampleSigma: 0
-    - _ShadowKernelSize: 64
-    - _ShadowMultiplier: 0
-    - _ShadowScale: 0.971
-    - _ShadowSigma: 0.2
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _UseInterpolation: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _LabelRotationMatrixRow1: {r: 0.000000059604645, g: 0.00000008742278, b: 0.99999994, a: 0}
-    - _LabelRotationMatrixRow2: {r: 0, g: -0.9999999, b: 0.00000008742278, a: 0}
-    - _LabelRotationMatrixRow3: {r: 0.99999994, g: 0, b: 0.000000059604645, a: 0}
-    - _LabelRotationMatrixRow4: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

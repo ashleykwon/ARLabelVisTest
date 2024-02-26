@@ -1,0 +1,66 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+// #pragma kernel CSInit
+
+Texture2D<float4> backgroundScreenshotForSum;
+Texture2D<float4> labelScreenshotForSum;
+
+RWStructuredBuffer<int> Result;
+
+int granularityMethod;
+int imgWidth;
+int imgHeight;
+
+
+[numthreads(4, 4, 1)] // total number of threads in a thread group (32 max in an NVIDIA gpu)
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // int numPixels = 0;
+
+    // float redSum = 0.0;
+    // float greenSum = 0.0;
+    // float blueSum = 0.0;
+
+    float4 backgroundColor = backgroundScreenshotForSum[id.xy];
+    float4 labelColor = labelScreenshotForSum[id.xy]; // This is entirely black somehow
+
+    // if (granularityMethod == 1){ // area-based
+    //     // for (int i = 0; i < imgWidth; i++){
+    //     //     for (int j = 0; j < imgHeight; j++){
+    //     //         float4 currentBGColor = 
+    //     //     }
+    //     // }
+    //     if (labelColor.r != 0.0 && labelColor.g != 0.0 && labelColor.b != 0.0){ // is a label area
+    //         // redSum += backgroundColor.r;
+    //         // greenSum += backgroundColor.g;
+    //         // blueSum += backgroundColor.b;
+    //         // numPixels += 1;
+    //     }
+    // }
+    // else if (granularityMethod == 2){ // all pixels in the user's view
+    //     // redSum += backgroundColor.r;
+    //     // greenSum += backgroundColor.g;
+    //     // blueSum += backgroundColor.b;
+    //     // numPixels += 1;
+
+    //     InterlockedAdd(Result[0], (int)(backgroundColor.r*255));
+    //     InterlockedAdd(Result[1], (int)(backgroundColor.g*255));
+    //     InterlockedAdd(Result[2], (int)(backgroundColor.b*255));
+    //     InterlockedAdd(Result[3], 1);
+    // }
+
+    InterlockedAdd(Result[0], (int)(backgroundScreenshotForSum[id.xy].r*255.0));
+    InterlockedAdd(Result[1], (int)(backgroundScreenshotForSum[id.xy].g*255.0));
+    InterlockedAdd(Result[2], (int)(backgroundScreenshotForSum[id.xy].b*255.0));
+    InterlockedAdd(Result[3], 1);
+
+    // if (numPixels != 0){
+    //     Result[id.x] = float3(redSum/numPixels, greenSum/numPixels, blueSum/numPixels, numPixels);
+    // }
+    // else{
+    //     Result[id.x] = float3(0.0, 0.0, 0.0, 0.0);
+    // }
+    // Result[id.x] = float3(labelColor.r, labelColor.g, labelColor.b);
+
+    // return;
+}
