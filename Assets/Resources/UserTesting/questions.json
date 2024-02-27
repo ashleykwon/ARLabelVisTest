@@ -1,0 +1,34 @@
+{
+    "sceneQuestions": [
+      {
+        "sceneName": "CityBridge",
+        "question": "Please select the polygon that has the same shape as the label",
+        "answers": [
+          "UserTesting/Answers/Hex1",
+          "UserTesting/Answers/Hex2",
+          "UserTesting/Answers/Hex3",
+          "UserTesting/Answers/HexTrue"
+        ]
+      },
+      {
+        "sceneName": "HotelParanal",
+        "question": "Please select the polygon that has the same shape as the label",
+        "answers": [
+          "UserTesting/Answers/Hex1",
+          "UserTesting/Answers/Hex3",
+          "UserTesting/Answers/HexTrue",
+          "UserTesting/Answers/Hex2"
+        ]
+      },
+      {
+        "sceneName": "LaSilla",
+        "question": "Please select the polygon that has the same shape as the label",
+        "answers": [
+          "UserTesting/Answers/HexTrue",
+          "UserTesting/Answers/Hex1",
+          "UserTesting/Answers/Hex2",
+          "UserTesting/Answers/Hex3"
+        ]
+      }
+    ]
+  }

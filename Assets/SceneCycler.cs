@@ -1,5 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,18 +12,36 @@ using TMPro;
 
 public class SceneCycler : MonoBehaviour
 {   
-    private Dictionary<string, List<int>> categoriesDict = new Dictionary<string, List<int>>();
-    private Dictionary<int, string> sceneNames = new Dictionary<int, string>();
-    private List<string> categories;
-    private int categoryIdx = 0;
-    private List<string> activeCategories = new List<string>();
+    public bool randomize = true;
+    
+    private int sceneIdx = 0;
+    private List<int> sceneMap = new List<int>();
     private List<int> allScenes = new List<int>();
     private List<int> activeScenes = new List<int>();
-    private int sceneIdx = 0;
+
+    private int categoryIdx = 0;
+    private List<string> categories;
+    private List<string> activeCategories = new List<string>();
+
+    private Dictionary<string, List<int>> categoriesDict = new Dictionary<string, List<int>>();
+    private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
+
+    private Dictionary<int, SceneQuestion> sceneQuestions = new Dictionary<int, SceneQuestion>();
+    int aIdx = 0;
+
+    Stopwatch detectionSW = new Stopwatch();
+    Stopwatch responseSW = new Stopwatch();
+
+    public GameObject questionUI;
+    public TMP_Text questionText;
+    public List<Image> answerImgs;
+    public List<Image> answerPanels;
+    private Color unselected = new Color(1.0f, 215 / 255f, 215 / 255f);
+
     private TMP_Text activeCatsText;
     private TMP_Text curCatText;
     private float vanishTime = 5.0f;
-    private GameObject sceneContainer;
+    // private GameObject sceneContainer;
     private bool rIndexTriggerHeld = false;
     private bool lIndexTriggerHeld = false;
     private bool lHandTriggerHeld = false;
@@ -35,16 +57,69 @@ public class SceneCycler : MonoBehaviour
 
         return tokens;
     }
+
+    private List<int> CreateAndShuffleList(int n)
+    {
+        List<int> list = new List<int>();
+        for (int i = 1; i < n; i++)
+        {
+            list.Add(i);
+        }
+
+        ShuffleList(list);
+        list.Insert(0,0);
+        return list;
+    }
+
+    private void ShuffleList(List<int> list)
+    {
+        System.Random rand = new System.Random();
+        int n = list.Count;
+        for (int i = n - 1; i > 0; i--)
+        {
+            int j = rand.Next(i + 1);
+            int temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+    }
+
+    private void ParseQuestions()
+    {
+        string filePath = Path.Combine(Application.dataPath, "Resources/UserTesting/questions.json");
+        string json = File.ReadAllText(filePath);
+
+        SceneQuestionsList questionsList = JsonUtility.FromJson<SceneQuestionsList>(json);
+        
+        foreach (SceneQuestion question in questionsList.sceneQuestions)
+        {
+            int sceneQIdx = sceneToIdx[question.sceneName];
+            sceneQuestions[sceneQIdx] = question;
+        }
+    }
+
     void Start()
     {
-        
+
+        List<int> randIndices = CreateAndShuffleList(SceneManager.sceneCountInBuildSettings);
+
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++) 
+        {
+            sceneMap.Add(i);
+        }
+
+        if (randomize)
+        {
+            sceneMap = CreateAndShuffleList(SceneManager.sceneCountInBuildSettings);
+        }
+
         for (int i = 1; i < SceneManager.sceneCountInBuildSettings; i++)
         {
-            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(sceneMap[i]);
             string sceneName = System.IO.Path.GetFileNameWithoutExtension(scenePath);
-            Debug.Log(sceneName);
             List<string> tokens = ParseName(sceneName);
-            sceneNames.Add(i, tokens[0]);
+            sceneToIdx.Add(tokens[0], i);
             allScenes.Add(i);
             for (int j = 1; j < tokens.Count; j++)
             {
@@ -55,33 +130,127 @@ public class SceneCycler : MonoBehaviour
                categoriesDict[tokens[j]].Add(i);
             }
         }
+
+        ParseQuestions();
         
         categories = new List<string>(categoriesDict.Keys);
         activeScenes.AddRange(allScenes);
 
-        sceneContainer = GameObject.Find("SceneContainer");
-        sceneContainer.SetActive(true);
-        Invoke("HideSceneContainer", vanishTime);
+        // sceneContainer = GameObject.Find("SceneContainer");
+        // sceneContainer.SetActive(true);
+        // Invoke("HideSceneContainer", vanishTime);
 
-        activeCatsText = GameObject.Find("ActiveCategories").GetComponent<TextMeshPro>();
-        activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
+        // activeCatsText = GameObject.Find("ActiveCategories").GetComponent<TextMeshPro>();
+        // activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
 
-        curCatText = GameObject.Find("CurrentCategory").GetComponent<TextMeshPro>();
-        curCatText.SetText("Cat: " + categories[categoryIdx]);
+        // curCatText = GameObject.Find("CurrentCategory").GetComponent<TextMeshPro>();
+        // curCatText.SetText("Cat: " + categories[categoryIdx]);
         //curCatText.color = Color.red;
 
-        SceneManager.LoadScene(activeScenes[sceneIdx]);
+
+        SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+        questionUI.SetActive(false);
+        UpdateQuestion();
+        UpdateResponse(0);
     }
 
-    public void HideSceneContainer()
+    // public void HideSceneContainer()
+    // {
+    //     sceneContainer.SetActive(false);
+    // }
+
+    public async Task WriteResponses()
     {
-        sceneContainer.SetActive(false);
+        SceneQuestionsList responses = new SceneQuestionsList();
+
+        foreach (KeyValuePair<int, SceneQuestion> entry in sceneQuestions)
+        {
+            responses.sceneQuestions.Add(entry.Value);
+        }
+
+        string json = JsonUtility.ToJson(responses, true);
+        string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+        string outpath = Path.Combine(Application.persistentDataPath, $"UserResponse_{dateString}.json");
+        UnityEngine.Debug.Log(outpath);
+        using (StreamWriter writer = new StreamWriter(outpath, false))
+        {
+            await writer.WriteAsync(json);
+        }
+    }
+
+    public void RecordResponse()
+    {
+        SceneQuestion cur = sceneQuestions[activeScenes[sceneIdx]];
+        if (!cur.responded)
+        {
+            responseSW.Stop();
+            long detectionTime = detectionSW.ElapsedMilliseconds;
+            long responseTime = responseSW.ElapsedMilliseconds;
+            cur.response = aIdx.ToString();
+            cur.detectionTime = detectionTime;
+            cur.responseTime = responseTime;
+            cur.responded = true;
+            UnityEngine.Debug.Log("Recorded response " + cur.answers[aIdx]);
+            UnityEngine.Debug.Log(responseTime);
+        }
+    }
+
+    public void UpdateResponse(int idx)
+    {
+        aIdx = idx;
+        for (int i = 0; i < answerPanels.Count; i++)
+        {
+            if (i == aIdx)
+            {
+                answerPanels[i].color = Color.green;
+            }
+            else
+            {
+                answerPanels[i].color = unselected;
+            }
+
+        }
+    }
+    
+    public void ShowQuestion()
+    {
+        detectionSW.Stop();
+        responseSW.Reset();
+        responseSW.Start();
+        questionUI.SetActive(true);
+    }
+
+    public void HideQuestion()
+    {
+        questionUI.SetActive(false);
+    }
+
+    // Updates active question based on current state of qIdx
+    public void UpdateQuestion()
+    {
+        
+        SceneQuestion curQ = sceneQuestions[activeScenes[sceneIdx]];
+        questionText.SetText(curQ.question);
+        for (int i = 0; i < answerImgs.Count; i++)
+        {
+            if (i < curQ.answers.Count)
+            {
+                Sprite sprite = Resources.Load<Sprite>(curQ.answers[i]);
+                UnityEngine.Debug.Log(curQ.answers[i]);
+                answerImgs[i].sprite = sprite;
+            }
+        }
     }
 
     public void LoadNext()
     {
         sceneIdx = (sceneIdx + 1) % activeScenes.Count;
-        SceneManager.LoadScene(activeScenes[sceneIdx]);
+        SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+
+        HideQuestion();
+        UpdateQuestion();
+        detectionSW.Reset();
+        detectionSW.Start();
     }
 
     //Update is called once per frame
@@ -92,7 +261,47 @@ public class SceneCycler : MonoBehaviour
         float rIndexTrigger = OVRInput.Get(OVRInput.Axis1D.SecondaryIndexTrigger);
         float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
+        
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            ShowQuestion();
+        }
 
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            HideQuestion();
+        }
+
+        Vector2 stickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+        if (stickInput.magnitude > 0.5f)
+        {
+            if (stickInput.x >= 0 && stickInput.y >= 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the first quadrant");
+            }
+            else if (stickInput.x < 0 && stickInput.y >= 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the second quadrant");
+            }
+            else if (stickInput.x < 0 && stickInput.y < 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the third quadrant");
+            }
+            else if (stickInput.x >= 0 && stickInput.y < 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the fourth quadrant");
+            }
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Stick is not pushed halfway to any direction");
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            WriteResponses();
+        }
 
         if (rIndexTrigger == 0) {
             rIndexTriggerHeld = false;
@@ -106,12 +315,12 @@ public class SceneCycler : MonoBehaviour
             lHandTriggerHeld = false;
         }
 
-        if ((rIndexTrigger > 0) && !rIndexTriggerHeld) 
+        if (((rIndexTrigger > 0) && !rIndexTriggerHeld) || Input.GetKeyDown(KeyCode.N)) 
         {   
             rIndexTriggerHeld = true;
-            CancelInvoke();
-            sceneContainer.SetActive(true); 
-            Invoke("HideSceneContainer", vanishTime);
+            // CancelInvoke();
+            // sceneContainer.SetActive(true); 
+            // Invoke("HideSceneContainer", vanishTime);
             if (activeScenes.Count > 0)
             {
                 LoadNext();
@@ -120,9 +329,9 @@ public class SceneCycler : MonoBehaviour
         else if ((lIndexTrigger > 0) && !lIndexTriggerHeld)
         {
             lIndexTriggerHeld = true;
-            CancelInvoke();
-            sceneContainer.SetActive(true); 
-            Invoke("HideSceneContainer", vanishTime);
+            // CancelInvoke();
+            // sceneContainer.SetActive(true); 
+            // Invoke("HideSceneContainer", vanishTime);
             string curCategory = categories[categoryIdx];
             if (activeCategories.Contains(curCategory))
             {
@@ -172,12 +381,12 @@ public class SceneCycler : MonoBehaviour
                     }
                 }
 
-                activeCatsText.SetText(updatedCatsText + " (" + activeScenes.Count.ToString() + ")");
+                // activeCatsText.SetText(updatedCatsText + " (" + activeScenes.Count.ToString() + ")");
             }
             else
             {
                 activeScenes.AddRange(allScenes);
-                activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
+                // activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
             }
 
             sceneIdx = 0;
@@ -189,11 +398,11 @@ public class SceneCycler : MonoBehaviour
         else if ((lHandTrigger > 0) && !lHandTriggerHeld)
         {
             lHandTriggerHeld = true;
-            CancelInvoke();
-            sceneContainer.SetActive(true); 
-            Invoke("HideSceneContainer", vanishTime);
+            // CancelInvoke();
+            // sceneContainer.SetActive(true); 
+            // Invoke("HideSceneContainer", vanishTime);
             categoryIdx = (categoryIdx + 1) % categories.Count;
-            curCatText.SetText("Cat: " + categories[categoryIdx]);
+            // curCatText.SetText("Cat: " + categories[categoryIdx]);
             if (activeCategories.Contains(categories[categoryIdx]))
             {
                 // curCatText.color = Color.green;
