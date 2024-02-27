@@ -500,6 +500,10 @@ Shader "Unlit/InverseCullCubeMapShader"
                     float4 inverted_lab = float4(l, a, b, lab.a);
                     col = LAB2RGB(inverted_lab);
                 } 
+                // Green Label
+                else if (_ColorMethod == 5){
+                    col = float4(0.0, 1.0, 0.0, 1.0);
+                }
                 return col;
             }
 
