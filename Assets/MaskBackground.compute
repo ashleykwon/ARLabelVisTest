@@ -1,0 +1,19 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture2D<int4> backgroundScreenshotForSum;
+Texture2D<int4> labelScreenshotForSum;
+RWTexture2D<int4> Result;
+
+[numthreads(1, 1 ,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{   
+    if (labelScreenshotForSum[id.xy].x > 200 && labelScreenshotForSum[id.xy].y > 200 && labelScreenshotForSum[id.xy].z > 200){
+        Result[id.xy] = backgroundScreenshotForSum[id.xy];
+    }
+    else{
+        Result[id.xy] = int4(0, 0, 0, 0);
+    }
+}

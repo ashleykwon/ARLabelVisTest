@@ -1857,7 +1857,7 @@ MonoBehaviour:
   backgroundAndLabelSphere: {fileID: 747280902}
   labelSphere: {fileID: 452877973}
   player: {fileID: 775743277}
-  cShader: {fileID: 7200000, guid: 0b7e056cf29f7eb49a7a077b3f842663, type: 3}
+  cShaderForMask: {fileID: 7200000, guid: c9a235625146cfd4480f04a868d4b0c9, type: 3}
 --- !u!1 &2106249830
 GameObject:
   m_ObjectHideFlags: 0

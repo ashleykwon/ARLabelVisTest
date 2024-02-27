@@ -51,7 +51,7 @@ Shader "Unlit/GetBGMask"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _BackgroundTex);
+                o.uv = TRANSFORM_TEX(v.uv, _MaskedBackgroundTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
@@ -59,13 +59,16 @@ Shader "Unlit/GetBGMask"
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_BackgroundTex, i.uv);
+                float4 col = tex2D(_MaskedBackgroundTex, i.uv);
                 fixed4 labelPixel = tex2D(_LabelTex, i.uv);
-                fixed4 backgroundPixel = tex2D(_BackgroundTex, i.uv);
-                if (labelPixel[3] == 0){
-                    backgroundPixel = float4(0.0, 0.0, 0.0, 0.0);
-                }
-                // col = float4(1.0, 0.0, 0.0, 1.0);
+                // fixed4 backgroundPixel = tex2D(_BackgroundTex, i.uv);
+                // if (labelPixel[0] < 0.9f && labelPixel[1] < 0.9f && labelPixel[2] < 0.9f){ // is a background pixel
+                //     col[3] = 0;
+                // }
+                // else{
+                //     col = backgroundPixel;
+                // }
+                col = float4(1, 0, 0, 0);
                 return col;
             }
             ENDCG
