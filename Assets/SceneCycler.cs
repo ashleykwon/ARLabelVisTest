@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -25,11 +26,17 @@ public class SceneCycler : MonoBehaviour
     private Dictionary<string, List<int>> categoriesDict = new Dictionary<string, List<int>>();
     private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
 
-    private Dictionary<int, List<SceneQuestion>> sceneQuestions = new Dictionary<int, List<SceneQuestion>>();
-    int qIdx = 0;
+    private Dictionary<int, SceneQuestion> sceneQuestions = new Dictionary<int, SceneQuestion>();
+    int aIdx = 0;
 
+    Stopwatch detectionSW = new Stopwatch();
+    Stopwatch responseSW = new Stopwatch();
+
+    public GameObject questionUI;
     public TMP_Text questionText;
-    public List<TMP_Text> answerTexts;
+    public List<Image> answerImgs;
+    public List<Image> answerPanels;
+    private Color unselected = new Color(1.0f, 215 / 255f, 215 / 255f);
 
     private TMP_Text activeCatsText;
     private TMP_Text curCatText;
@@ -87,12 +94,7 @@ public class SceneCycler : MonoBehaviour
         foreach (SceneQuestion question in questionsList.sceneQuestions)
         {
             int sceneQIdx = sceneToIdx[question.sceneName];
-
-            if (!sceneQuestions.ContainsKey(sceneQIdx))
-            {
-                sceneQuestions[sceneQIdx] = new List<SceneQuestion>();
-            }
-            sceneQuestions[sceneQIdx].Add(question);
+            sceneQuestions[sceneQIdx] = question;
         }
     }
 
@@ -147,8 +149,9 @@ public class SceneCycler : MonoBehaviour
 
 
         SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
-        qIdx = 0;
+        questionUI.SetActive(false);
         UpdateQuestion();
+        UpdateResponse(0);
     }
 
     public void HideSceneContainer()
@@ -160,44 +163,81 @@ public class SceneCycler : MonoBehaviour
     {
         SceneQuestionsList responses = new SceneQuestionsList();
 
-        foreach (KeyValuePair<int, List<SceneQuestion>> entry in sceneQuestions)
+        foreach (KeyValuePair<int, SceneQuestion> entry in sceneQuestions)
         {
-            foreach (SceneQuestion question in entry.Value)
-            {
-                responses.sceneQuestions.Add(question);
-            }
+            responses.sceneQuestions.Add(entry.Value);
         }
 
         string json = JsonUtility.ToJson(responses, true);
         string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
         string outpath = Path.Combine(Application.persistentDataPath, $"UserResponse_{dateString}.json");
-        Debug.Log(outpath);
+        UnityEngine.Debug.Log(outpath);
         using (StreamWriter writer = new StreamWriter(outpath, false))
         {
             await writer.WriteAsync(json);
         }
     }
 
-    public void RecordResponse(int idx)
+    public void RecordResponse()
     {
-        sceneQuestions[activeScenes[sceneIdx]][qIdx].response = sceneQuestions[activeScenes[sceneIdx]][qIdx].answers[idx];
-        Debug.Log("Recorded response " + sceneQuestions[activeScenes[sceneIdx]][qIdx].answers[idx]);
+        SceneQuestion cur = sceneQuestions[activeScenes[sceneIdx]];
+        if (!cur.responded)
+        {
+            responseSW.Stop();
+            long detectionTime = detectionSW.ElapsedMilliseconds;
+            long responseTime = responseSW.ElapsedMilliseconds;
+            cur.response = aIdx.ToString();
+            cur.detectionTime = detectionTime;
+            cur.responseTime = responseTime;
+            cur.responded = true;
+            UnityEngine.Debug.Log("Recorded response " + cur.answers[aIdx]);
+            UnityEngine.Debug.Log(responseTime);
+        }
     }
 
-    public void UpdateQuestion()
+    public void UpdateResponse(int idx)
     {
-        SceneQuestion curQ = sceneQuestions[activeScenes[sceneIdx]][qIdx];
-        questionText.SetText(curQ.question);
-
-        for (int i = 0; i < answerTexts.Count; i++)
+        aIdx = idx;
+        for (int i = 0; i < answerPanels.Count; i++)
         {
-            if (i < curQ.answers.Count)
+            if (i == aIdx)
             {
-                answerTexts[i].SetText(curQ.answers[i]);
+                answerPanels[i].color = Color.green;
             }
             else
             {
-                answerTexts[i].SetText("");
+                answerPanels[i].color = unselected;
+            }
+
+        }
+    }
+    
+    public void ShowQuestion()
+    {
+        detectionSW.Stop();
+        responseSW.Reset();
+        responseSW.Start();
+        questionUI.SetActive(true);
+    }
+
+    public void HideQuestion()
+    {
+        questionUI.SetActive(false);
+    }
+
+    // Updates active question based on current state of qIdx
+    public void UpdateQuestion()
+    {
+        
+        SceneQuestion curQ = sceneQuestions[activeScenes[sceneIdx]];
+        questionText.SetText(curQ.question);
+        for (int i = 0; i < answerImgs.Count; i++)
+        {
+            if (i < curQ.answers.Count)
+            {
+                Sprite sprite = Resources.Load<Sprite>(curQ.answers[i]);
+                UnityEngine.Debug.Log(curQ.answers[i]);
+                answerImgs[i].sprite = sprite;
             }
         }
     }
@@ -207,8 +247,10 @@ public class SceneCycler : MonoBehaviour
         sceneIdx = (sceneIdx + 1) % activeScenes.Count;
         SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
 
-        qIdx = 0;
+        HideQuestion();
         UpdateQuestion();
+        detectionSW.Reset();
+        detectionSW.Start();
     }
 
     //Update is called once per frame
@@ -220,22 +262,40 @@ public class SceneCycler : MonoBehaviour
         float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
         
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            ShowQuestion();
+        }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.H))
         {
-            RecordResponse(0);
+            HideQuestion();
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
+
+        Vector2 stickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
+
+        if (stickInput.magnitude > 0.5f)
         {
-            RecordResponse(1);
+            if (stickInput.x >= 0 && stickInput.y >= 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the first quadrant");
+            }
+            else if (stickInput.x < 0 && stickInput.y >= 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the second quadrant");
+            }
+            else if (stickInput.x < 0 && stickInput.y < 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the third quadrant");
+            }
+            else if (stickInput.x >= 0 && stickInput.y < 0)
+            {
+                UnityEngine.Debug.Log("Stick is in the fourth quadrant");
+            }
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        else
         {
-            RecordResponse(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            RecordResponse(3);
+            UnityEngine.Debug.Log("Stick is not pushed halfway to any direction");
         }
 
         if (Input.GetKeyDown(KeyCode.R))

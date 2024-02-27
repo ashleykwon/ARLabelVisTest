@@ -2,29 +2,33 @@
     "sceneQuestions": [
       {
         "sceneName": "CityBridge",
-        "question": "Please select the number of edges in the AR polygon label",
+        "question": "Please select the polygon that has the same shape as the label",
         "answers": [
-          "3",
-          "4",
-          "5",
-          "6"
+          "Polygons/Hex1",
+          "Polygons/Hex2",
+          "Polygons/Hex3",
+          "Polygons/HexTrue"
         ]
       },
       {
         "sceneName": "HotelParanal",
-        "question": "Please select the number of edges in the AR polygon label",
+        "question": "Please select the polygon that has the same shape as the label",
         "answers": [
-            "3",
-            "6",
-            "9"
+          "Polygons/Hex1",
+          "Polygons/Hex3",
+          "Polygons/HexTrue",
+          "Polygons/Hex2"
+
         ]
       },
       {
         "sceneName": "LaSilla",
-        "question": "Please select the number of edges in the AR polygon label",
+        "question": "Please select the polygon that has the same shape as the label",
         "answers": [
-            "1",
-            "2"
+          "Polygons/HexTrue",
+          "Polygons/Hex1",
+          "Polygons/Hex2",
+          "Polygons/Hex3"
         ]
       }
     ]
