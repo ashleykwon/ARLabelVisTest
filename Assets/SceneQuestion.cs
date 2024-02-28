@@ -10,6 +10,7 @@ public class SceneQuestion
     public List<string> answers;
     public bool responded = false;
     public string response = "";
+    public int labelMode = -1;
     public long detectionTime = -1;
     public long responseTime = -1;
 }

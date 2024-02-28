@@ -40,8 +40,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     void toTexture2D(RenderTexture rTex, Texture2D screenshot, int width, int height)
     {
         RenderTexture.active = rTex;
-        screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
-        screenshot.Apply();
+        //screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        //screenshot.Apply();
         // RenderTexture.active = null;
     }
 

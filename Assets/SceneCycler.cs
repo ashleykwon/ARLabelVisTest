@@ -183,10 +183,13 @@ public class SceneCycler : MonoBehaviour
         SceneQuestion cur = sceneQuestions[activeScenes[sceneIdx]];
         if (!cur.responded)
         {
+
+            UserTestingMovePlayer instance = FindObjectOfType<UserTestingMovePlayer>();
             responseSW.Stop();
             long detectionTime = detectionSW.ElapsedMilliseconds;
             long responseTime = responseSW.ElapsedMilliseconds;
             cur.response = aIdx.ToString();
+            cur.labelMode = instance.currentLabelDisplayMode;
             cur.detectionTime = detectionTime;
             cur.responseTime = responseTime;
             cur.responded = true;
@@ -210,6 +213,11 @@ public class SceneCycler : MonoBehaviour
             }
 
         }
+    }
+
+    public bool Responded()
+    {
+        return sceneQuestions[activeScenes[sceneIdx]].responded;
     }
     
     public void ShowQuestion()
@@ -262,40 +270,43 @@ public class SceneCycler : MonoBehaviour
         float lIndexTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger);
         float lHandTrigger = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
         
-        if(Input.GetKeyDown(KeyCode.S))
-        {
-            ShowQuestion();
-        }
-
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            HideQuestion();
-        }
 
         Vector2 stickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
 
-        if (stickInput.magnitude > 0.5f)
+        if (stickInput.magnitude > 0.6f)
         {
-            if (stickInput.x >= 0 && stickInput.y >= 0)
+            if (stickInput.x < 0 && stickInput.y >= 0)
             {
-                UnityEngine.Debug.Log("Stick is in the first quadrant");
+                UpdateResponse(0);
             }
-            else if (stickInput.x < 0 && stickInput.y >= 0)
+            else if (stickInput.x >= 0 && stickInput.y >= 0)
             {
-                UnityEngine.Debug.Log("Stick is in the second quadrant");
+                UpdateResponse(1);
             }
             else if (stickInput.x < 0 && stickInput.y < 0)
             {
-                UnityEngine.Debug.Log("Stick is in the third quadrant");
+                UpdateResponse(2);
             }
             else if (stickInput.x >= 0 && stickInput.y < 0)
             {
-                UnityEngine.Debug.Log("Stick is in the fourth quadrant");
+                UpdateResponse(3);
             }
         }
-        else
+
+        if(OVRInput.GetUp(OVRInput.Button.SecondaryThumbstick))
         {
-            UnityEngine.Debug.Log("Stick is not pushed halfway to any direction");
+            if (!Responded())
+            {
+                if (!questionUI.activeSelf)
+                {
+                    ShowQuestion();
+                }
+                else
+                {
+                    RecordResponse();
+                    HideQuestion();
+                }
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -326,91 +337,91 @@ public class SceneCycler : MonoBehaviour
                 LoadNext();
             }
         }
-        else if ((lIndexTrigger > 0) && !lIndexTriggerHeld)
-        {
-            lIndexTriggerHeld = true;
-            // CancelInvoke();
-            // sceneContainer.SetActive(true); 
-            // Invoke("HideSceneContainer", vanishTime);
-            string curCategory = categories[categoryIdx];
-            if (activeCategories.Contains(curCategory))
-            {
-                activeCategories.Remove(curCategory);
-                // curCatText.color = Color.red;
-            }
-            else
-            {
-                activeCategories.Add(curCategory);
-                // curCatText.color = Color.green;
-            }
+        // else if ((lIndexTrigger > 0) && !lIndexTriggerHeld)
+        // {
+        //     lIndexTriggerHeld = true;
+        //     // CancelInvoke();
+        //     // sceneContainer.SetActive(true); 
+        //     // Invoke("HideSceneContainer", vanishTime);
+        //     string curCategory = categories[categoryIdx];
+        //     if (activeCategories.Contains(curCategory))
+        //     {
+        //         activeCategories.Remove(curCategory);
+        //         // curCatText.color = Color.red;
+        //     }
+        //     else
+        //     {
+        //         activeCategories.Add(curCategory);
+        //         // curCatText.color = Color.green;
+        //     }
 
-            activeScenes.Clear();
+        //     activeScenes.Clear();
 
 
-            if (activeCategories.Count > 0) 
-            {
-                for (int i = 0; i < allScenes.Count; i++)
-                {
-                    bool inIntersection = true;
+        //     if (activeCategories.Count > 0) 
+        //     {
+        //         for (int i = 0; i < allScenes.Count; i++)
+        //         {
+        //             bool inIntersection = true;
 
-                    for (int j = 0; j < activeCategories.Count; j++)
-                    {
-                        if (!categoriesDict[activeCategories[j]].Contains(allScenes[i])) 
-                        {
-                            inIntersection = false;
-                            break;
-                        }
-                    }
+        //             for (int j = 0; j < activeCategories.Count; j++)
+        //             {
+        //                 if (!categoriesDict[activeCategories[j]].Contains(allScenes[i])) 
+        //                 {
+        //                     inIntersection = false;
+        //                     break;
+        //                 }
+        //             }
 
-                    if (inIntersection)
-                    {
-                        activeScenes.Add(allScenes[i]);
-                    }
-                }
+        //             if (inIntersection)
+        //             {
+        //                 activeScenes.Add(allScenes[i]);
+        //             }
+        //         }
 
-                string updatedCatsText = "Active: ";
-                for (int i = 0; i < activeCategories.Count; i++)
-                {
-                    if (i > 0)
-                    {
-                        updatedCatsText += ", " + activeCategories[i];
-                    }
-                    else
-                    {
-                        updatedCatsText += activeCategories[i];
-                    }
-                }
+        //         string updatedCatsText = "Active: ";
+        //         for (int i = 0; i < activeCategories.Count; i++)
+        //         {
+        //             if (i > 0)
+        //             {
+        //                 updatedCatsText += ", " + activeCategories[i];
+        //             }
+        //             else
+        //             {
+        //                 updatedCatsText += activeCategories[i];
+        //             }
+        //         }
 
-                // activeCatsText.SetText(updatedCatsText + " (" + activeScenes.Count.ToString() + ")");
-            }
-            else
-            {
-                activeScenes.AddRange(allScenes);
-                // activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
-            }
+        //         // activeCatsText.SetText(updatedCatsText + " (" + activeScenes.Count.ToString() + ")");
+        //     }
+        //     else
+        //     {
+        //         activeScenes.AddRange(allScenes);
+        //         // activeCatsText.SetText("Active: ALL" + " (" + activeScenes.Count.ToString() + ")");
+        //     }
 
-            sceneIdx = 0;
-            if (activeScenes.Count > 0)
-            {
-                SceneManager.LoadScene(activeScenes[sceneIdx]);
-            }
-        }
-        else if ((lHandTrigger > 0) && !lHandTriggerHeld)
-        {
-            lHandTriggerHeld = true;
-            // CancelInvoke();
-            // sceneContainer.SetActive(true); 
-            // Invoke("HideSceneContainer", vanishTime);
-            categoryIdx = (categoryIdx + 1) % categories.Count;
-            // curCatText.SetText("Cat: " + categories[categoryIdx]);
-            if (activeCategories.Contains(categories[categoryIdx]))
-            {
-                // curCatText.color = Color.green;
-            }
-            else
-            {
-                // curCatText.color = Color.red;
-            }
-        }
+        //     sceneIdx = 0;
+        //     if (activeScenes.Count > 0)
+        //     {
+        //         SceneManager.LoadScene(activeScenes[sceneIdx]);
+        //     }
+        // }
+        // else if ((lHandTrigger > 0) && !lHandTriggerHeld)
+        // {
+        //     lHandTriggerHeld = true;
+        //     // CancelInvoke();
+        //     // sceneContainer.SetActive(true); 
+        //     // Invoke("HideSceneContainer", vanishTime);
+        //     categoryIdx = (categoryIdx + 1) % categories.Count;
+        //     // curCatText.SetText("Cat: " + categories[categoryIdx]);
+        //     if (activeCategories.Contains(categories[categoryIdx]))
+        //     {
+        //         // curCatText.color = Color.green;
+        //     }
+        //     else
+        //     {
+        //         // curCatText.color = Color.red;
+        //     }
+        // }
     }
 }
