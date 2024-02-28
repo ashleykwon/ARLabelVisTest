@@ -100,7 +100,7 @@ Material:
     - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
-    - _ColorMethod: 5
+    - _ColorMethod: 4
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
