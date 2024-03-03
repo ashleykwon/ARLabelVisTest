@@ -101,7 +101,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     void LateUpdate()
     {  
-        Debug.Log(backgroundRT);
         // Convert the screenshot from the background and the label cameras to texture2D for sum calculation 
         toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
         toTexture2D(labelRT, labelScreenshotForSum, w, h);
