@@ -211,7 +211,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return float4(r, g, b, hsv.a);
             }
 
-            float4 RGB2LAB(float4 RGB) 
+            float4 RGB2LAB(float4 RGB) // probably referenced from here:
             {
                 float R = RGB.r;
                 float G = RGB.g;
@@ -491,9 +491,35 @@ Shader "Unlit/InverseCullCubeMapShader"
                     float b = lab[2];
 
                     
-                    l *= -1;
-                    a *= -1;
-                    b *= -1;
+                    // l *= -1;
+                    // a *= -1;
+                    // b *= -1;
+                    if ((49.0 <= l) && (l <= 51.0)){
+                        l = 100;
+                    }
+                    else{
+                        l = 100 - l;
+                    }
+                    
+                    a = 0;
+                    b = 0;
+                    if (a < 0){
+                        // a = 500*25/29.0;
+                        a = 128.0;
+                    }
+                    else if (a >= 0){
+                        // a = -1*500*25/29.0;
+                        a = -127;
+                    }
+                    if (b < 0){
+                        // b = 200*25/29.0;
+                        b = 128.0;
+                    }
+                    else if (b >= 0){
+                        // b = -200*25/29.0;
+                        b = -127;
+                    }
+
                     // a = 62.1313548;// -81.1856371;
                     // b = -95.50187772;//76.11578826;
 

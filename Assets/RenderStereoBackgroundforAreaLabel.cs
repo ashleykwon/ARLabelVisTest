@@ -40,8 +40,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     void toTexture2D(RenderTexture rTex, Texture2D screenshot, int width, int height)
     {
         RenderTexture.active = rTex;
-        //screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
-        //screenshot.Apply();
+        screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        screenshot.Apply();
         // RenderTexture.active = null;
     }
 
@@ -101,6 +101,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     void LateUpdate()
     {  
+        Debug.Log(backgroundRT);
         // Convert the screenshot from the background and the label cameras to texture2D for sum calculation 
         toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
         toTexture2D(labelRT, labelScreenshotForSum, w, h);
@@ -109,6 +110,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         int granularityMethod = backgroundAndLabelSphereMaterial.GetInt("_GranularityMethod");
 
         if (granularityMethod == 1){ // area-based label
+           
             // Using compute shader, mask the background so that it only contains pixels under the area label
             cShaderForMask.SetTexture(maskBuffer_kernelID, "backgroundScreenshotForSum", backgroundScreenshotForSum);
             cShaderForMask.SetTexture(maskBuffer_kernelID, "labelScreenshotForSum", labelScreenshotForSum);
@@ -117,8 +119,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
 
             // For mask debugging purposes only 
-            // byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
-            // File.WriteAllBytes(Application.dataPath + "/MaskedBackground.png", bytes);
+            byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
+            File.WriteAllBytes(Application.dataPath + "/MaskedBackground2.png", bytes);
         }
 
         // Save images for debugging purposes only
@@ -184,7 +186,12 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", 0.0f);
             backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", 0.0f);
         }
+        
+    }
 
+
+    void OnDestroy() // Destroy render textures upon stopping the run
+    {
         RenderTexture.ReleaseTemporary(backgroundRT);
         RenderTexture.ReleaseTemporary(labelRT);
     }
