@@ -498,11 +498,9 @@ Shader "Unlit/InverseCullCubeMapShader"
                         l = 100;
                     }
                     else{
-                        l = 100 - l;
+                        l = 100.0 - l;
                     }
-                    
-                    a = 0;
-                    b = 0;
+
                     if (a < 0){
                         // a = 500*25/29.0;
                         a = 128.0;
@@ -511,6 +509,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                         // a = -1*500*25/29.0;
                         a = -127;
                     }
+
                     if (b < 0){
                         // b = 200*25/29.0;
                         b = 128.0;
