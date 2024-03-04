@@ -529,6 +529,11 @@ Shader "Unlit/InverseCullCubeMapShader"
                 else if (_ColorMethod == 5){
                     col = float4(0.0, 1.0, 0.0, 1.0);
                 }
+                
+                // No label
+                else if (_ColorMethod == 6){
+                    col = float4(0.0, 0.0, 0.0, 0.0);
+                }
                 return col;
             }
 
@@ -636,12 +641,12 @@ Shader "Unlit/InverseCullCubeMapShader"
                                     //if we are so unlucky that no sample presents in the neighborhood
                                     col = function_f(_ColorMethod, bgSample);
                                 }
-
-                                
-                                
                             }
                             // set the opacity level
                             col[3] = _OpacityLevel;
+                            if (_ColorMethod == 6){
+                                col[3] = 0.0;
+                            }
                         // Apply outline if selected
                         if (_EnableOutline == 1)
                         {

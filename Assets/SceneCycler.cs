@@ -273,7 +273,7 @@ public class SceneCycler : MonoBehaviour
 
         Vector2 stickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.RTouch);
 
-        if (stickInput.magnitude > 0.6f)
+        if (stickInput.magnitude > 0.8f)
         {
             if (stickInput.x < 0 && stickInput.y >= 0)
             {
