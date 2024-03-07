@@ -33,6 +33,8 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _OpacityLevel("Label opacity level", Range(0, 1)) = 1
 
+        
+
     }
     SubShader
     {

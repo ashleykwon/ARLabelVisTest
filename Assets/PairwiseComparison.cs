@@ -27,7 +27,8 @@ public class PairwiseComparison : MonoBehaviour
     Vector2 stickInput;
     int[] currentComparison;
     int currentComparisonPairIdx; // index in numComparisons
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
