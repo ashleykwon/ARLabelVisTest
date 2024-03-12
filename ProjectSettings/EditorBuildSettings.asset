@@ -35,7 +35,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TestScenes/Gradient/GreyGradient_Spheres.unity
     guid: ee0c5aec464724434b1759585a55fe72
-  - enabled: 1
+  - enabled: 0
     path: Assets/TestScenes/Gradient/RGGradient_Spheres.unity
     guid: 40d492bde67704067824efdfca0ff1e2
   - enabled: 0
@@ -53,7 +53,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TestScenes/SolidColors/TriColorRGBNoise_Spheres_Noise.unity
     guid: 1d4eb157ce1b84661966b54344899b05
-  - enabled: 1
+  - enabled: 0
     path: Assets/TestScenes/SolidColors/CheckerBW_Spheres_Checker.unity
     guid: c39192a8098ae48d6a7b2083f5c67d44
   - enabled: 0
@@ -65,7 +65,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TestScenes/SolidColors/CheckerRG_Spheres_Checker.unity
     guid: 64991d64760b349bb809c90893cfafbf
-  - enabled: 1
+  - enabled: 0
     path: Assets/TestScenes/SolidColors/CheckerRG_Spheres_Checker_Noise.unity
     guid: b9664b93e127c4fad9bb0744f98b9687
   - enabled: 0

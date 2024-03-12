@@ -34,9 +34,11 @@ public class SceneCycler : MonoBehaviour
 
     public GameObject questionUI;
     public TMP_Text questionText;
+    public GameObject answerContainer;
     public List<Image> answerImgs;
     public List<Image> answerPanels;
     private Color unselected = new Color(1.0f, 215 / 255f, 215 / 255f);
+    public GameObject labelSphere;
 
     private TMP_Text activeCatsText;
     private TMP_Text curCatText;
@@ -228,9 +230,31 @@ public class SceneCycler : MonoBehaviour
         questionUI.SetActive(true);
     }
 
+    // false - task 1 (polygons), true - task 2 (optimal label)
+    public bool Mode()
+    {
+        return sceneQuestions[activeScenes[sceneIdx]].answers.Count == 0;
+    }
+
+    public void ShowPanels()
+    {
+        answerContainer.SetActive(true);
+    }
+
+    public void HidePanels()
+    {
+        answerContainer.SetActive(false);
+    }
+
     public void HideQuestion()
     {
         questionUI.SetActive(false);
+    }
+
+    public void UpdateMask(string name)
+    {
+        Cubemap newLabelCubemap = Resources.Load("Materials/" + name, typeof(Cubemap)) as Cubemap;
+        labelSphere.GetComponent<Renderer>().material.SetTexture("_CubeMap", newLabelCubemap);
     }
 
     // Updates active question based on current state of qIdx
@@ -239,6 +263,9 @@ public class SceneCycler : MonoBehaviour
         
         SceneQuestion curQ = sceneQuestions[activeScenes[sceneIdx]];
         questionText.SetText(curQ.question);
+
+        UpdateMask(curQ.mask);
+
         for (int i = 0; i < answerImgs.Count; i++)
         {
             if (i < curQ.answers.Count)
@@ -248,17 +275,27 @@ public class SceneCycler : MonoBehaviour
                 answerImgs[i].sprite = sprite;
             }
         }
+
+        if (Mode())
+        {
+            ShowQuestion();
+            HidePanels();
+        }
     }
 
     public void LoadNext()
     {
-        sceneIdx = (sceneIdx + 1) % activeScenes.Count;
-        SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+        if (Responded())
+        {   
+            ShowPanels();
 
-        HideQuestion();
-        UpdateQuestion();
-        detectionSW.Reset();
-        detectionSW.Start();
+            sceneIdx = (sceneIdx + 1) % activeScenes.Count;
+            SceneManager.LoadScene(sceneMap[activeScenes[sceneIdx]]);
+            HideQuestion();
+            UpdateQuestion();
+            detectionSW.Reset();
+            detectionSW.Start();
+        }
     }
 
     //Update is called once per frame

@@ -3,6 +3,7 @@
       {
         "sceneName": "CityBridge",
         "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "mask": "Test",
         "answers": [
           "UserTesting/Answers/Hex1",
           "UserTesting/Answers/Hex2",
@@ -13,6 +14,7 @@
       {
         "sceneName": "HotelParanal",
         "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "mask": "HotelParanal_Test2",
         "answers": [
           "UserTesting/Answers/Hex1",
           "UserTesting/Answers/Hex3",
@@ -23,6 +25,7 @@
       {
         "sceneName": "LaSilla",
         "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "mask": "Test",
         "answers": [
           "UserTesting/Answers/HexTrue_HotelParanal",
           "UserTesting/Answers/Hex1",

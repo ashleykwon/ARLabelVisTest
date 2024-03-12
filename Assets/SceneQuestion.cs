@@ -7,6 +7,7 @@ public class SceneQuestion
 {
     public string sceneName;
     public string question;
+    public string mask;
     public List<string> answers;
     public bool responded = false;
     public string response = "";
