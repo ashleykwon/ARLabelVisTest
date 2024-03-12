@@ -32,6 +32,12 @@
           "UserTesting/Answers/Hex2",
           "UserTesting/Answers/Hex3"
         ]
+      },
+      {
+        "sceneName": "LaSilla",
+        "question": "Choose the labelling mode that optimizes visibility.",
+        "mask": "Test",
+        "answers": []
       }
     ]
   }
