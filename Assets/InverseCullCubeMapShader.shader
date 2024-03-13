@@ -580,20 +580,15 @@ Shader "Unlit/InverseCullCubeMapShader"
                     // col = float4(_CIEDE_label_r, _CIEDE_label_g, _CIEDE_label_b, 1);
                     // col = float4(1, 0, 0, 1);
 
-                    for (int i = 0; i < 406; i+=3){
+                    for (int i = 0; i <= 406; i+=3){
                         float4 candidatePoint = float4(_CIELABCandidates[i], _CIELABCandidates[i+1], _CIELABCandidates[i+2], 1);
                         float distance = CIEDE00(RGB2LAB(bgSample), candidatePoint);
                         // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
-                        // CIEDE00(RGB2LAB(col), candidatePoint);
                         if (distance > maxDistance){
                             maxDistance = distance;
                             LABatMaxDistance = candidatePoint;
                         }
-                        // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
                     }
-                    // col = bgSample()
-                    // LAB2RGB(LABatMaxDistance);
-                    // float4 inverted_lab = float4(l, a, b, lab.a);
                     col = LAB2RGB(LABatMaxDistance);
                 } 
                 // Green Label

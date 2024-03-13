@@ -14,7 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TestScenes/CubeSphere_Geometry.unity
     guid: 9f7d8c7034f5347f5b02c578f3d3ff29
-  - enabled: 1
+  - enabled: 0
     path: Assets/TestScenes/360/CityBridge_360_Night_Outdoor.unity
     guid: 5c6696ff86ab24767b4645d5f02459ca
   - enabled: 1

@@ -85,10 +85,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Find the ID of the average RGB value calculation function we'll use in Compute Shader
         maskBuffer_kernelID = cShaderForMask.FindKernel("CSMain");
 
+        // Read the txt file that contains candidate LAB values and copy their values into CandidateCIELABVals
         CandidateCIELABVals = new List<float>();
-
-
-        // Read the txt file that contains candidate LAB values
         var linesRead = File.ReadLines("./Assets/CandidateLABvals2.txt");
         foreach (var lineRead in linesRead)
         {
