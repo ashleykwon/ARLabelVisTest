@@ -59,6 +59,9 @@ public class PairwiseComparison : MonoBehaviour
             allComparisons.RemoveAt(currentPairIdx);
         }
 
+        // For debugging purposes only
+        // comparisonsToUse[0][0] = 5;
+
 
         // Set default values for label mode visualization 
         currentMode = 0; // 0 by default
@@ -103,13 +106,13 @@ public class PairwiseComparison : MonoBehaviour
             labelSphereMaterial.SetInt("_GranularityMethod", 2);
             modeID.text = "Mode ID: 4";
         }
-        else if (currentLabelDisplayMode == 5){ // CIELAB + Per-background + 70% opacity
+        else if (currentLabelDisplayMode == 5){ // CIELAB + Per-pixel + 70% opacity
             labelSphereMaterial.SetInt("_ColorMethod", 4);
             labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
             labelSphereMaterial.SetInt("_GranularityMethod", 0);
             modeID.text = "Mode ID: 5";
         }
-        else if (currentLabelDisplayMode == 6){ // CIELAB + Per-background + 70% opacity
+        else if (currentLabelDisplayMode == 6){ // CIELAB + Per-area + 70% opacity
             labelSphereMaterial.SetInt("_ColorMethod", 4);
             labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
             labelSphereMaterial.SetInt("_GranularityMethod", 1);
@@ -121,7 +124,7 @@ public class PairwiseComparison : MonoBehaviour
             labelSphereMaterial.SetInt("_GranularityMethod", 2);
             modeID.text = "Mode ID: 7";
         }
-        else if (currentLabelDisplayMode == 8){ // CIELAB + Per-background + 70% opacity
+        else if (currentLabelDisplayMode == 8){ // No label
             labelSphereMaterial.SetInt("_ColorMethod", 6);
             labelSphereMaterial.SetFloat("_OpacityLevel", 0.0f);
             modeID.text = "Mode ID: No label";

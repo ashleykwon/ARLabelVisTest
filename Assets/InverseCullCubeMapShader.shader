@@ -33,9 +33,12 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _OpacityLevel("Label opacity level", Range(0, 1)) = 1
 
-        
+        _CIEDE_label_r("Label_color_red_set_by_CIEDE00", Range(0,1)) = 0.1
+        _CIEDE_label_g("Label_color_green_set_by_CIEDE00", Range(0,1)) = 0.1
+        _CIEDE_label_b("Label_color_blue_set_by_CIEDE00", Range(0,1)) = 0.1
 
     }
+
     SubShader
     {
         // To be able to apply transparency to the sphere
@@ -99,6 +102,12 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _Background_sum_r;
             float _Background_sum_g;
             float _Background_sum_b;
+
+            float _CIEDE_label_r;
+            float _CIEDE_label_g;
+            float _CIEDE_label_b;
+
+            float _CIELABCandidates[408];
            
            
             struct v2f 
@@ -403,6 +412,85 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return RGBfinal;
             }
 
+            float CIEDE00(float4 LAB1, float4 LAB2)
+            { // from https://hajim.rochester.edu/ece/sites/gsharma/ciede2000/ciede2000noteCRNA.pdf
+                float distance = 0.0;
+                
+                // Get the LAB values from the inputs
+                float L1 = LAB1[0];
+                float a1 = LAB1[1];
+                float b1 = LAB1[2];
+
+                float L2 = LAB2[0];
+                float a2 = LAB2[1];
+                float b2 = LAB2[2];
+
+                float L_avg = (L1 + L2)/2;
+
+                // Calculate C and h
+                float C_Lab1 = sqrt(pow(a1, 2) + pow(b1, 2));
+                float C_Lab2 = sqrt(pow(a2, 2) + pow(b2, 2));
+                float C_avg = (C_Lab1 + C_Lab2)/2;
+
+                float G = 0.5*(1 - sqrt(pow(C_avg, 7)/(pow(C_avg, 7) + pow(25, 7))));
+                float a1_prime = (1 + G)*a1;
+                float a2_prime = (1 + G)*a2;
+                
+                float h_Lab1 = 0;
+                float h_Lab2 = 0;
+                if (a1_prime != 0 && b1 != 0){
+                    h_Lab1 = atan(b1/a1_prime);
+                }
+                if (a2_prime != 0 && b2 != 0){
+                    h_Lab2 = atan(b1/a2_prime);
+                }
+
+                float h_avg = 0;
+                if (abs(h_Lab1 - h_Lab2) <= 180 && C_Lab1*C_Lab2 != 0){
+                    h_avg = (h_Lab1 + h_Lab2)/2;
+                }
+                else if (abs(h_Lab1 - h_Lab2) > 180 && (h_Lab1 + h_Lab2) < 360 && C_Lab1*C_Lab2 != 0){
+                    h_avg = (h_Lab1 + h_Lab2 + 360)/2;
+                }
+                else if (abs(h_Lab1 - h_Lab2) > 180 && (h_Lab1 + h_Lab2) >= 360 && C_Lab1*C_Lab2 != 0){
+                    h_avg = (h_Lab1 + h_Lab2 - 360)/2;
+                }
+                else if (C_Lab1*C_Lab2 == 0){
+                    h_avg = h_Lab1 + h_Lab2;
+                }
+                
+                // Calculate deltaL, deltaC, deltaH
+                float deltaL = L2 - L1;
+                float deltaC = C_Lab2 - C_Lab1;
+                float deltaH = 0;
+                if (C_Lab1*C_Lab2 == 0){
+                    deltaH = 0;
+                }
+                else if (C_Lab1*C_Lab2 != 0 && abs(h_Lab2 - h_Lab1) <= 180){
+                    deltaH = h_Lab2 - h_Lab1;
+                }
+                else if (C_Lab1*C_Lab2 != 0 && (h_Lab2 - h_Lab1) > 180){
+                    deltaH = h_Lab2 - h_Lab1 - 360;
+                }
+                else if (C_Lab1*C_Lab2 != 0 && (h_Lab2 - h_Lab1) < -180){
+                    deltaH = h_Lab2 - h_Lab1 + 360;
+                }
+
+                // Calculate T S_l, S_c, S_h, and R_t
+                float T = 1 - 0.17*cos(h_avg - 30) + 0.24*cos(2*h_avg) + 0.32*cos(3*h_avg + 6) - 0.2*cos(4*h_avg - 63);
+                float deltaTheta = 30*exp(-1*pow((h_avg - 275)/25, 2));
+                float R_c = 2*sqrt(pow(C_avg, 7)/(pow(C_avg, 7) + pow(25, 7)));
+                float S_l = 1 + ((0.015*pow(L_avg - 50, 2))/sqrt(20 + pow(L_avg - 50, 2)));
+                float S_c = 1 + 0.045*C_avg;
+                float S_h = 1 + 0.015*C_avg*T;
+                float R_t = -sin(2*deltaTheta*R_c);
+
+                // Calculate CIEDE00 (assume k_l = k_c = k_h = 0)
+                distance = sqrt(pow(deltaL/S_l, 2) + pow(deltaC/S_c, 2) + pow(deltaH/S_h, 2) + R_t*(deltaC/S_c)*(deltaH/S_h));
+
+                return distance;
+            }
+
 
             float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
             {
@@ -487,45 +575,26 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    float4 lab = RGB2LAB(bgSample);
-                    float l = lab[0];
-                    float a = lab[1];
-                    float b = lab[2];
+                    float maxDistance = 0;
+                    float4 LABatMaxDistance = float4(0, 0, 0, 1);
+                    // col = float4(_CIEDE_label_r, _CIEDE_label_g, _CIEDE_label_b, 1);
+                    // col = float4(1, 0, 0, 1);
 
-                    
-                    // l *= -1;
-                    // a *= -1;
-                    // b *= -1;
-                    if ((49.0 <= l) && (l <= 51.0)){
-                        l = 100;
+                    for (int i = 0; i < 406; i+=3){
+                        float4 candidatePoint = float4(_CIELABCandidates[i], _CIELABCandidates[i+1], _CIELABCandidates[i+2], 1);
+                        float distance = CIEDE00(RGB2LAB(bgSample), candidatePoint);
+                        // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
+                        // CIEDE00(RGB2LAB(col), candidatePoint);
+                        if (distance > maxDistance){
+                            maxDistance = distance;
+                            LABatMaxDistance = candidatePoint;
+                        }
+                        // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
                     }
-                    else{
-                        l = 100.0 - l;
-                    }
-
-                    if (a < 0){
-                        // a = 500*25/29.0;
-                        a = 128.0;
-                    }
-                    else if (a >= 0){
-                        // a = -1*500*25/29.0;
-                        a = -127;
-                    }
-
-                    if (b < 0){
-                        // b = 200*25/29.0;
-                        b = 128.0;
-                    }
-                    else if (b >= 0){
-                        // b = -200*25/29.0;
-                        b = -127;
-                    }
-
-                    // a = 62.1313548;// -81.1856371;
-                    // b = -95.50187772;//76.11578826;
-
-                    float4 inverted_lab = float4(l, a, b, lab.a);
-                    col = LAB2RGB(inverted_lab);
+                    // col = bgSample()
+                    // LAB2RGB(LABatMaxDistance);
+                    // float4 inverted_lab = float4(l, a, b, lab.a);
+                    col = LAB2RGB(LABatMaxDistance);
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
@@ -700,30 +769,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                         }
                     }
                 
-                
-
-                // Render billboard if _BillboardColorMethod != 0
-                // if (billboardTex[3] != 0)
-                // {
-                //     if (_BillboardColorMethod == 1) // blue billboard
-                //     {
-                //         col = float4(0,0,1,1);
-                //     }
-                //     else if (_BillboardColorMethod == 2) // referenced from the paper by Grasset et al.
-                //     {
-                //         float4 defaultBillboardColor = float4(0.5,0.5,0.5,1); // this can be defined by the user
-                        
-                //         float neighborhoodSize = 10; // assuming this creates a sampling area of size 10 by 10         
-                //         float4 billboardHSL = RGB2HSL(defaultBillboardColor);
-                //         float4 backgroundHSL = RGB2HSL(local_backgroundAvg);
-                //         if (abs(backgroundHSL[2] - billboardHSL[2]) < _BillboardLightnessContrastThreshold) // this threshold can be modified
-                //         {
-                //             billboardHSL[2] = 1 - backgroundHSL[2];
-                //             col = HSL2RGB(billboardHSL);
-                //         }
-                //     }
-                // }
-
                 // Render billboard and label color mode
                 if (modeTex[3] != 0)
                 {

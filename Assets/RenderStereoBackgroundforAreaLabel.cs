@@ -34,6 +34,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     public ComputeShader cShaderForMask;
     int maskBuffer_kernelID;
+    List<float> CandidateCIELABVals;
+    float[] CandidateCIELABValsAsArray;
 
 
 
@@ -42,7 +44,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         RenderTexture.active = rTex;
         screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
         screenshot.Apply();
-        // RenderTexture.active = null;
     }
 
     
@@ -83,6 +84,23 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
         // Find the ID of the average RGB value calculation function we'll use in Compute Shader
         maskBuffer_kernelID = cShaderForMask.FindKernel("CSMain");
+
+        CandidateCIELABVals = new List<float>();
+
+
+        // Read the txt file that contains candidate LAB values
+        var linesRead = File.ReadLines("./Assets/CandidateLABvals2.txt");
+        foreach (var lineRead in linesRead)
+        {
+            string[] num = lineRead.Split(",");
+            for (int i = 0; i < num.Length; i++){
+                CandidateCIELABVals.Add(float.Parse(num[i], System.Globalization.CultureInfo.InvariantCulture));
+            }
+        }
+
+        // Initiate the storage for candidate CIELAB values
+        CandidateCIELABValsAsArray = CandidateCIELABVals.ToArray();  // float array of size 3 * number of LAB value candidates (each value has 3 coordinates)
+        backgroundAndLabelSphereMaterial.SetFloatArray("_CIELABCandidates", CandidateCIELABValsAsArray);
     }
 
     // Update is called once per frame
@@ -118,8 +136,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
 
             // For mask debugging purposes only 
-            byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
-            File.WriteAllBytes(Application.dataPath + "/MaskedBackground2.png", bytes);
+            // byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
+            // File.WriteAllBytes(Application.dataPath + "/MaskedBackground2.png", bytes);
         }
 
         // Save images for debugging purposes only
@@ -180,7 +198,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
                 }
         }
 
-        else{
+        else{ // per-pixel label 
             backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", 0.0f);
             backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", 0.0f);
             backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", 0.0f);
