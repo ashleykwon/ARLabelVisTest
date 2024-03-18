@@ -94,9 +94,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Background_sum_b: 0.38039216
-    - _Background_sum_g: 0.43137255
-    - _Background_sum_r: 0.4392157
+    - _Background_sum_b: 0.003921569
+    - _Background_sum_g: 0.015686275
+    - _Background_sum_r: 0.019607844
     - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0.076
     - _BumpScale: 1
@@ -112,7 +112,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GranularityMethod: 2
+    - _GranularityMethod: 1
     - _LabelRotationMatrix: 0
     - _Metallic: 0
     - _Mode: 0

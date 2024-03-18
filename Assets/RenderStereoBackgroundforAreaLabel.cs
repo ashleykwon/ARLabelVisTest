@@ -34,7 +34,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     public ComputeShader cShaderForMask;
     int maskBuffer_kernelID;
-    List<float> CandidateCIELABVals;
+    List<Color32> CandidateCIELABVals;
     float[] CandidateCIELABValsAsArray;
 
 
@@ -44,6 +44,87 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         RenderTexture.active = rTex;
         screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
         screenshot.Apply();
+    }
+
+    Color32 LAB2RGB(Vector3 LAB)
+    {
+        double L = LAB[0];
+        double A = LAB[1];
+        double B = LAB[2];
+
+        // reference values, D65/2°
+        double Xr = 95.047;  
+        double Yr = 100.0;
+        double Zr = 108.883;
+
+        // first convert LAB to XYZ
+        double var_Y = (L + 16.0) / 116.0;
+        double var_X = A / 500 + var_Y;
+        double var_Z = var_Y - B / 200.0;
+
+        if (Math.Pow(var_Y, 3)  > 0.008856){
+            var_Y = Math.Pow(var_Y, 3.0);
+        }  
+        else{
+            var_Y = (var_Y - 16 / 116) / 7.787;
+        }
+            
+        if (Math.Pow(var_X, 3)  > 0.008856){
+            var_X = Math.Pow(var_X, 3.0);
+        }
+        else{
+            var_X = (var_X - 16 / 116) / 7.787;
+        }
+            
+        if (Math.Pow(var_Z, 3)  > 0.008856){
+            var_Z = Math.Pow(var_Z, 3.0);
+        } 
+        else{
+            var_Z = (var_Z - 16.0 / 116.0) / 7.787;
+        }
+            
+        double X = var_X * Xr;
+        double Y = var_Y * Yr;
+        double Z = var_Z * Zr;
+
+        // now convert XYZ to RGB
+        X /= 100.0;
+        Y /= 100.0;
+        Z /= 100.0;
+
+        double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+        double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
+        double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
+
+        if (var_R > 0.0031308){
+            var_R = 1.055 * (Math.Pow(var_R, (1 / 2.4))) - 0.055;
+        } 
+        else{
+            var_R = 12.92 * var_R;
+        }
+            
+        if (var_G > 0.0031308){
+            var_G = 1.055 * (Math.Pow(var_G, (1 / 2.4))) - 0.055;
+        } 
+        else{
+            var_G = 12.92 * var_G;
+        }
+            
+        if (var_B > 0.0031308){
+            var_B = 1.055 * (Math.Pow(var_B, (1 / 2.4))) - 0.055;
+        } 
+            
+        else{
+            var_B = 12.92 * var_B;
+        }
+
+        // ensure values are between 0 and 255
+        int finalR = (int) (Math.Max(Math.Min(var_R*255, 255), 0));
+        int finalG = (int) (Math.Max(Math.Min(var_G*255, 255), 0));
+        int finalB = (int) (Math.Max(Math.Min(var_B*255, 255), 0));
+
+        Color32 RGB = new Color32((byte) (finalR), (byte) (finalG), (byte) (finalB), 255);
+        return RGB;
     }
 
     
@@ -86,19 +167,36 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         maskBuffer_kernelID = cShaderForMask.FindKernel("CSMain");
 
         // Read the txt file that contains candidate LAB values and copy their values into CandidateCIELABVals
-        CandidateCIELABVals = new List<float>();
-        var linesRead = File.ReadLines("./Assets/CandidateLABvals2.txt");
+        CandidateCIELABVals = new List<Color32>();
+        var linesRead = File.ReadLines("./Assets/CandidateLABvals.txt");
         foreach (var lineRead in linesRead)
         {
             string[] num = lineRead.Split(",");
-            for (int i = 0; i < num.Length; i++){
-                CandidateCIELABVals.Add(float.Parse(num[i], System.Globalization.CultureInfo.InvariantCulture));
-            }
+            Vector3 currentLAB = new Vector3(float.Parse(num[0], System.Globalization.CultureInfo.InvariantCulture), 
+                                            float.Parse(num[1], System.Globalization.CultureInfo.InvariantCulture), 
+                                            float.Parse(num[2], System.Globalization.CultureInfo.InvariantCulture));
+            Color32 currentLABAsRGB = LAB2RGB(currentLAB);
+            CandidateCIELABVals.Add(currentLABAsRGB);
+            // for (int i = 0; i < num.Length; i++){
+            //     CandidateCIELABVals.Add(float.Parse(num[i], System.Globalization.CultureInfo.InvariantCulture));
+            // }
         }
 
+        // Make a lookup table (texture3d) with the corresponding LAB-to-RGB converted value at each RGB index
+        int lineCounter = 0;
+        Texture3D LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
+        var linesReadRGB = File.ReadLines("./Assets/CorrespondingRGBVals.txt");
+        foreach (var lineReadRGB in linesReadRGB){
+            string[] num = lineReadRGB.Split(",");
+            LookupTable.SetPixel(int.Parse(num[0]), int.Parse(num[1]), int.Parse(num[2]), CandidateCIELABVals[lineCounter]);
+            lineCounter += 1;
+        }
+
+        backgroundAndLabelSphereMaterial.SetTexture("_CIELAB_LookupTable", LookupTable);
+
         // Initiate the storage for candidate CIELAB values
-        CandidateCIELABValsAsArray = CandidateCIELABVals.ToArray();  // float array of size 3 * number of LAB value candidates (each value has 3 coordinates)
-        backgroundAndLabelSphereMaterial.SetFloatArray("_CIELABCandidates", CandidateCIELABValsAsArray);
+        // CandidateCIELABValsAsArray = CandidateCIELABVals.ToArray();  // float array of size 3 * number of LAB value candidates (each value has 3 coordinates)
+        // backgroundAndLabelSphereMaterial.SetFloatArray("_CIELABCandidates", CandidateCIELABValsAsArray);
     }
 
     // Update is called once per frame

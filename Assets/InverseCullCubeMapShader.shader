@@ -33,9 +33,9 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _OpacityLevel("Label opacity level", Range(0, 1)) = 1
 
-        _CIEDE_label_r("Label_color_red_set_by_CIEDE00", Range(0,1)) = 0.1
-        _CIEDE_label_g("Label_color_green_set_by_CIEDE00", Range(0,1)) = 0.1
-        _CIEDE_label_b("Label_color_blue_set_by_CIEDE00", Range(0,1)) = 0.1
+        // _CIEDE_label_r("Label_color_red_set_by_CIEDE00", Range(0,1)) = 0.1
+        // _CIEDE_label_g("Label_color_green_set_by_CIEDE00", Range(0,1)) = 0.1
+        // _CIEDE_label_b("Label_color_blue_set_by_CIEDE00", Range(0,1)) = 0.1
 
     }
 
@@ -107,8 +107,7 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _CIEDE_label_g;
             float _CIEDE_label_b;
 
-            float _CIELABCandidates[408];
-           
+            sampler3D _CIELAB_LookupTable;
            
             struct v2f 
             {
@@ -575,21 +574,28 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    float maxDistance = 0;
-                    float4 LABatMaxDistance = float4(0, 0, 0, 1);
-                    // col = float4(_CIEDE_label_r, _CIEDE_label_g, _CIEDE_label_b, 1);
-                    // col = float4(1, 0, 0, 1);
+                    // float maxDistance = 0;
+                    // float4 LABatMaxDistance = float4(0, 0, 0, 1);
 
-                    for (int i = 0; i <= 406; i+=3){
-                        float4 candidatePoint = float4(_CIELABCandidates[i], _CIELABCandidates[i+1], _CIELABCandidates[i+2], 1);
-                        float distance = CIEDE00(RGB2LAB(bgSample), candidatePoint);
-                        // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
-                        if (distance > maxDistance){
-                            maxDistance = distance;
-                            LABatMaxDistance = candidatePoint;
-                        }
+                    // for (int i = 0; i <= 406; i+=3){
+                    //     float4 candidatePoint = float4(_CIELABCandidates[i], _CIELABCandidates[i+1], _CIELABCandidates[i+2], 1);
+                    //     float distance = CIEDE00(RGB2LAB(bgSample), candidatePoint);
+                    //     // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
+                    //     if (distance > maxDistance){
+                    //         maxDistance = distance;
+                    //         LABatMaxDistance = candidatePoint;
+                    //     }
+                    // }
+                    int R_idx = int(bgSample[0]*255);
+                    int G_idx = int(bgSample[1]*255);
+                    int B_idx = int(bgSample[2]*255);
+                    if (R_idx%4 == 0 && G_idx%4 == 0 && B_idx%4 == 0){ // Only because step size is 4
+                       col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx));
                     }
-                    col = LAB2RGB(LABatMaxDistance);
+                    else{ // use interpolation of the nearest RGB values
+                        col = float4(1,0,0,1); // fix this
+                    }
+                    // col = LAB2RGB(LABatMaxDistance);
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
