@@ -182,16 +182,59 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             // }
         }
 
+        int lookupTableStepSize = 4; // change for a different step size
+
         // Make a lookup table (texture3d) with the corresponding LAB-to-RGB converted value at each RGB index
         int lineCounter = 0;
         Texture3D LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
         var linesReadRGB = File.ReadLines("./Assets/CorrespondingRGBVals.txt");
         foreach (var lineReadRGB in linesReadRGB){
             string[] num = lineReadRGB.Split(",");
-            LookupTable.SetPixel(int.Parse(num[0]), int.Parse(num[1]), int.Parse(num[2]), CandidateCIELABVals[lineCounter]);
+            int rIdx = int.Parse(num[0]);
+            int gIdx = int.Parse(num[1]);
+            int bIdx = int.Parse(num[2]);
+
+            if (rIdx % lookupTableStepSize == 0 && gIdx % lookupTableStepSize == 0 && bIdx % lookupTableStepSize == 0){ // use values represented in the lookup table as they are if r, g, and b values are multiple of the step size
+                LookupTable.SetPixel(rIdx, gIdx, bIdx, CandidateCIELABVals[lineCounter]);
+            }
+            else{ // do trilinear interpolation based on https://en.wikipedia.org/wiki/Trilinear_interpolation
+                int rLowerBound = (int) ((rIdx / lookupTableStepSize)) * lookupTableStepSize;
+                int rUpperBound = rLowerBound + lookupTableStepSize; 
+
+                int gLowerBound = (int) ((gIdx / lookupTableStepSize)) * lookupTableStepSize;
+                int gUpperBound = gLowerBound + lookupTableStepSize; 
+
+                int bLowerBound = (int) ((bIdx / lookupTableStepSize)) * lookupTableStepSize;
+                int bUpperBound = bLowerBound + lookupTableStepSize; 
+
+                float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
+                float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
+                float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
+
+                Color32 C000 = LookupTable.GetPixel(rLowerBound, gLowerBound, bLowerBound); // c000
+                Color32 C100 = LookupTable.GetPixel(rUpperBound, gLowerBound, bLowerBound); // c100
+                Color32 C010 = LookupTable.GetPixel(rLowerBound, gUpperBound, bLowerBound); // c010
+                Color32 C110 = LookupTable.GetPixel(rUpperBound, gUpperBound, bLowerBound); // c110
+                Color32 C001 = LookupTable.GetPixel(rLowerBound, gLowerBound, bUpperBound); // c001
+                Color32 C101 = LookupTable.GetPixel(rUpperBound, gLowerBound, bUpperBound); // c101
+                Color32 C011 = LookupTable.GetPixel(rLowerBound, gUpperBound, bUpperBound); // c011
+                Color32 C111 = LookupTable.GetPixel(rUpperBound, gUpperBound, bUpperBound); // c111
+
+                Vector3 C00 = new Vector3(C000[0]*(1-rDiff) + C100[0]*rDiff, C000[1]*(1-rDiff) + C100[1]*rDiff, C000[2]*(1-rDiff) + C100[2]*rDiff);
+                Vector3 C01 = new Vector3(C001[0]*(1-rDiff) + C101[0]*rDiff, C001[1]*(1-rDiff) + C101[1]*rDiff, C001[2]*(1-rDiff) + C101[2]*rDiff);
+                Vector3 C10 = new Vector3(C010[0]*(1-rDiff) + C110[0]*rDiff, C010[1]*(1-rDiff) + C110[1]*rDiff, C010[2]*(1-rDiff) + C110[2]*rDiff);
+                Vector3 C11 = new Vector3(C011[0]*(1-rDiff) + C111[0]*rDiff, C011[1]*(1-rDiff) + C111[1]*rDiff, C011[2]*(1-rDiff) + C111[2]*rDiff);
+
+                Vector3 C0 = new Vector3(C00[0]*(1-gDiff) + C10[0]*gDiff, C00[1]*(1-gDiff) + C10[1]*gDiff, C00[2]*(1-gDiff) + C10[2]*gDiff);
+                Vector3 C1 = new Vector3(C10[0]*(1-gDiff) + C11[0]*gDiff, C10[1]*(1-gDiff) + C11[1]*gDiff, C10[2]*(1-gDiff) + C11[2]*gDiff);
+
+                Vector3 C = new Vector3((int) (C0[0]*(1-bDiff) + C1[0]*bDiff), (int) (C0[1]*(1-bDiff) + C1[1]*bDiff), (int) (C0[2]*(1-bDiff) + C1[2]*bDiff));
+                Color32 interpolatedColor = new Color32((byte) C[0], (byte) C[1], (byte) C[2], 255);
+                LookupTable.SetPixel(rIdx, gIdx, bIdx, interpolatedColor);
+            }
             lineCounter += 1;
         }
-
+        // Debug.Log(CandidateCIELABVals.Count);
         backgroundAndLabelSphereMaterial.SetTexture("_CIELAB_LookupTable", LookupTable);
 
         // Initiate the storage for candidate CIELAB values

@@ -574,28 +574,10 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    // float maxDistance = 0;
-                    // float4 LABatMaxDistance = float4(0, 0, 0, 1);
-
-                    // for (int i = 0; i <= 406; i+=3){
-                    //     float4 candidatePoint = float4(_CIELABCandidates[i], _CIELABCandidates[i+1], _CIELABCandidates[i+2], 1);
-                    //     float distance = CIEDE00(RGB2LAB(bgSample), candidatePoint);
-                    //     // sqrt(pow(col[0] - _CIELABCandidates[i], 2) + pow(col[1] - _CIELABCandidates[i+1], 2) + pow(col[1] - _CIELABCandidates[i+2], 2));
-                    //     if (distance > maxDistance){
-                    //         maxDistance = distance;
-                    //         LABatMaxDistance = candidatePoint;
-                    //     }
-                    // }
                     int R_idx = int(bgSample[0]*255);
                     int G_idx = int(bgSample[1]*255);
                     int B_idx = int(bgSample[2]*255);
-                    if (R_idx%4 == 0 && G_idx%4 == 0 && B_idx%4 == 0){ // Only because step size is 4
-                       col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx));
-                    }
-                    else{ // use interpolation of the nearest RGB values
-                        col = float4(1,0,0,1); // fix this
-                    }
-                    // col = LAB2RGB(LABatMaxDistance);
+                    col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx)); // assumes that the lookup table has no missing values
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
