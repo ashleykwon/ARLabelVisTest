@@ -574,10 +574,26 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    int R_idx = int(bgSample[0]*255);
-                    int G_idx = int(bgSample[1]*255);
-                    int B_idx = int(bgSample[2]*255);
-                    col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx)); // assumes that the lookup table has no missing values
+                    // int R_idx = int(bgSample[0]*255);
+                    // int G_idx = int(bgSample[1]*255);
+                    // int B_idx = int(bgSample[2]*255);
+                    // col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx)); // assumes that the lookup table has no missing values
+                    
+                    // Temporary
+                    float4 hsv = RGB2HSV(bgSample);
+                    float h = hsv[0];
+                    float s = hsv[1];
+                    float v = hsv[2];
+                    h += 180;
+                    h %= 360;
+
+                    v = 100 - v;
+
+                    // v +=50;
+                    // v %=100;
+                    
+                    float4 inverted_hsv = float4(h, s, v, 1.0);
+                    col = HSV2RGB(inverted_hsv);
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
