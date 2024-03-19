@@ -151,6 +151,14 @@ public class QuestionCycler : MonoBehaviour
         }
     }
 
+    public void ManualResponse()
+    {
+        SceneQuestion cur = sceneQuestions[qMap[qIdx]];
+        cur.response = aIdx.ToString();
+        cur.labelMode = instance.currentLabelDisplayMode;
+        cur.responded = true;
+    }
+
     public void UpdateResponse(int idx)
     {
         aIdx = idx;
@@ -250,6 +258,22 @@ public class QuestionCycler : MonoBehaviour
         }
     }
 
+    public void LoadPrev(bool bypass = false)
+    {
+        if (bypass || Responded())
+        {   
+            ShowPanels();
+
+            qIdx = (qIdx - 1) % qMap.Count;
+            string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
+            SceneManager.LoadScene(sceneToIdx[nextScn]);
+            HideQuestion();
+            UpdateQuestion();
+            detectionSW.Reset();
+            detectionSW.Start();
+        }
+    }
+
     //Update is called once per frame
     void Update()
     {
@@ -282,25 +306,31 @@ public class QuestionCycler : MonoBehaviour
             }
         }
 
-        if(OVRInput.GetUp(OVRInput.Button.SecondaryThumbstick))
-        {
-            if (!Responded())
-            {
-                if (!questionUI.activeSelf)
-                {
-                    ShowQuestion();
-                }
-                else
-                {
-                    RecordResponse();
-                    HideQuestion();
-                }
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.W))
         {
             WriteResponses();
+        }
+        else if (Input.GetKeyDown(KeyCode.R))
+        {
+            ManualResponse();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            LoadPrev(true);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            LoadNext(true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            ShowQuestion();
+            if (Mode())
+            {
+                HidePanels();
+            }
         }
 
         if (rIndexTrigger == 0) {
@@ -318,11 +348,25 @@ public class QuestionCycler : MonoBehaviour
         if (((rIndexTrigger > 0) && !rIndexTriggerHeld) || Input.GetKeyDown(KeyCode.N)) 
         {   
             rIndexTriggerHeld = true;
-            // CancelInvoke();
-            // sceneContainer.SetActive(true); 
-            // Invoke("HideSceneContainer", vanishTime);
+            if (!Responded())
+            {
+                if (!questionUI.activeSelf)
+                {
+                    ShowQuestion();
+                }
+                else
+                {
+                    RecordResponse();
+                    HideQuestion();
+                }
+            }
             LoadNext();
         }
    
+    }
+
+    void OnDestroy()
+    {
+        WriteResponses();
     }
 }
