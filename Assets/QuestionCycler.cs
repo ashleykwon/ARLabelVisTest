@@ -87,6 +87,33 @@ public class QuestionCycler : MonoBehaviour
             qMap.Add(i);
             i++;
         }
+
+        if (randomize)
+        {
+            qMap = CreateAndShuffleList(qMap.Count);
+        }
+
+        Dictionary<string, List<int>> uniqScntoi = new Dictionary<string, List<int>>();
+
+        for (int j = 0; j < qMap.Count; j++)
+        {
+            SceneQuestion cur = sceneQuestions[qMap[j]];
+            if (!uniqScntoi.ContainsKey(cur.sceneName))
+            {
+                uniqScntoi[cur.sceneName] = new List<int>();
+            }
+            uniqScntoi[cur.sceneName].Add(qMap[j]);
+        }
+
+        qMap = new List<int>();
+
+        foreach (var kvp in uniqScntoi)
+        {
+            foreach (int idx in kvp.Value)
+            {
+                qMap.Add(idx);
+            }
+        }
     }
 
     void Start()
@@ -102,11 +129,6 @@ public class QuestionCycler : MonoBehaviour
         }
 
         ParseQuestions();
-
-        if (randomize)
-        {
-            qMap = CreateAndShuffleList(qMap.Count);
-        }
 
         LoadNext(true);
     }
@@ -153,6 +175,7 @@ public class QuestionCycler : MonoBehaviour
 
     public void ManualResponse()
     {
+        UserTestingMovePlayer instance = FindObjectOfType<UserTestingMovePlayer>();
         SceneQuestion cur = sceneQuestions[qMap[qIdx]];
         cur.response = aIdx.ToString();
         cur.labelMode = instance.currentLabelDisplayMode;
@@ -179,6 +202,11 @@ public class QuestionCycler : MonoBehaviour
     public bool Responded()
     {
         return sceneQuestions[qMap[qIdx]].responded;
+    }
+
+    public string SceneName()
+    {
+        return sceneQuestions[qMap[qIdx]].sceneName;
     }
     
     public void ShowQuestion()
@@ -258,13 +286,19 @@ public class QuestionCycler : MonoBehaviour
         }
     }
 
+    int mod(int x, int m) {
+        return (x%m + m)%m;
+    }
+
     public void LoadPrev(bool bypass = false)
     {
         if (bypass || Responded())
         {   
             ShowPanels();
 
-            qIdx = (qIdx - 1) % qMap.Count;
+            qIdx = mod(qIdx - 1, qMap.Count);
+            UnityEngine.Debug.Log(-1 );
+            UnityEngine.Debug.Log(qMap[qIdx]);
             string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
             SceneManager.LoadScene(sceneToIdx[nextScn]);
             HideQuestion();
@@ -272,6 +306,8 @@ public class QuestionCycler : MonoBehaviour
             detectionSW.Reset();
             detectionSW.Start();
         }
+
+
     }
 
     //Update is called once per frame
@@ -318,10 +354,12 @@ public class QuestionCycler : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             LoadPrev(true);
+            UnityEngine.Debug.Log($"Question manually updated to question {qIdx} ({SceneName()}) from question.json");
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             LoadNext(true);
+            UnityEngine.Debug.Log($"Question manually updated to question {qIdx} ({SceneName()}) from question.json");
         }
 
         if (Input.GetKeyDown(KeyCode.S))
