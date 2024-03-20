@@ -15,12 +15,6 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _EnableOutline("Enable Outline", Int) = 1
 
-        // _EnableShadow("Enable Shadow", Int) = 0
-        // _ShadowKernelSize("Shadow Blur Kernel Size", Range(0, 200)) = 28
-        // _ShadowSigma("Shadow Blur Sigma", Range(0, 100)) = 80
-        // _ShadowScale("Shadow Scale", Range(0.8, 1.05)) = 1.0
-        // _ShadowMultiplier("Shadow Intensity", Range(0, 2)) = 0.1
-
         _BillboardColorMethod("Billboard Color Method", Int) = 1
         _BillboardLightnessContrastThreshold("Billboard lightness contrast threshold", Range(0,1)) = 0.5
 
@@ -33,10 +27,12 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _OpacityLevel("Label opacity level", Range(0, 1)) = 1
 
-        // _CIEDE_label_r("Label_color_red_set_by_CIEDE00", Range(0,1)) = 0.1
-        // _CIEDE_label_g("Label_color_green_set_by_CIEDE00", Range(0,1)) = 0.1
-        // _CIEDE_label_b("Label_color_blue_set_by_CIEDE00", Range(0,1)) = 0.1
+        _CIELAB_LookupTable("CIELAB lookup table", 3D) = "white" {}
+        _LookupTableStepSize("Lookup table step size", Int) = 4
 
+        _cielab_r("cielab_r", Range(0,1)) = 0.1
+        _cielab_g("cielab_g", Range(0,1)) = 0.1
+        _cielab_b("cielab_b", Range(0,1)) = 0.1
     }
 
     SubShader
@@ -76,15 +72,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             // Outline-related variables
             int _EnableOutline;
 
-            // Shadow-related variables
-            // int _EnableShadow;
-            // static float _ShadowKernelSize;
-            // float _ShadowSigma;
-            // float _ShadowScale;
-            // float _ShadowMultiplier;
-            // float4 _BlurredLabelTex_TexelSize;
-            // float4 _LabelTex_TexelSize;
-
             // Billboard-related variables
             int _BillboardColorMethod;
             float _BillboardLightnessContrastThreshold;
@@ -103,11 +90,12 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _Background_sum_g;
             float _Background_sum_b;
 
-            float _CIEDE_label_r;
-            float _CIEDE_label_g;
-            float _CIEDE_label_b;
+            float _cielab_r;
+            float _cielab_g;
+            float _cielab_b;
 
             sampler3D _CIELAB_LookupTable;
+            int _LookupTableStepSize;
            
             struct v2f 
             {
@@ -120,7 +108,8 @@ Shader "Unlit/InverseCullCubeMapShader"
                 
                 v2f o;
                 o.pos = UnityObjectToClipPos( v.vertex );
-                o.uv = v.vertex.xyz * half3(1,1,1); // mirror so cubemap projects as expected
+                o.uv = v.vertex;
+                // .xyz * half3(1,1,1); 
 
                 return o;
             }
@@ -411,83 +400,45 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return RGBfinal;
             }
 
-            float CIEDE00(float4 LAB1, float4 LAB2)
-            { // from https://hajim.rochester.edu/ece/sites/gsharma/ciede2000/ciede2000noteCRNA.pdf
-                float distance = 0.0;
-                
-                // Get the LAB values from the inputs
-                float L1 = LAB1[0];
-                float a1 = LAB1[1];
-                float b1 = LAB1[2];
+            float4 interpolation2D(float4 lowerBound, float4 upperBound, float difference){
+                return float4(lowerBound[0]*(1 - difference) + difference*upperBound[0], lowerBound[1]*(1 - difference) + difference*upperBound[1], lowerBound[2]*(1 - difference) + difference*upperBound[2], 1.0);
+            }
 
-                float L2 = LAB2[0];
-                float a2 = LAB2[1];
-                float b2 = LAB2[2];
+            float4 trilinearInterpolation(int rIdx, int gIdx, int bIdx, int lookupTableStepSize){
+                float rLowerBound = float((rIdx / lookupTableStepSize) * lookupTableStepSize)/255;
+                float rUpperBound = float(rLowerBound + lookupTableStepSize)/255; 
 
-                float L_avg = (L1 + L2)/2;
+                float gLowerBound = float((gIdx / lookupTableStepSize) * lookupTableStepSize)/255;
+                float gUpperBound = float(gLowerBound + lookupTableStepSize)/255; 
 
-                // Calculate C and h
-                float C_Lab1 = sqrt(pow(a1, 2) + pow(b1, 2));
-                float C_Lab2 = sqrt(pow(a2, 2) + pow(b2, 2));
-                float C_avg = (C_Lab1 + C_Lab2)/2;
+                float bLowerBound = float((bIdx / lookupTableStepSize) * lookupTableStepSize)/255;
+                float bUpperBound = float(bLowerBound + lookupTableStepSize)/255; 
 
-                float G = 0.5*(1 - sqrt(pow(C_avg, 7)/(pow(C_avg, 7) + pow(25, 7))));
-                float a1_prime = (1 + G)*a1;
-                float a2_prime = (1 + G)*a2;
-                
-                float h_Lab1 = 0;
-                float h_Lab2 = 0;
-                if (a1_prime != 0 && b1 != 0){
-                    h_Lab1 = atan(b1/a1_prime);
-                }
-                if (a2_prime != 0 && b2 != 0){
-                    h_Lab2 = atan(b1/a2_prime);
-                }
+                float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
+                float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
+                float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
 
-                float h_avg = 0;
-                if (abs(h_Lab1 - h_Lab2) <= 180 && C_Lab1*C_Lab2 != 0){
-                    h_avg = (h_Lab1 + h_Lab2)/2;
-                }
-                else if (abs(h_Lab1 - h_Lab2) > 180 && (h_Lab1 + h_Lab2) < 360 && C_Lab1*C_Lab2 != 0){
-                    h_avg = (h_Lab1 + h_Lab2 + 360)/2;
-                }
-                else if (abs(h_Lab1 - h_Lab2) > 180 && (h_Lab1 + h_Lab2) >= 360 && C_Lab1*C_Lab2 != 0){
-                    h_avg = (h_Lab1 + h_Lab2 - 360)/2;
-                }
-                else if (C_Lab1*C_Lab2 == 0){
-                    h_avg = h_Lab1 + h_Lab2;
-                }
-                
-                // Calculate deltaL, deltaC, deltaH
-                float deltaL = L2 - L1;
-                float deltaC = C_Lab2 - C_Lab1;
-                float deltaH = 0;
-                if (C_Lab1*C_Lab2 == 0){
-                    deltaH = 0;
-                }
-                else if (C_Lab1*C_Lab2 != 0 && abs(h_Lab2 - h_Lab1) <= 180){
-                    deltaH = h_Lab2 - h_Lab1;
-                }
-                else if (C_Lab1*C_Lab2 != 0 && (h_Lab2 - h_Lab1) > 180){
-                    deltaH = h_Lab2 - h_Lab1 - 360;
-                }
-                else if (C_Lab1*C_Lab2 != 0 && (h_Lab2 - h_Lab1) < -180){
-                    deltaH = h_Lab2 - h_Lab1 + 360;
-                }
+                float4 C000 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bLowerBound)); // c000
+                float4 C100 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bLowerBound)); // c100
+                float4 C010 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bLowerBound)); // c010
+                float4 C110 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bLowerBound)); // c110
+                float4 C001 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bUpperBound)); // c001
+                float4 C101 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bUpperBound)); // c101
+                float4 C011 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bUpperBound)); // c011
+                float4 C111 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bUpperBound)); // c111
 
-                // Calculate T S_l, S_c, S_h, and R_t
-                float T = 1 - 0.17*cos(h_avg - 30) + 0.24*cos(2*h_avg) + 0.32*cos(3*h_avg + 6) - 0.2*cos(4*h_avg - 63);
-                float deltaTheta = 30*exp(-1*pow((h_avg - 275)/25, 2));
-                float R_c = 2*sqrt(pow(C_avg, 7)/(pow(C_avg, 7) + pow(25, 7)));
-                float S_l = 1 + ((0.015*pow(L_avg - 50, 2))/sqrt(20 + pow(L_avg - 50, 2)));
-                float S_c = 1 + 0.045*C_avg;
-                float S_h = 1 + 0.015*C_avg*T;
-                float R_t = -sin(2*deltaTheta*R_c);
+                float4 C00 = interpolation2D(C000, C100, rDiff);
+                float4 C01 = interpolation2D(C001, C101, rDiff);
+                float4 C10 = interpolation2D(C010, C110, rDiff);
+                float4 C11 = interpolation2D(C011, C111, rDiff);
 
-                // Calculate CIEDE00 (assume k_l = k_c = k_h = 0)
-                distance = sqrt(pow(deltaL/S_l, 2) + pow(deltaC/S_c, 2) + pow(deltaH/S_h, 2) + R_t*(deltaC/S_c)*(deltaH/S_h));
+                float4 C0 = interpolation2D(C00, C10, gDiff);
+                float4 C1 = interpolation2D(C10, C11, gDiff);
 
-                return distance;
+                float4 interpolatedColor = interpolation2D(C0, C1, bDiff);
+
+                // float4 interpolatedColor = float4(C[0], C[1], C[2], 1);
+                return interpolatedColor;
             }
 
 
@@ -498,19 +449,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // return 1 / (sigma*sqrt(2 * pi)) * exp(-1*(x * x) / (2 * (sigma*sigma)));
             }
 
-            float4 local_pixel_sum(float neighborhoodSize, v2f vdata){
-                float4 sum = float4(0,0,0,0);
-                 for (int i = neighborhoodSize / 2; i >= -neighborhoodSize / 2; i--) {
-                        for(int j = neighborhoodSize / 2; j >= -neighborhoodSize / 2; j--){
-                            float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-                            float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-                            half3 coords = half3(x, y, vdata.uv.z);
-                            sum += texCUBE(_CubeMap, coords); 
-                            }
-                        }
-
-                return sum;
-            }
 
             float4 function_f (int method, float4 bgSample){
                 float4 col = float4(0,0,0,0);
@@ -546,7 +484,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                     }
                     col = paletteCol; 
                 }
-                //Yuanbo's method
+                //Yuanbo's method (RGB inversion)
                 else if (_ColorMethod == 2) 
                 {
                     float dummy = float4(1.0, 1.0, 1.0, 1.0);
@@ -564,9 +502,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                     h %= 360;
 
                     v = 100 - v;
-
-                    // v +=50;
-                    // v %=100;
                     
                     float4 inverted_hsv = float4(h, s, v, 1.0);
                     col = HSV2RGB(inverted_hsv);
@@ -574,26 +509,17 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    // int R_idx = int(bgSample[0]*255);
-                    // int G_idx = int(bgSample[1]*255);
-                    // int B_idx = int(bgSample[2]*255);
-                    // col = tex3D(_CIELAB_LookupTable, float3(R_idx, G_idx, B_idx)); // assumes that the lookup table has no missing values
-                    
-                    // Temporary
-                    float4 hsv = RGB2HSV(bgSample);
-                    float h = hsv[0];
-                    float s = hsv[1];
-                    float v = hsv[2];
-                    h += 180;
-                    h %= 360;
-
-                    v = 100 - v;
-
-                    // v +=50;
-                    // v %=100;
-                    
-                    float4 inverted_hsv = float4(h, s, v, 1.0);
-                    col = HSV2RGB(inverted_hsv);
+                    int R_idx = int(bgSample[0]*255);
+                    int G_idx = int(bgSample[1]*255);
+                    int B_idx = int(bgSample[2]*255);
+                    if (R_idx%4 == 0 && G_idx%4 == 0 && B_idx%4 == 0){
+                        col = tex3D(_CIELAB_LookupTable, bgSample.rgb); // assumes that the lookup table has no missing values
+                        col.a = 1;
+                    }
+                    else{
+                        col = trilinearInterpolation(R_idx, G_idx, B_idx, _LookupTableStepSize);
+                        col.a = 1;
+                    }
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
@@ -641,12 +567,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // float3 rotationVec = float3(-1.0,-1.0,-1.0);
                 fixed4 labelTex = texCUBE(_LabelCubeMap, vdata.uv); // Delete rotationVec in non-direct rendering (the one that uses the png file) version
                 labelTex = separateBillboardLabelMode(labelTex, 0);
-                float offset = 78;
-
-                float sample_x = (vdata.uv.x+1) * 100;
-                float sample_y = (vdata.uv.y+1) * 100;
-
-                float isSample = hash(sample_x, sample_y, offset);
 
                 float4 bgSample = texCUBE(_CubeMap, vdata.uv); 
                 if (_GranularityMethod != 0) 
@@ -659,116 +579,72 @@ Shader "Unlit/InverseCullCubeMapShader"
                 float _sampled_prob = 0.2;
                 int _neighborhoodSize= 5;
 
-                fixed4 billboardTex = texCUBE(_BillboardCubeMap, vdata.uv);
-                billboardTex = separateBillboardLabelMode(billboardTex, 1);
-
                 fixed4 modeTex = texCUBE(_ModeCubeMap,vdata.uv);
                 modeTex = separateBillboardLabelMode(modeTex, 2);
 
-                float4 local_backgroundAvg = float4(sum_all_results[1]/sum_all_results[0], sum_all_results[2]/sum_all_results[0], sum_all_results[3]/sum_all_results[0], 1);
-                // local_backgroundAvg = float4(1,1,1,1);
-                    // //Label color and outline assignment
-                    if (labelTex[3] != 0) // is a label pixel
+                // //Label color and outline assignment
+                if (labelTex[3] != 0) // is a label pixel
+                {   
+                    col = function_f(_ColorMethod, bgSample);
+                   
+                    // set the opacity level
+                    col[3] = _OpacityLevel;
+                    if (_ColorMethod == 6){
+                        col[3] = 0.0;
+                    }
+
+                    // Apply outline if selected
+                    if (_EnableOutline == 1)
                     {
-                            //this is a sampled pixel
-                            if(isSample < _sampled_prob){
-                                col = function_f(_ColorMethod, bgSample);
-                            }else{
-                                //this is a unsampled pixel
-                                float top_r = 0.001;
-                                float top_g = 0.001;
-                                float top_b = 0.001;
-                                float top_a = 0.001;
-                                float bot= 0.001;
+                        // Applying sobel filter
+                        float2 delta = float2(0.0075, 0.0015);
+                        // float2 delta = float2(1,1);
+                        
+                        float4 hr = float4(0, 0, 0, 0);
+                        float4 vt = float4(0, 0, 0, 0);
 
-                                //go through its neighbors
-                                for (int i = _neighborhoodSize / 2; i >= -_neighborhoodSize / 2; i--) {
-                                for(int j = _neighborhoodSize / 2; j >= -_neighborhoodSize / 2; j--){
-                                    float x = vdata.uv.x + i * _MainTex_TexelSize.x;
-                                    float y = vdata.uv.y + j * _MainTex_TexelSize.y;
-                                        if (hash(x, y, offset)){
-                                            half3 coords = half3(x, y, vdata.uv.z);
-                                            float4 sample_col = texCUBE(_CubeMap, coords); 
-                                            float4 f_sample_col = function_f(_ColorMethod, bgSample);
-                                            float dist = float(i*i) + float(j*j) +1 ;
+                        float filter[3][3] = {
+                            {-1, 0, 1},
+                            {-2, 0, 2},
+                            {-1, 0, 1}
+                        };
 
-                                            top_r += f_sample_col[0] / dist;
-                                            top_g += f_sample_col[1] / dist;
-                                            top_b += f_sample_col[2] / dist;
-                                            top_a += f_sample_col[3] / dist;
-                                            bot += 1.0 / dist;
-                                        }   
-                                    }
+                        for (int i = -1; i <= 1; i++){
+                            for (int j = -1; j <= 1; j++){
+                                float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
+                                float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
+                                float4 pix = texCUBE(_LabelCubeMap, coords);
+                                if (pix[0] == 1 && pix[1] == 1 && pix[2] == 1 && pix[3] == 1) // is a label pixel
+                                {
+                                    hr += pix *  filter[i + 1][j + 1];
+                                    vt += pix *  filter[j + 1][i + 1];
                                 }
-
-                                if (top_r != 0.001){
-                                    top_r = top_r / bot;
-                                    top_g = top_g / bot;
-                                    top_b = top_b / bot;
-                                    top_a = top_a / bot;
-                                    col = float4(top_r,top_g,top_b,top_a);
-                                }else{
-                                    //if we are so unlucky that no sample presents in the neighborhood
-                                    col = function_f(_ColorMethod, bgSample);
+                                else
+                                {
+                                    hr += float4(0,0,0,0)*  filter[i + 1][j + 1];
+                                    vt += float4(0,0,0,0)*  filter[j + 1][i + 1];
                                 }
-                            }
-                            // set the opacity level
-                            col[3] = _OpacityLevel;
-                            if (_ColorMethod == 6){
-                                col[3] = 0.0;
-                            }
-                        // Apply outline if selected
-                        if (_EnableOutline == 1)
-                        {
-                            // Applying sobel filter
-                            float2 delta = float2(0.0075, 0.0015);
-                            // float2 delta = float2(1,1);
-                            
-                            float4 hr = float4(0, 0, 0, 0);
-                            float4 vt = float4(0, 0, 0, 0);
-
-                            float filter[3][3] = {
-                                {-1, 0, 1},
-                                {-2, 0, 2},
-                                {-1, 0, 1}
-                            };
-
-                            for (int i = -1; i <= 1; i++){
-                                for (int j = -1; j <= 1; j++){
-                                    float2 xyCoords = float2(vdata.uv.x, vdata.uv.y) + float2(i, j) * delta;
-                                    float3 coords = float3(xyCoords.x, xyCoords.y, vdata.uv.z);
-                                    float4 pix = texCUBE(_LabelCubeMap, coords);
-                                    if (pix[0] == 1 && pix[1] == 1 && pix[2] == 1 && pix[3] == 1) // is a label pixel
-                                    {
-                                        hr += pix *  filter[i + 1][j + 1];
-                                        vt += pix *  filter[j + 1][i + 1];
-                                    }
-                                    else
-                                    {
-                                        hr += float4(0,0,0,0)*  filter[i + 1][j + 1];
-                                        vt += float4(0,0,0,0)*  filter[j + 1][i + 1];
-                                    }
-                                    // hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
-                                    // vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
-                                }
-                            }
-
-
-                            float edges =  sqrt(hr * hr + vt * vt);
-                            // sobel(_LabelTex, vdata.uv);
-
-                            
-                            if(edges != 0){ //Outline the edges
-                                if (col.r + col.g + col.b < 0.5){
-                                    col = float4(1, 1, 1, _OpacityLevel); // White outline if low grayscale value
-                                }else{
-                                col = float4(0, 0, 0, _OpacityLevel); // black outline if high grayscale value
-                                } 
+                                // hr += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[i + 1][j + 1];
+                                // vt += texCUBE(_LabelCubeMap, coords*rotationVec) *  filter[j + 1][i + 1];
                             }
                         }
+
+
+                        float edges =  sqrt(hr * hr + vt * vt);
+                        // sobel(_LabelTex, vdata.uv);
+
+                        
+                        if(edges != 0){ //Outline the edges
+                            if (col.r + col.g + col.b < 0.5){
+                                col = float4(1, 1, 1, _OpacityLevel); // White outline if low grayscale value
+                            }else{
+                            col = float4(0, 0, 0, _OpacityLevel); // black outline if high grayscale value
+                            } 
+                        }
                     }
+                }
                 
-                // Render billboard and label color mode
+                // Render label color mode
                 if (modeTex[3] != 0)
                 {
                     col[0] = 1.0;
@@ -776,31 +652,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                     col[2] = 1.0;
                     col[3] = 1.0;
                 }
-
-                // Apply shadow if selected // needs to be debugged.
-                // if (_EnableShadow == 1) 
-                // {
-                //     if (shadowTex[3] == 1)
-                //     {
-                //         col = float4(0.1, 0.1, 0.1, 0.8);
-                //         float4 acc = float4(0, 0, 0, 0);
-                //         for (int i = _ShadowKernelSize / 2; i >= -_ShadowKernelSize / 2; i--) 
-                //         {
-                //             float y = vdata.uv.y + i * _LabelTex_TexelSize.y;
-                //             float x = vdata.uv.x;
-                //             float2 coords = float2(x, y);
-                //             coords = (coords - 0.5) / _ShadowScale + 0.5;
-                //             float3 coordswithZ = float3(coords.x, coords.y, vdata.uv.z); // z coordinate added to access pixels in _LabelCubeMap
-                //             float weight = gaussian1D(i, _ShadowSigma); 
-                //             acc += shadowTex * weight; // gaussian blur applied along the y axis
-                //         }
-                        
-                //         col = col - col*(acc * _ShadowMultiplier); //ShadowMultiplier makes the shadow more opaque
-                //     }
-                    
-                // }
-
-                // col = billboardTex;
 
                 return col;
             }

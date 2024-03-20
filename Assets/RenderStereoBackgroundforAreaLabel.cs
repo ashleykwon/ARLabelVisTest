@@ -36,7 +36,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     int maskBuffer_kernelID;
     List<Color32> CandidateCIELABVals;
     float[] CandidateCIELABValsAsArray;
-
+    Texture3D LookupTable;
 
 
     void toTexture2D(RenderTexture rTex, Texture2D screenshot, int width, int height)
@@ -168,78 +168,38 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
         // Read the txt file that contains candidate LAB values and copy their values into CandidateCIELABVals
         CandidateCIELABVals = new List<Color32>();
-        var linesRead = File.ReadLines("./Assets/CandidateLABvals.txt");
-        foreach (var lineRead in linesRead)
+        var linesReadLAB = File.ReadLines("./Assets/CandidateLABvals.txt");
+        foreach (var lineReadLAB in linesReadLAB)
         {
-            string[] num = lineRead.Split(",");
+            string[] num = lineReadLAB.Split(",");
             Vector3 currentLAB = new Vector3(float.Parse(num[0], System.Globalization.CultureInfo.InvariantCulture), 
                                             float.Parse(num[1], System.Globalization.CultureInfo.InvariantCulture), 
                                             float.Parse(num[2], System.Globalization.CultureInfo.InvariantCulture));
             Color32 currentLABAsRGB = LAB2RGB(currentLAB);
             CandidateCIELABVals.Add(currentLABAsRGB);
-            // for (int i = 0; i < num.Length; i++){
-            //     CandidateCIELABVals.Add(float.Parse(num[i], System.Globalization.CultureInfo.InvariantCulture));
-            // }
         }
 
         int lookupTableStepSize = 4; // change for a different step size
 
         // Make a lookup table (texture3d) with the corresponding LAB-to-RGB converted value at each RGB index
         int lineCounter = 0;
-        Texture3D LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
+        LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
+        // LookupTable.mipCount = 0;
         var linesReadRGB = File.ReadLines("./Assets/CorrespondingRGBVals.txt");
+       
         foreach (var lineReadRGB in linesReadRGB){
             string[] num = lineReadRGB.Split(",");
             int rIdx = int.Parse(num[0]);
             int gIdx = int.Parse(num[1]);
             int bIdx = int.Parse(num[2]);
-
-            if (rIdx % lookupTableStepSize == 0 && gIdx % lookupTableStepSize == 0 && bIdx % lookupTableStepSize == 0){ // use values represented in the lookup table as they are if r, g, and b values are multiple of the step size
-                LookupTable.SetPixel(rIdx, gIdx, bIdx, CandidateCIELABVals[lineCounter]);
-            }
-            else{ // do trilinear interpolation based on https://en.wikipedia.org/wiki/Trilinear_interpolation
-                int rLowerBound = (int) ((rIdx / lookupTableStepSize)) * lookupTableStepSize;
-                int rUpperBound = rLowerBound + lookupTableStepSize; 
-
-                int gLowerBound = (int) ((gIdx / lookupTableStepSize)) * lookupTableStepSize;
-                int gUpperBound = gLowerBound + lookupTableStepSize; 
-
-                int bLowerBound = (int) ((bIdx / lookupTableStepSize)) * lookupTableStepSize;
-                int bUpperBound = bLowerBound + lookupTableStepSize; 
-
-                float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
-                float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
-                float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
-
-                Color32 C000 = LookupTable.GetPixel(rLowerBound, gLowerBound, bLowerBound); // c000
-                Color32 C100 = LookupTable.GetPixel(rUpperBound, gLowerBound, bLowerBound); // c100
-                Color32 C010 = LookupTable.GetPixel(rLowerBound, gUpperBound, bLowerBound); // c010
-                Color32 C110 = LookupTable.GetPixel(rUpperBound, gUpperBound, bLowerBound); // c110
-                Color32 C001 = LookupTable.GetPixel(rLowerBound, gLowerBound, bUpperBound); // c001
-                Color32 C101 = LookupTable.GetPixel(rUpperBound, gLowerBound, bUpperBound); // c101
-                Color32 C011 = LookupTable.GetPixel(rLowerBound, gUpperBound, bUpperBound); // c011
-                Color32 C111 = LookupTable.GetPixel(rUpperBound, gUpperBound, bUpperBound); // c111
-
-                Vector3 C00 = new Vector3(C000[0]*(1-rDiff) + C100[0]*rDiff, C000[1]*(1-rDiff) + C100[1]*rDiff, C000[2]*(1-rDiff) + C100[2]*rDiff);
-                Vector3 C01 = new Vector3(C001[0]*(1-rDiff) + C101[0]*rDiff, C001[1]*(1-rDiff) + C101[1]*rDiff, C001[2]*(1-rDiff) + C101[2]*rDiff);
-                Vector3 C10 = new Vector3(C010[0]*(1-rDiff) + C110[0]*rDiff, C010[1]*(1-rDiff) + C110[1]*rDiff, C010[2]*(1-rDiff) + C110[2]*rDiff);
-                Vector3 C11 = new Vector3(C011[0]*(1-rDiff) + C111[0]*rDiff, C011[1]*(1-rDiff) + C111[1]*rDiff, C011[2]*(1-rDiff) + C111[2]*rDiff);
-
-                Vector3 C0 = new Vector3(C00[0]*(1-gDiff) + C10[0]*gDiff, C00[1]*(1-gDiff) + C10[1]*gDiff, C00[2]*(1-gDiff) + C10[2]*gDiff);
-                Vector3 C1 = new Vector3(C10[0]*(1-gDiff) + C11[0]*gDiff, C10[1]*(1-gDiff) + C11[1]*gDiff, C10[2]*(1-gDiff) + C11[2]*gDiff);
-
-                Vector3 C = new Vector3((int) (C0[0]*(1-bDiff) + C1[0]*bDiff), (int) (C0[1]*(1-bDiff) + C1[1]*bDiff), (int) (C0[2]*(1-bDiff) + C1[2]*bDiff));
-                Color32 interpolatedColor = new Color32((byte) C[0], (byte) C[1], (byte) C[2], 255);
-                LookupTable.SetPixel(rIdx, gIdx, bIdx, interpolatedColor);
-            }
+            LookupTable.SetPixel(rIdx, gIdx, bIdx, CandidateCIELABVals[lineCounter]);
             lineCounter += 1;
+            // Debug.Log(LookupTable.GetPixel(rIdx, gIdx, bIdx));
         }
-        // Debug.Log(CandidateCIELABVals.Count);
-        backgroundAndLabelSphereMaterial.SetTexture("_CIELAB_LookupTable", LookupTable);
+        LookupTable.Apply();
 
-        // Initiate the storage for candidate CIELAB values
-        // CandidateCIELABValsAsArray = CandidateCIELABVals.ToArray();  // float array of size 3 * number of LAB value candidates (each value has 3 coordinates)
-        // backgroundAndLabelSphereMaterial.SetFloatArray("_CIELABCandidates", CandidateCIELABValsAsArray);
+        backgroundAndLabelSphereMaterial.SetTexture("_CIELAB_LookupTable", LookupTable);
+        backgroundAndLabelSphereMaterial.SetInt("_LookupTableStepSize", lookupTableStepSize);
     }
 
     // Update is called once per frame
