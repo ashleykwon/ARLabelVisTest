@@ -28,7 +28,6 @@ Shader "Unlit/InverseCullCubeMapShader"
         _OpacityLevel("Label opacity level", Range(0, 1)) = 1
 
         _CIELAB_LookupTable("CIELAB lookup table", 3D) = "white" {}
-        _LookupTableStepSize("Lookup table step size", Int) = 4
 
         _cielab_r("cielab_r", Range(0,1)) = 0.1
         _cielab_g("cielab_g", Range(0,1)) = 0.1
@@ -95,7 +94,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _cielab_b;
 
             sampler3D _CIELAB_LookupTable;
-            int _LookupTableStepSize;
            
             struct v2f 
             {
@@ -400,46 +398,46 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return RGBfinal;
             }
 
-            float4 interpolation2D(float4 lowerBound, float4 upperBound, float difference){
-                return float4(lowerBound[0]*(1 - difference) + difference*upperBound[0], lowerBound[1]*(1 - difference) + difference*upperBound[1], lowerBound[2]*(1 - difference) + difference*upperBound[2], 1.0);
-            }
+            // float4 interpolation2D(float4 lowerBound, float4 upperBound, float difference){
+            //     return float4(lowerBound[0]*(1 - difference) + difference*upperBound[0], lowerBound[1]*(1 - difference) + difference*upperBound[1], lowerBound[2]*(1 - difference) + difference*upperBound[2], 1.0);
+            // }
 
-            float4 trilinearInterpolation(int rIdx, int gIdx, int bIdx, int lookupTableStepSize){
-                float rLowerBound = float((rIdx / lookupTableStepSize) * lookupTableStepSize)/255;
-                float rUpperBound = float(rLowerBound + lookupTableStepSize)/255; 
+            // float4 trilinearInterpolation(int rIdx, int gIdx, int bIdx, int lookupTableStepSize){
+            //     float rLowerBound = ((rIdx / lookupTableStepSize) * lookupTableStepSize)/255; // find the closest lowerbound multiple of 4 and divide it by 255 to match the coordinate system of HLSL's tex3d
+            //     float rUpperBound = (rLowerBound*255.0 + lookupTableStepSize)/255; 
 
-                float gLowerBound = float((gIdx / lookupTableStepSize) * lookupTableStepSize)/255;
-                float gUpperBound = float(gLowerBound + lookupTableStepSize)/255; 
+            //     float gLowerBound = ((gIdx / lookupTableStepSize) * lookupTableStepSize)/255;
+            //     float gUpperBound = (gLowerBound*255.0 + lookupTableStepSize)/255; 
 
-                float bLowerBound = float((bIdx / lookupTableStepSize) * lookupTableStepSize)/255;
-                float bUpperBound = float(bLowerBound + lookupTableStepSize)/255; 
+            //     float bLowerBound = ((bIdx / lookupTableStepSize) * lookupTableStepSize)/255;
+            //     float bUpperBound = (bLowerBound*255.0 + lookupTableStepSize)/255; 
 
-                float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
-                float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
-                float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
+            //     float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
+            //     float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
+            //     float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
 
-                float4 C000 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bLowerBound)); // c000
-                float4 C100 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bLowerBound)); // c100
-                float4 C010 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bLowerBound)); // c010
-                float4 C110 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bLowerBound)); // c110
-                float4 C001 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bUpperBound)); // c001
-                float4 C101 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bUpperBound)); // c101
-                float4 C011 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bUpperBound)); // c011
-                float4 C111 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bUpperBound)); // c111
+            //     float4 C000 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bLowerBound)); // c000
+            //     float4 C100 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bLowerBound)); // c100
+            //     float4 C010 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bLowerBound)); // c010
+            //     float4 C110 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bLowerBound)); // c110
+            //     float4 C001 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bUpperBound)); // c001
+            //     float4 C101 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bUpperBound)); // c101
+            //     float4 C011 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bUpperBound)); // c011
+            //     float4 C111 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bUpperBound)); // c111
 
-                float4 C00 = interpolation2D(C000, C100, rDiff);
-                float4 C01 = interpolation2D(C001, C101, rDiff);
-                float4 C10 = interpolation2D(C010, C110, rDiff);
-                float4 C11 = interpolation2D(C011, C111, rDiff);
+            //     float4 C00 = interpolation2D(C000, C100, rDiff);
+            //     float4 C01 = interpolation2D(C001, C101, rDiff);
+            //     float4 C10 = interpolation2D(C010, C110, rDiff);
+            //     float4 C11 = interpolation2D(C011, C111, rDiff);
 
-                float4 C0 = interpolation2D(C00, C10, gDiff);
-                float4 C1 = interpolation2D(C10, C11, gDiff);
+            //     float4 C0 = interpolation2D(C00, C10, gDiff);
+            //     float4 C1 = interpolation2D(C10, C11, gDiff);
 
-                float4 interpolatedColor = interpolation2D(C0, C1, bDiff);
-
-                // float4 interpolatedColor = float4(C[0], C[1], C[2], 1);
-                return interpolatedColor;
-            }
+            //     float4 interpolatedColor = interpolation2D(C0, C1, bDiff);
+            //     interpolatedColor[3] = _OpacityLevel;
+            //     // float4 interpolatedColor = float4(C[0], C[1], C[2], 1);
+            //     return interpolatedColor;
+            // }
 
 
             float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
@@ -509,17 +507,8 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // CIELAB inversion
                 else if (_ColorMethod == 4)
                 {
-                    int R_idx = int(bgSample[0]*255);
-                    int G_idx = int(bgSample[1]*255);
-                    int B_idx = int(bgSample[2]*255);
-                    if (R_idx%4 == 0 && G_idx%4 == 0 && B_idx%4 == 0){
-                        col = tex3D(_CIELAB_LookupTable, bgSample.rgb); // assumes that the lookup table has no missing values
-                        col.a = 1;
-                    }
-                    else{
-                        col = trilinearInterpolation(R_idx, G_idx, B_idx, _LookupTableStepSize);
-                        col.a = 1;
-                    }
+                    col = tex3D(_CIELAB_LookupTable, bgSample.rgb);
+                    // col[1] = 1 - col[1];
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
@@ -585,6 +574,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                 // //Label color and outline assignment
                 if (labelTex[3] != 0) // is a label pixel
                 {   
+                    // bgSample = float4(252.0, 252.0, 252.0, 1);
                     col = function_f(_ColorMethod, bgSample);
                    
                     // set the opacity level
@@ -638,7 +628,7 @@ Shader "Unlit/InverseCullCubeMapShader"
                             if (col.r + col.g + col.b < 0.5){
                                 col = float4(1, 1, 1, _OpacityLevel); // White outline if low grayscale value
                             }else{
-                            col = float4(0, 0, 0, _OpacityLevel); // black outline if high grayscale value
+                                col = float4(0, 0, 0, _OpacityLevel); // black outline if high grayscale value
                             } 
                         }
                     }

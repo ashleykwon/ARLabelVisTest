@@ -1508,6 +1508,7 @@ MonoBehaviour:
   labelSphere: {fileID: 452877973}
   player: {fileID: 775743277}
   cShaderForMask: {fileID: 7200000, guid: c9a235625146cfd4480f04a868d4b0c9, type: 3}
+  LookupTable: {fileID: 11700000, guid: 98c29dca8403d6544ae8e989dbe6d787, type: 2}
 --- !u!4 &2057361879 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}

@@ -11,6 +11,7 @@ using System.Linq;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 using UnityEngine.Rendering;
+using UnityEditor;
 
 public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 {
@@ -36,7 +37,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     int maskBuffer_kernelID;
     List<Color32> CandidateCIELABVals;
     float[] CandidateCIELABValsAsArray;
-    Texture3D LookupTable;
+    public Texture3D LookupTable;
 
 
     void toTexture2D(RenderTexture rTex, Texture2D screenshot, int width, int height)
@@ -134,8 +135,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     {
         // Get the material to which the Inverse Cull shader is attached
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
-        // maskedBackgroundMaterial = maskedBackground.GetComponent<MeshRenderer>().sharedMaterial;
-        // // backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 1);
         
         // Set up the background and label screenshot cameras
         backgroundScreenshotCamera = FindObjectsOfType<Camera>()[0]; // right eye anchor
@@ -166,40 +165,45 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Find the ID of the average RGB value calculation function we'll use in Compute Shader
         maskBuffer_kernelID = cShaderForMask.FindKernel("CSMain");
 
+        ////// The lines below are for creating and saving a new lookup texture ///////////
         // Read the txt file that contains candidate LAB values and copy their values into CandidateCIELABVals
-        CandidateCIELABVals = new List<Color32>();
-        var linesReadLAB = File.ReadLines("./Assets/CandidateLABvals.txt");
-        foreach (var lineReadLAB in linesReadLAB)
-        {
-            string[] num = lineReadLAB.Split(",");
-            Vector3 currentLAB = new Vector3(float.Parse(num[0], System.Globalization.CultureInfo.InvariantCulture), 
-                                            float.Parse(num[1], System.Globalization.CultureInfo.InvariantCulture), 
-                                            float.Parse(num[2], System.Globalization.CultureInfo.InvariantCulture));
-            Color32 currentLABAsRGB = LAB2RGB(currentLAB);
-            CandidateCIELABVals.Add(currentLABAsRGB);
-        }
+        // CandidateCIELABVals = new List<Color32>();
+        // var linesReadLAB = File.ReadLines("./Assets/AllCandidateLABvals.txt");
+        // foreach (var lineReadLAB in linesReadLAB)
+        // {
+        //     string[] num = lineReadLAB.Split(",");
+        //     Vector3 currentLAB = new Vector3(float.Parse(num[0], System.Globalization.CultureInfo.InvariantCulture), 
+        //                                     float.Parse(num[1], System.Globalization.CultureInfo.InvariantCulture), 
+        //                                     float.Parse(num[2], System.Globalization.CultureInfo.InvariantCulture));
+        //     Color32 currentLABAsRGB = LAB2RGB(currentLAB);
+        //     CandidateCIELABVals.Add(currentLABAsRGB);
+        // }
 
-        int lookupTableStepSize = 4; // change for a different step size
+        // int lookupTableStepSize = 4; // change for a different step size
 
-        // Make a lookup table (texture3d) with the corresponding LAB-to-RGB converted value at each RGB index
-        int lineCounter = 0;
-        LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
-        // LookupTable.mipCount = 0;
-        var linesReadRGB = File.ReadLines("./Assets/CorrespondingRGBVals.txt");
+        // // Make a lookup table (texture3d) with the corresponding LAB-to-RGB converted value at each RGB index
+        // int lineCounter = 0;
+        // LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
+        
+        // // LookupTable.mipCount = 0;
+        // var linesReadRGB = File.ReadLines("./Assets/AllCorrespondingRGBVals.txt");
        
-        foreach (var lineReadRGB in linesReadRGB){
-            string[] num = lineReadRGB.Split(",");
-            int rIdx = int.Parse(num[0]);
-            int gIdx = int.Parse(num[1]);
-            int bIdx = int.Parse(num[2]);
-            LookupTable.SetPixel(rIdx, gIdx, bIdx, CandidateCIELABVals[lineCounter]);
-            lineCounter += 1;
-            // Debug.Log(LookupTable.GetPixel(rIdx, gIdx, bIdx));
-        }
-        LookupTable.Apply();
+        // foreach (var lineReadRGB in linesReadRGB){
+        //     string[] num = lineReadRGB.Split(",");
+        //     int rIdx = int.Parse(num[0]);
+        //     int gIdx = int.Parse(num[1]);
+        //     int bIdx = int.Parse(num[2]);
+        //     LookupTable.SetPixel(rIdx, gIdx, bIdx, CandidateCIELABVals[lineCounter]);
+        //     lineCounter += 1;
+        //     // Debug.Log(LookupTable.GetPixel(rIdx, gIdx, bIdx));
+        // }
 
+        // LookupTable.Apply(updateMipmaps: false);
+        // AssetDatabase.CreateAsset(LookupTable, $"Assets/LookupTexture.asset");
+        // AssetDatabase.SaveAssetIfDirty(LookupTable);
+        ////// The lines above are for creating and saving a new lookup texture ///////////
+        
         backgroundAndLabelSphereMaterial.SetTexture("_CIELAB_LookupTable", LookupTable);
-        backgroundAndLabelSphereMaterial.SetInt("_LookupTableStepSize", lookupTableStepSize);
     }
 
     // Update is called once per frame
