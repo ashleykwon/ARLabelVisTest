@@ -17,13 +17,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TestScenes/360/CityBridge_360_Night_Outdoor.unity
     guid: 5c6696ff86ab24767b4645d5f02459ca
-  - enabled: 1
+  - enabled: 0
     path: Assets/TestScenes/360/HotelParanal_360_Day_Indoor.unity
     guid: 8f417359d02864dad8959e605da03415
   - enabled: 1
     path: Assets/TestScenes/360/LaSilla_360_Night_Outdoor.unity
     guid: 11cb9e618fa7443c39541598a0714a19
-  - enabled: 0
+  - enabled: 1
     path: Assets/TestScenes/360/MansonBayPier_360_Day_Outdoor.unity
     guid: dd4a62cb3c75449d68e60025e987af78
   - enabled: 0

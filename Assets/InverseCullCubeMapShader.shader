@@ -29,9 +29,9 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _CIELAB_LookupTable("CIELAB lookup table", 3D) = "white" {}
 
-        _cielab_r("cielab_r", Range(0,1)) = 0.1
-        _cielab_g("cielab_g", Range(0,1)) = 0.1
-        _cielab_b("cielab_b", Range(0,1)) = 0.1
+        _Min_Label_Grayscale("Minimum_Label_Grayscale", Range(0,1)) = 0.1
+        _Max_Label_Grayscale("Maximum_Label_Grayscale", Range(0,1)) = 0.1
+        // _Avg_Label_Grayscale("Maximum_Label_Grayscale", Range(0,1)) = 0.1
     }
 
     SubShader
@@ -89,9 +89,9 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _Background_sum_g;
             float _Background_sum_b;
 
-            float _cielab_r;
-            float _cielab_g;
-            float _cielab_b;
+            float _Min_Label_Grayscale;
+            float _Max_Label_Grayscale;
+            // float _Avg_Label_Grayscale;
 
             sampler3D _CIELAB_LookupTable;
            
@@ -398,48 +398,6 @@ Shader "Unlit/InverseCullCubeMapShader"
                 return RGBfinal;
             }
 
-            // float4 interpolation2D(float4 lowerBound, float4 upperBound, float difference){
-            //     return float4(lowerBound[0]*(1 - difference) + difference*upperBound[0], lowerBound[1]*(1 - difference) + difference*upperBound[1], lowerBound[2]*(1 - difference) + difference*upperBound[2], 1.0);
-            // }
-
-            // float4 trilinearInterpolation(int rIdx, int gIdx, int bIdx, int lookupTableStepSize){
-            //     float rLowerBound = ((rIdx / lookupTableStepSize) * lookupTableStepSize)/255; // find the closest lowerbound multiple of 4 and divide it by 255 to match the coordinate system of HLSL's tex3d
-            //     float rUpperBound = (rLowerBound*255.0 + lookupTableStepSize)/255; 
-
-            //     float gLowerBound = ((gIdx / lookupTableStepSize) * lookupTableStepSize)/255;
-            //     float gUpperBound = (gLowerBound*255.0 + lookupTableStepSize)/255; 
-
-            //     float bLowerBound = ((bIdx / lookupTableStepSize) * lookupTableStepSize)/255;
-            //     float bUpperBound = (bLowerBound*255.0 + lookupTableStepSize)/255; 
-
-            //     float rDiff = (rIdx - rLowerBound)/(rUpperBound - rLowerBound);
-            //     float gDiff = (gIdx - gLowerBound)/(gUpperBound - gLowerBound);
-            //     float bDiff = (bIdx - bLowerBound)/(bUpperBound - bLowerBound);
-
-            //     float4 C000 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bLowerBound)); // c000
-            //     float4 C100 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bLowerBound)); // c100
-            //     float4 C010 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bLowerBound)); // c010
-            //     float4 C110 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bLowerBound)); // c110
-            //     float4 C001 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gLowerBound, bUpperBound)); // c001
-            //     float4 C101 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gLowerBound, bUpperBound)); // c101
-            //     float4 C011 = tex3D(_CIELAB_LookupTable, float3(rLowerBound, gUpperBound, bUpperBound)); // c011
-            //     float4 C111 = tex3D(_CIELAB_LookupTable, float3(rUpperBound, gUpperBound, bUpperBound)); // c111
-
-            //     float4 C00 = interpolation2D(C000, C100, rDiff);
-            //     float4 C01 = interpolation2D(C001, C101, rDiff);
-            //     float4 C10 = interpolation2D(C010, C110, rDiff);
-            //     float4 C11 = interpolation2D(C011, C111, rDiff);
-
-            //     float4 C0 = interpolation2D(C00, C10, gDiff);
-            //     float4 C1 = interpolation2D(C10, C11, gDiff);
-
-            //     float4 interpolatedColor = interpolation2D(C0, C1, bDiff);
-            //     interpolatedColor[3] = _OpacityLevel;
-            //     // float4 interpolatedColor = float4(C[0], C[1], C[2], 1);
-            //     return interpolatedColor;
-            // }
-
-
             float gaussian1D(float x, float sigma) // based on https://mccormickml.com/2013/08/15/the-gaussian-kernel/
             {
                 float pi = 3.14159265359;
@@ -508,7 +466,26 @@ Shader "Unlit/InverseCullCubeMapShader"
                 else if (_ColorMethod == 4)
                 {
                     col = tex3D(_CIELAB_LookupTable, bgSample.rgb);
-                    // col[1] = 1 - col[1];
+                    if (_GranularityMethod == 0){ // scale pixel values for the per-pixel method
+                        float grayscaleVal = (bgSample[0] + bgSample[1] + bgSample[2])/3.0;
+                        float newGrayscaleVal = ((grayscaleVal - _Min_Label_Grayscale)/(_Max_Label_Grayscale - _Min_Label_Grayscale))*(_Max_Label_Grayscale - _Min_Label_Grayscale+20); // this 20 can be changed to another number
+                        // float newGrayscaleVal = 1 + (grayscaleVal-_Avg_Label_Grayscale);
+                        
+                        // // col[0] = (col[0]+grayscaleVal)/(1+grayscaleVal);
+                        // // col[1] = (col[1]+grayscaleVal)/(1+grayscaleVal);
+                        // // col[2] = (col[2]+grayscaleVal)/(1+grayscaleVal);
+                        // col[0] *= newGrayscaleVal;
+                        // col[1] *= newGrayscaleVal;
+                        // col[2] *= newGrayscaleVal;
+
+                        col[0]*= (newGrayscaleVal);
+                        col[1]*= (newGrayscaleVal);
+                        col[2]*= (newGrayscaleVal);
+                        
+                        col[0] = max(0, min(1, col[0]));
+                        col[1] = max(0, min(1, col[1]));
+                        col[2] = max(0, min(1, col[2]));
+                    }
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){
