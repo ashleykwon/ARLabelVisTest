@@ -45,8 +45,11 @@ Shader "Unlit/LabelBackgroundShader"
             {
                 // sample the texture
                 fixed4 col = texCUBE(_CubeMap, vdata.uv);
-                if (col[0] != 0){
+                if (col[0] != 0 && col[1] != 0){
                     col = float4(1.0, 1.0, 1.0, 1.0);
+                }
+                else if (col[0] != 0 && col[0] == 0){
+                    col = float4(1.0, 0.0, 0.0, 1.0);
                 }
                 else{
                     col = float4(0.0, 0.0, 0.0, 1.0);

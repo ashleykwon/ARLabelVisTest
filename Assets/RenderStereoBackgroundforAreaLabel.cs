@@ -21,6 +21,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     Material backgroundAndLabelSphereMaterial;
     Camera backgroundScreenshotCamera;
     Camera labelScreenshotCamera;
+    Camera centerEyeCamera;
 
     Texture2D backgroundScreenshotForSum; // this doesn't need to be assigned outside of this code
     Texture2D labelScreenshotForSum; // this doesn't need to be assigned outside of this code
@@ -41,6 +42,17 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     List<List<Color32>> ColorHistogram;
     List<Vector3> ColorHistogramBins;
+    public Texture2D CenterMarkedLabelTexture;
+    int[] labelCenterCoord;
+
+    // bool backgroundAvgDerived;
+    // bool labelAvgDerived;
+    // bool labelGrayscaleValuesDerived;
+
+    // Vector3 backgroundAverage;
+    // Vector3 labelAverage;
+    // float minGray;
+    // float maxGray;
 
 
 
@@ -143,9 +155,15 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Set up the background and label screenshot cameras
         backgroundScreenshotCamera = FindObjectsOfType<Camera>()[0]; // right eye anchor
         labelScreenshotCamera = FindObjectsOfType<Camera>()[2]; // left eye anchor
+        centerEyeCamera = FindObjectsOfType<Camera>()[1]; // center eye anchor -> this is a physical camera
 
         w = backgroundScreenshotCamera.pixelWidth;
         h = backgroundScreenshotCamera.pixelHeight;
+
+        // h = (int)(2*centerEyeCamera.focalLength*100.0f*Math.Tan(centerEyeCamera.fieldOfView/2.0f));
+        // w = (int)(centerEyeCamera.aspect*h);
+        // Debug.Log(h);
+        // Debug.Log(w);
 
         // Initiate the texture to which background pixels will be rendered
         backgroundScreenshotForSum = new Texture2D(w, h, TextureFormat.RGBA32, false);
@@ -229,8 +247,28 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             }
         }
 
+        // Iterate through each coordinate in the label texture and find the center coordinate
+        labelCenterCoord = new int[2];
+        for (int wi = 0; wi < CenterMarkedLabelTexture.width; wi++){
+            for (int hi = 0; hi < CenterMarkedLabelTexture.height; hi++){
+                Color currentColor = CenterMarkedLabelTexture.GetPixel(wi, hi);
+                if (currentColor.r > 250 && currentColor.g < 1 && currentColor.b < 1){
+                    labelCenterCoord[0] = wi;
+                    labelCenterCoord[1] = hi;
+                }
+            }
+        }
+
+        // backgroundAvgDerived = false;
+        // labelAvgDerived = false;
+        // labelGrayscaleValuesDerived = false;
         // Sanity check for the correct number of bin upper bounds
         // Debug.Log(ColorHistogramBins.Count);
+
+        // backgroundAverage = new Vector3(0.0f, 0.0f, 0.0f);
+        // labelAverage = new Vector3(0.0f, 0.0f, 0.0f);;
+        // minGray = 0.0f;
+        // maxGray = 0.0f;
     }
 
     // Update is called once per frame
@@ -256,21 +294,26 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Get the current granularity method
         int granularityMethod = backgroundAndLabelSphereMaterial.GetInt("_GranularityMethod");
 
-        if (granularityMethod == 1 || granularityMethod == 0){ // area-based label
+        // if (granularityMethod == 1 || granularityMethod == 0){ // area-based label or per-pixel label
            
-            // Using compute shader, mask the background so that it only contains pixels under the area label
-            cShaderForMask.SetTexture(maskBuffer_kernelID, "backgroundScreenshotForSum", backgroundScreenshotForSum);
-            cShaderForMask.SetTexture(maskBuffer_kernelID, "labelScreenshotForSum", labelScreenshotForSum);
-            cShaderForMask.SetTexture(maskBuffer_kernelID, "Result", backgroundRT);
-            cShaderForMask.Dispatch(maskBuffer_kernelID, w, h, 1);
-            toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
+        // Using compute shader, mask the background so that it only contains pixels under the area label or pixels at a certain distance from the center of the label
+        cShaderForMask.SetInt("granularityMethod", granularityMethod);
+        cShaderForMask.SetInt("image_width", w);
+        cShaderForMask.SetInt("image_height", h);
+        cShaderForMask.SetInts("labelCenterCoord", labelCenterCoord);
+        cShaderForMask.SetFloat("distanceThreshold", 5.0f);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "backgroundScreenshotForSum", backgroundScreenshotForSum);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "labelScreenshotForSum", labelScreenshotForSum);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "Result", backgroundRT);
+        cShaderForMask.Dispatch(maskBuffer_kernelID, w, h, 1);
+        toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
 
-            // For mask debugging purposes only 
-            // byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
-            // File.WriteAllBytes(Application.dataPath + "/MaskedBackground2.png", bytes);
-        }
+        // For mask debugging purposes only 
+        byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/MaskedBackground3.png", bytes);
+        // }
 
-        if (granularityMethod != 0){
+        if (granularityMethod != 0){ // area-based label or background-based label
             if (requests.Count < 8){
                 requests.Enqueue(AsyncGPUReadback.Request(backgroundScreenshotForSum, 0, TextureFormat.RGBA32, (AsyncGPUReadbackRequest req) =>
                 {
@@ -313,10 +356,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
                             }
                         }
 
-                        // for (int i = 0; i < ColorHistogram.Count; i++){
-                        //     Debug.Log(ColorHistogram[i].Count);
-                        // }
-                        
 
                         if (count != 0){ // handles the case when the label is not in the user's view 
                             r = (float)((averageR/count)/255.0);
@@ -345,7 +384,6 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
                                 }
 
                                 binSizeSum += currentBin.Count;
-
                                 // r = (float)(averageR/255.0);
                                 // g = (float)(averageG/255.0);
                                 // b = (float)(averageB/255.0);
@@ -357,10 +395,27 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
                         g = (float)((averageG/binSizeSum)/255.0);
                         b = (float)((averageB/binSizeSum)/255.0);
 
+                       // Make sure that the average calculation happens only once
+                        // if (binSizeSum != 0){
+                        //     if (granularityMethod == 1){
+                        //         labelAvgDerived = true;
+                        //         labelAverage[0] = r;
+                        //         labelAverage[1] = g;
+                        //         labelAverage[2] = b;
+                        //     }
+                        //     else{
+                        //         backgroundAvgDerived = true;
+                        //         backgroundAverage[0] = r;
+                        //         backgroundAverage[1] = g;
+                        //         backgroundAverage[2] = b;
+                        //     }
+                        // }
+
                         // Assign the "average" background color
                         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", r);
                         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", g);
                         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", b);
+
                            
                         // Debug.Log(averageR);
                         // Empty bins in ColorHistogram for the next frame
@@ -373,6 +428,19 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
                     requests.Dequeue();
                     }));
                 }
+                // else{ // this handles the case where the background or the label average has already been derived
+                //     if (granularityMethod == 1){
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", labelAverage[0]);
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", labelAverage[1]);
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", labelAverage[2]);
+                //     }
+                //     else{
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[0]);
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[1]);
+                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[2]);
+                //     }
+                // }
+                
         }
 
         else{ // per-pixel label 

@@ -7,22 +7,83 @@
 Texture2D<int4> backgroundScreenshotForSum;
 Texture2D<int4> labelScreenshotForSum;
 RWTexture2D<int4> Result;
-// int granularityMethod;
+int2 labelCenterCoord;
+int granularityMethod;
+float distanceThreshold;
+int image_width;
+int image_height;
 // float4 averageBackgroundColor;
 // int4 CIELABResult;
 // int CandidateLABVals[408];
 // int distanceToReturn;
 
+
+float2 pixel_to_coord(int2 pixel, int image_width, int image_height){
+    // Convert pixel position to spherical coordinates
+    float lon = (pixel[0] / image_width) * 360 - 180;
+    float lat = 90 - (pixel[1] / image_height) * 180;
+    float2 result = float2(lon, lat);
+    return result;
+}
+
+float great_circle_distance(int2 target_pixel, int2 source_pixel, int image_width, int image_height){
+    // Assuming the image represents a full 360 degree view of the sphere
+    // Convert pixel coordinates to longitude and latitude
+    float2 lon1lat1 = pixel_to_coord(target_pixel, image_width, image_height);
+    float lon1 = lon1lat1[0];
+    float lat1 = lon1lat1[1];
+
+    float2 lon2lat2 = pixel_to_coord(source_pixel, image_width, image_height);
+    float lon2 = lon2lat2[0];
+    float lat2 = lon2lat2[1];
+    
+    // Convert degrees to radians
+    // lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+    lon1 = radians(lon1);
+    lat1 = radians(lat1);
+    lon2 = radians(lon2);
+    lat2 = radians(lat2);
+    
+    // Haversine formula
+    float dlon = lon2 - lon1;
+    float dlat = lat2 - lat1;
+    float a = pow(sin(dlat/2), 2) + cos(lat1) * cos(lat2) * pow(sin(dlon/2), 2);
+    float c = 2 * asin(sqrt(a));
+    
+    // Radius of the image in pixels (mean radius)
+    float R = image_width/(2*radians(180));
+    float distance = R * c;
+    
+    return distance;
+}
+
+
 [numthreads(1, 1 ,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {   
-    if (labelScreenshotForSum[id.xy].x > 200 && labelScreenshotForSum[id.xy].y > 200 && labelScreenshotForSum[id.xy].z > 200){
-        Result[id.xy] = backgroundScreenshotForSum[id.xy];
+    if (granularityMethod == 1){
+        if (labelScreenshotForSum[id.xy].x > 200 && labelScreenshotForSum[id.xy].y > 200 && labelScreenshotForSum[id.xy].z > 200){
+            Result[id.xy] = backgroundScreenshotForSum[id.xy];
+        }
+        else{
+            Result[id.xy] = int4(0, 0, 0, 0);
+        }
     }
-    else{
-        Result[id.xy] = int4(0, 0, 0, 0);
+
+    else if (granularityMethod == 2){
+        float distance = great_circle_distance(id.xy, labelCenterCoord, image_width, image_height);
+        if (distance <= distanceThreshold){
+            Result[id.xy] = backgroundScreenshotForSum[id.xy];
+        }
+        else{
+            Result[id.xy] = int4(0, 0, 0, 0);
+        }
     }
+    
 }
+
+
+
 
 // float4 RGB2LAB(float4 RGB) // probably referenced from here:
 // {

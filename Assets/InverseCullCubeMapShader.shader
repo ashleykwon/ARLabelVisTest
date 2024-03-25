@@ -466,14 +466,14 @@ Shader "Unlit/InverseCullCubeMapShader"
                 else if (_ColorMethod == 4)
                 {
                     col = tex3D(_CIELAB_LookupTable, bgSample.rgb);
-                    if (_GranularityMethod == 0){ // scale pixel values for the per-pixel method
-                        float grayscaleVal = (bgSample[0] + bgSample[1] + bgSample[2])/3.0;
-                        float newGrayscaleVal = ((grayscaleVal - _Min_Label_Grayscale)/(_Max_Label_Grayscale - _Min_Label_Grayscale))*((_Max_Label_Grayscale - _Min_Label_Grayscale)*20); // this 20 can be changed to another number
+                    // if (_GranularityMethod == 0){ // scale pixel values for the per-pixel method
+                    //     float grayscaleVal = (bgSample[0] + bgSample[1] + bgSample[2])/3.0;
+                    //     float newGrayscaleVal = _Min_Label_Grayscale + ((grayscaleVal - _Min_Label_Grayscale)/(_Max_Label_Grayscale - _Min_Label_Grayscale))*((_Max_Label_Grayscale - _Min_Label_Grayscale)*20); // this 20 can be changed to another number
                         
-                        col[0] = max(0, min(1, col[0]*newGrayscaleVal));
-                        col[1] = max(0, min(1, col[1]*newGrayscaleVal));
-                        col[2] = max(0, min(1, col[2]*newGrayscaleVal));
-                    }
+                    //     col[0] = max(0, min(1, col[0]*newGrayscaleVal));
+                    //     col[1] = max(0, min(1, col[1]*newGrayscaleVal));
+                    //     col[2] = max(0, min(1, col[2]*newGrayscaleVal));
+                    // }
                 } 
                 // Green Label
                 else if (_ColorMethod == 5){

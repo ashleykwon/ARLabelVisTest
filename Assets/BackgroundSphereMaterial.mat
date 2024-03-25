@@ -99,9 +99,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _Avg_Label_Grayscale: 0.015732046
-    - _Background_sum_b: 0
-    - _Background_sum_g: 0
-    - _Background_sum_r: 0
+    - _Background_sum_b: 0.019607844
+    - _Background_sum_g: 0.023529412
+    - _Background_sum_r: 0.03137255
     - _BillboardColorMethod: 0
     - _BillboardLightnessContrastThreshold: 0
     - _BumpScale: 1
@@ -117,12 +117,12 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GranularityMethod: 0
+    - _GranularityMethod: 2
     - _LabelRotationMatrix: 0
     - _LookupTableStepSize: 4
-    - _Max_Label_Grayscale: 0.72026145
+    - _Max_Label_Grayscale: 0.98169935
     - _Metallic: 0
-    - _Min_Label_Grayscale: 0.0013071896
+    - _Min_Label_Grayscale: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OpacityLevel: 0.7
