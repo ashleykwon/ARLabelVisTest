@@ -195,6 +195,10 @@ public class PairwiseComparison : MonoBehaviour
                 currentComparisonPairIdx += 1;  
                 currentComparison = comparisonsToUse[currentComparisonPairIdx];
                 displayMode(currentComparison[0]);
+                // if (currentComparisonPairIdx == numComparisons-1){
+                //     Debug.Log("Done!");
+                //     modeID.text = "End of all comparisons!";
+                // }
 
             }
             else{

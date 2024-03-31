@@ -7,11 +7,17 @@
 Texture2D<int4> backgroundScreenshotForSum;
 Texture2D<int4> labelScreenshotForSum;
 RWTexture2D<int4> Result;
-int2 labelCenterCoord;
-int granularityMethod;
-float distanceThreshold;
+
+// TextureCube<float4> backgroundRenderTexture;
+// TextureCube<float4> labelRenderTexture;
+// RWTexture2D<int4> Result;
+
+// int2 labelCenterCoord;
+// int granularityMethod;
+// float distanceThreshold;
 int image_width;
 int image_height;
+
 // float4 averageBackgroundColor;
 // int4 CIELABResult;
 // int CandidateLABVals[408];
@@ -51,7 +57,7 @@ float great_circle_distance(int2 target_pixel, int2 source_pixel, int image_widt
     float c = 2 * asin(sqrt(a));
     
     // Radius of the image in pixels (mean radius)
-    float R = image_width/(2*radians(180));
+    float R = image_width/(2.0*3.141592);
     float distance = R * c;
     
     return distance;
@@ -59,26 +65,26 @@ float great_circle_distance(int2 target_pixel, int2 source_pixel, int image_widt
 
 
 [numthreads(1, 1 ,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+void CSMain (uint2 id : SV_DispatchThreadID)
 {   
-    if (granularityMethod == 1){
-        if (labelScreenshotForSum[id.xy].x > 200 && labelScreenshotForSum[id.xy].y > 200 && labelScreenshotForSum[id.xy].z > 200){
-            Result[id.xy] = backgroundScreenshotForSum[id.xy];
-        }
-        else{
-            Result[id.xy] = int4(0, 0, 0, 0);
-        }
+    // if (granularityMethod == 0 || granularityMethod == 1){
+    if (labelScreenshotForSum[id.xy].x > 200 && labelScreenshotForSum[id.xy].y > 200 && labelScreenshotForSum[id.xy].z > 200){
+        Result[id.xy] = backgroundScreenshotForSum[id.xy];
     }
+    else{
+        Result[id.xy] = int4(0, 0, 0, 0);
+    }
+    // }
 
-    else if (granularityMethod == 2){
-        float distance = great_circle_distance(id.xy, labelCenterCoord, image_width, image_height);
-        if (distance <= distanceThreshold){
-            Result[id.xy] = backgroundScreenshotForSum[id.xy];
-        }
-        else{
-            Result[id.xy] = int4(0, 0, 0, 0);
-        }
-    }
+    // else if (granularityMethod == 2){
+    //     float distance = great_circle_distance(id.xy, (uint2)labelCenterCoord, image_width, image_height);
+    //     if (distance <= distanceThreshold){
+    //         Result[id.xy] = backgroundScreenshotForSum[id.xy];
+    //     }
+    //     else{
+    //         Result[id.xy] = int4(0, 0, 0, 0);
+    //     }
+    // }
     
 }
 

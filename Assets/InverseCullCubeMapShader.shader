@@ -29,9 +29,6 @@ Shader "Unlit/InverseCullCubeMapShader"
 
         _CIELAB_LookupTable("CIELAB lookup table", 3D) = "white" {}
 
-        _Min_Label_Grayscale("Minimum_Label_Grayscale", Range(0,1)) = 0.1
-        _Max_Label_Grayscale("Maximum_Label_Grayscale", Range(0,1)) = 0.1
-        // _Avg_Label_Grayscale("Maximum_Label_Grayscale", Range(0,1)) = 0.1
     }
 
     SubShader
@@ -89,9 +86,6 @@ Shader "Unlit/InverseCullCubeMapShader"
             float _Background_sum_g;
             float _Background_sum_b;
 
-            float _Min_Label_Grayscale;
-            float _Max_Label_Grayscale;
-            // float _Avg_Label_Grayscale;
 
             sampler3D _CIELAB_LookupTable;
            
@@ -466,6 +460,23 @@ Shader "Unlit/InverseCullCubeMapShader"
                 else if (_ColorMethod == 4)
                 {
                     col = tex3D(_CIELAB_LookupTable, bgSample.rgb);
+                    if (_GranularityMethod == 0){
+                        float4 bgSampleAsLAB = RGB2LAB(bgSample);
+                        float4 backgroundAvg = float4(_Background_sum_r, _Background_sum_g, _Background_sum_b, 1);
+                        float4 backgroundAVGAsLAB = RGB2LAB(backgroundAvg);
+                        float4 avgMaxDistLAB = RGB2LAB(tex3D(_CIELAB_LookupTable, backgroundAvg.rgb));
+                        
+                        float4 diff = float4(bgSampleAsLAB[0]-backgroundAVGAsLAB[0], bgSampleAsLAB[1]-backgroundAVGAsLAB[1], bgSampleAsLAB[2]-backgroundAVGAsLAB[2], 1);
+                        col = LAB2RGB(float4(avgMaxDistLAB[0]+diff[0], avgMaxDistLAB[1]+diff[1], avgMaxDistLAB[2]+diff[2], 1));
+                    }
+                    
+                    // float4 centerRGBAsLAB = RGB2LAB(float4(32.0/255.0, 136.0/255.0, 0.0, 1.0));
+                    // float4 centerLABMostDistant = float4(56.95726412, -31.72008812, -68.11541354, 1.0);      
+                    // float4 diff = float4(bgSampleAsLAB[0]-centerRGBAsLAB[0], bgSampleAsLAB[1]-centerRGBAsLAB[1], bgSampleAsLAB[2]-centerRGBAsLAB[2], 1);
+                    // float4 newLAB = float4(centerLABMostDistant[0]+diff[0], centerLABMostDistant[1]+diff[1], centerLABMostDistant[2]+diff[2], 1.0);
+                    // col = LAB2RGB(centerLABMostDistant);
+                    
+                    
                     // if (_GranularityMethod == 0){ // scale pixel values for the per-pixel method
                     //     float grayscaleVal = (bgSample[0] + bgSample[1] + bgSample[2])/3.0;
                     //     float newGrayscaleVal = _Min_Label_Grayscale + ((grayscaleVal - _Min_Label_Grayscale)/(_Max_Label_Grayscale - _Min_Label_Grayscale))*((_Max_Label_Grayscale - _Min_Label_Grayscale)*20); // this 20 can be changed to another number

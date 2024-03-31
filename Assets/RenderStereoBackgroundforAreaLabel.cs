@@ -23,11 +23,12 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     Camera labelScreenshotCamera;
     Camera centerEyeCamera;
 
-    Texture2D backgroundScreenshotForSum; // this doesn't need to be assigned outside of this code
-    Texture2D labelScreenshotForSum; // this doesn't need to be assigned outside of this code
+    Texture2D maskedBackgroundAsTex2D; // this doesn't need to be assigned outside of this code
+    public Texture2D LabelMask;
+    public Texture2D EquirectangularBackground;
+    public Texture2D BackgroundMask;
 
     RenderTexture backgroundRT;
-    RenderTexture labelRT;
     int w;
     int h;
 
@@ -42,17 +43,12 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
     List<List<Color32>> ColorHistogram;
     List<Vector3> ColorHistogramBins;
-    public Texture2D CenterMarkedLabelTexture;
-    int[] labelCenterCoord;
+    // public Texture2D CenterMarkedLabelTexture;
+    // int[] labelCenterCoord;
+    Color32 backgroundAvg;
+    Color32 labelAvg;
+    public bool backgroundOrLableChanged;
 
-    // bool backgroundAvgDerived;
-    // bool labelAvgDerived;
-    // bool labelGrayscaleValuesDerived;
-
-    // Vector3 backgroundAverage;
-    // Vector3 labelAverage;
-    // float minGray;
-    // float maxGray;
 
 
 
@@ -144,6 +140,116 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         return RGB;
     }
 
+    void ApplyMask(RenderTexture backgroundRT, Texture2D EquirectangularBackground, Texture2D Mask, int w, int h)
+    {
+        // Using compute shader, mask the background so that it only contains pixels under the area label or pixels at a certain distance from the center of the label
+        cShaderForMask.SetInt("image_width", w);
+        cShaderForMask.SetInt("image_height", h);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "backgroundScreenshotForSum", EquirectangularBackground);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "labelScreenshotForSum", Mask);
+        cShaderForMask.SetTexture(maskBuffer_kernelID, "Result", backgroundRT);
+        cShaderForMask.Dispatch(maskBuffer_kernelID, w, h, 1);
+        toTexture2D(backgroundRT, maskedBackgroundAsTex2D, w, h);
+    }
+
+    void FindHistogramAverageColor(Texture2D maskedBackgroundAsTex2D, int granularityMode)
+    {   
+        // Initialize the average value to return 
+        Color32 avgVal = new Color32(0, 0, 0, 0);
+        
+        // Do the histogram-based average calculation 
+        if (requests.Count < 8)
+        {
+            requests.Enqueue(AsyncGPUReadback.Request(maskedBackgroundAsTex2D, 0, TextureFormat.RGBA32, (AsyncGPUReadbackRequest req) =>
+            {
+                if (req.hasError)
+                {
+                    Debug.Log("GPU readback error detected.");
+                    requests.Dequeue();
+                    return;
+                }
+                else if (req.done)
+                {
+                    req.GetData<Color32>().CopyTo(backgroundDataBuffer);
+
+                    int averageR = 0;
+                    int averageG = 0;
+                    int averageB = 0;
+                    int count = 0;
+
+                    for (int i = 0; i < backgroundDataBuffer.Length; ++i)
+                    {   
+                        if (backgroundDataBuffer[i].a != 0){
+
+                            // Add the current color to the corresponding bin in ColorHistogram
+                            for (int binIdx = 0; binIdx < ColorHistogramBins.Count; binIdx++){
+                                Vector3 currentBinRange = ColorHistogramBins[binIdx];
+                                if (backgroundDataBuffer[i].r <= currentBinRange[0] && backgroundDataBuffer[i].g <= currentBinRange[1] && backgroundDataBuffer[i].b <= currentBinRange[2]){
+                                    ColorHistogram[binIdx].Add(backgroundDataBuffer[i]);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Find the bin that has the largest number of colors
+                    ColorHistogram = ColorHistogram.OrderBy(bin => bin.Count).ToList();
+                    
+                    // Iterate through all colors in the bin that contained the maximum number of colors 
+                    // and calculate the average color of the colors in that bin
+                    int numBinsToTake = 2;
+                    int binSizeSum = 0;
+                    
+                    for (int binIdxReversed = 0; binIdxReversed <= numBinsToTake; binIdxReversed ++){
+                        List<Color32> currentBin = ColorHistogram[ColorHistogram.Count - 1 - binIdxReversed];
+
+                        if (currentBin.Count != 0){
+                            for (int i = 0; i < currentBin.Count; i++){
+                                averageR += currentBin[i].r;
+                                averageG += currentBin[i].g;
+                                averageB += currentBin[i].b;
+                            }
+
+                            binSizeSum += currentBin.Count;
+                        }
+                    }
+                    if (binSizeSum != 0){
+                        averageR = (int)(averageR/binSizeSum);
+                        averageG = (int)(averageG/binSizeSum);
+                        averageB = (int)(averageB/binSizeSum);
+                    }
+                    else{
+                        averageR = 0;
+                        averageG = 0;
+                        averageB = 0;
+                    }
+                    
+
+                    // Convert the result into a Colro32 object to return
+                    avgVal = new Color32((byte)averageR, (byte)averageG, (byte)averageB, 255);
+                    if (granularityMode == 2){
+                        backgroundAvg = avgVal;
+                    }
+                    else{
+                        labelAvg = avgVal;
+                    }
+                    
+                    // Debug.Log(avgVal);
+                    // Empty bins for future uses
+                    for (int bin = 0; bin < ColorHistogram.Count; bin++){
+                        ColorHistogram[bin].Clear();
+                    }
+                   
+                    
+                }
+
+                requests.Dequeue();
+            }));
+        }
+        // Empty backgroundDataBuffer for future uses
+        // Array.Clear(backgroundDataBuffer, 0, backgroundDataBuffer.Length);
+    }
+
     
 
     // Start is called before the first frame update
@@ -157,19 +263,14 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         labelScreenshotCamera = FindObjectsOfType<Camera>()[2]; // left eye anchor
         centerEyeCamera = FindObjectsOfType<Camera>()[1]; // center eye anchor -> this is a physical camera
 
-        w = backgroundScreenshotCamera.pixelWidth;
-        h = backgroundScreenshotCamera.pixelHeight;
-
-        // h = (int)(2*centerEyeCamera.focalLength*100.0f*Math.Tan(centerEyeCamera.fieldOfView/2.0f));
-        // w = (int)(centerEyeCamera.aspect*h);
-        // Debug.Log(h);
-        // Debug.Log(w);
+        w = LabelMask.width;
+        h = LabelMask.height;
 
         // Initiate the texture to which background pixels will be rendered
-        backgroundScreenshotForSum = new Texture2D(w, h, TextureFormat.RGBA32, false);
+        maskedBackgroundAsTex2D = new Texture2D(w, h, TextureFormat.RGBA32, false);
 
-        // Initiate the texture to which the black-white label pixels will be rendered
-        labelScreenshotForSum = new Texture2D(w, h, TextureFormat.RGBA32, false);
+        // // Initiate the texture to which the black-white label pixels will be rendered
+        // labelScreenshotForSum = new Texture2D(w, h, TextureFormat.RGBA32, false);
 
         // Block out unwanted layers from label and background screenshot cameras
         labelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
@@ -179,8 +280,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // Initialize temporary render textures
         backgroundRT = RenderTexture.GetTemporary(w, h);
         backgroundRT.enableRandomWrite = true;
-        labelRT = RenderTexture.GetTemporary(w, h);
-
+       
         // Color buffer
         backgroundDataBuffer = new Color32[w*h];
 
@@ -247,28 +347,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             }
         }
 
-        // Iterate through each coordinate in the label texture and find the center coordinate
-        labelCenterCoord = new int[2];
-        for (int wi = 0; wi < CenterMarkedLabelTexture.width; wi++){
-            for (int hi = 0; hi < CenterMarkedLabelTexture.height; hi++){
-                Color currentColor = CenterMarkedLabelTexture.GetPixel(wi, hi);
-                if (currentColor.r > 250 && currentColor.g < 1 && currentColor.b < 1){
-                    labelCenterCoord[0] = wi;
-                    labelCenterCoord[1] = hi;
-                }
-            }
-        }
-
-        // backgroundAvgDerived = false;
-        // labelAvgDerived = false;
-        // labelGrayscaleValuesDerived = false;
-        // Sanity check for the correct number of bin upper bounds
-        // Debug.Log(ColorHistogramBins.Count);
-
-        // backgroundAverage = new Vector3(0.0f, 0.0f, 0.0f);
-        // labelAverage = new Vector3(0.0f, 0.0f, 0.0f);;
-        // minGray = 0.0f;
-        // maxGray = 0.0f;
+        backgroundOrLableChanged = true;
     }
 
     // Update is called once per frame
@@ -278,230 +357,57 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         labelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
         
         // Render to temporary render textures from both the background (right-eye) and the label (left-eye) cameras
-        backgroundScreenshotCamera.targetTexture = backgroundRT;
-        labelScreenshotCamera.targetTexture = labelRT;
-        backgroundScreenshotCamera.Render();
-        labelScreenshotCamera.Render();
+        // backgroundScreenshotCamera.targetTexture = backgroundRT;
+        // labelScreenshotCamera.targetTexture = labelRT;
+        // backgroundScreenshotCamera.Render();
+        // labelScreenshotCamera.Render();
     }
 
 
     void LateUpdate()
     {  
-        // Convert the screenshot from the background and the label cameras to texture2D for sum calculation 
-        toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
-        toTexture2D(labelRT, labelScreenshotForSum, w, h);
-
         // Get the current granularity method
         int granularityMethod = backgroundAndLabelSphereMaterial.GetInt("_GranularityMethod");
 
-        // if (granularityMethod == 1 || granularityMethod == 0){ // area-based label or per-pixel label
-           
-        // Using compute shader, mask the background so that it only contains pixels under the area label or pixels at a certain distance from the center of the label
-        cShaderForMask.SetInt("granularityMethod", granularityMethod);
-        cShaderForMask.SetInt("image_width", w);
-        cShaderForMask.SetInt("image_height", h);
-        cShaderForMask.SetInts("labelCenterCoord", labelCenterCoord);
-        cShaderForMask.SetFloat("distanceThreshold", 5.0f);
-        cShaderForMask.SetTexture(maskBuffer_kernelID, "backgroundScreenshotForSum", backgroundScreenshotForSum);
-        cShaderForMask.SetTexture(maskBuffer_kernelID, "labelScreenshotForSum", labelScreenshotForSum);
-        cShaderForMask.SetTexture(maskBuffer_kernelID, "Result", backgroundRT);
-        cShaderForMask.Dispatch(maskBuffer_kernelID, w, h, 1);
-        toTexture2D(backgroundRT, backgroundScreenshotForSum, w, h);
+        // if the background scene or label changes, calculate the background average
+        if (backgroundOrLableChanged == true){ 
+            // Calculate the new background average value
+            ApplyMask(backgroundRT, EquirectangularBackground, BackgroundMask, w, h);
+            FindHistogramAverageColor(maskedBackgroundAsTex2D, 2);
+            
+            // Calculate the new label average value
+            ApplyMask(backgroundRT, EquirectangularBackground, LabelMask, w, h);
+            FindHistogramAverageColor(maskedBackgroundAsTex2D, 1);
+            
+            // Debug.Log(backgroundAvg);
+            // Debug.Log(labelAvg);
+            backgroundOrLableChanged = false;
 
-        // For mask debugging purposes only 
-        byte[] bytes = backgroundScreenshotForSum.EncodeToPNG();
-        File.WriteAllBytes(Application.dataPath + "/MaskedBackground3.png", bytes);
-        // }
-
-        if (granularityMethod != 0){ // area-based label or background-based label
-            if (requests.Count < 8){
-                requests.Enqueue(AsyncGPUReadback.Request(backgroundScreenshotForSum, 0, TextureFormat.RGBA32, (AsyncGPUReadbackRequest req) =>
-                {
-                    if (req.hasError)
-                    {
-                        Debug.Log("GPU readback error detected.");
-                        requests.Dequeue();
-                        return;
-                    }
-                    else if (req.done)
-                    {
-                        // Calculate background pixel average for an area or the entire background
-                        float r = 0.0f;
-                        float g = 0.0f;
-                        float b = 0.0f;
-
-                        req.GetData<Color32>().CopyTo(backgroundDataBuffer);
-
-                        int averageR = 0;
-                        int averageG = 0;
-                        int averageB = 0;
-                        int count = 0;
-
-                        for (int i = 0; i < backgroundDataBuffer.Length; ++i)
-                        {   
-                            if (backgroundDataBuffer[i].a != 0){
-                                // averageR += backgroundDataBuffer[i].r;
-                                // averageG += backgroundDataBuffer[i].g;
-                                // averageB += backgroundDataBuffer[i].b;
-                                // ++count;
-
-                                // Add the current color to the corresponding bin in ColorHistogram
-                                for (int binIdx = 0; binIdx < ColorHistogramBins.Count; binIdx++){
-                                    Vector3 currentBinRange = ColorHistogramBins[binIdx];
-                                    if (backgroundDataBuffer[i].r <= currentBinRange[0] && backgroundDataBuffer[i].g <= currentBinRange[1] && backgroundDataBuffer[i].b <= currentBinRange[2]){
-                                        ColorHistogram[binIdx].Add(backgroundDataBuffer[i]);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-
-                        if (count != 0){ // handles the case when the label is not in the user's view 
-                            r = (float)((averageR/count)/255.0);
-                            g = (float)((averageG/count)/255.0);
-                            b = (float)((averageB/count)/255.0);
-                        }
-                        
-                        // Find the bin that has the largest number of colors
-                        ColorHistogram = ColorHistogram.OrderBy(bin => bin.Count).ToList();
-                        
-                        // Iterate through all colors in the bin that contained the maximum number of colors 
-                        // and calculate the average color of the colors in that bin
-                        int numBinsToTake = 2;
-                        // List<Color32> largestBin = ColorHistogram[ColorHistogram.Count-1];
-                        // int largestBinSize = largestBin.Count;
-                        // Debug.Log(largestBinSize);
-                        int binSizeSum = 0;
-                        for (int binIdxReversed = 0; binIdxReversed <= numBinsToTake; binIdxReversed ++){
-                            List<Color32> currentBin = ColorHistogram[ColorHistogram.Count - 1 - binIdxReversed];
-
-                            if (currentBin.Count != 0){
-                                for (int i = 0; i < currentBin.Count; i++){
-                                    averageR += currentBin[i].r;
-                                    averageG += currentBin[i].g;
-                                    averageB += currentBin[i].b;
-                                }
-
-                                binSizeSum += currentBin.Count;
-                                // r = (float)(averageR/255.0);
-                                // g = (float)(averageG/255.0);
-                                // b = (float)(averageB/255.0);
-
-                            }
-                        }
-                        
-                        r = (float)((averageR/binSizeSum)/255.0);
-                        g = (float)((averageG/binSizeSum)/255.0);
-                        b = (float)((averageB/binSizeSum)/255.0);
-
-                       // Make sure that the average calculation happens only once
-                        // if (binSizeSum != 0){
-                        //     if (granularityMethod == 1){
-                        //         labelAvgDerived = true;
-                        //         labelAverage[0] = r;
-                        //         labelAverage[1] = g;
-                        //         labelAverage[2] = b;
-                        //     }
-                        //     else{
-                        //         backgroundAvgDerived = true;
-                        //         backgroundAverage[0] = r;
-                        //         backgroundAverage[1] = g;
-                        //         backgroundAverage[2] = b;
-                        //     }
-                        // }
-
-                        // Assign the "average" background color
-                        backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", r);
-                        backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", g);
-                        backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", b);
-
-                           
-                        // Debug.Log(averageR);
-                        // Empty bins in ColorHistogram for the next frame
-                        for (int bin = 0; bin < ColorHistogram.Count; bin++){
-                            ColorHistogram[bin].Clear();
-                        }
-                        
-                    }
-
-                    requests.Dequeue();
-                    }));
-                }
-                // else{ // this handles the case where the background or the label average has already been derived
-                //     if (granularityMethod == 1){
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", labelAverage[0]);
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", labelAverage[1]);
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", labelAverage[2]);
-                //     }
-                //     else{
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[0]);
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[1]);
-                //         backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", backgroundAverage[2]);
-                //     }
-                // }
-                
         }
 
-        else{ // per-pixel label 
-            if (requests.Count < 8){
-                    requests.Enqueue(AsyncGPUReadback.Request(backgroundScreenshotForSum, 0, TextureFormat.RGBA32, (AsyncGPUReadbackRequest req) =>
-                    {
-                        if (req.hasError)
-                        {
-                            Debug.Log("GPU readback error detected.");
-                            requests.Dequeue();
-                            return;
-                        }
-                        else if (req.done)
-                        {
-                            // Get the bounds of minimum and maximum 
-                            req.GetData<Color32>().CopyTo(backgroundDataBuffer);
+        // // Saved the masked background texture for debugging purposes
+        // byte[] bytes = maskedBackgroundAsTex2D.EncodeToPNG();
+        // File.WriteAllBytes(Application.dataPath + "/MaskedBackground5.png", bytes);
 
-                            float maxGray = 0.0f;
-                            float minGray = 255.0f;
-                            // float avgGray = 0.0f;
-                            // int count = 0;
-
-                            for (int i = 0; i < backgroundDataBuffer.Length; ++i)
-                            {   
-                                if (backgroundDataBuffer[i].a != 0){
-                                    float grayScale = (backgroundDataBuffer[i].r + backgroundDataBuffer[i].g + backgroundDataBuffer[i].b)/3.0f;
-                                    // avgGray += grayScale; 
-                                    // count += 1;
-                                    if (grayScale < minGray){
-                                        minGray = grayScale;
-                                    }
-                                    if (grayScale > maxGray){
-                                        maxGray = grayScale;
-                                    }
-                                }
-                            }
-                            // Debug.Log(minGray);
-                            // Debug.Log(maxGray);
-                            backgroundAndLabelSphereMaterial.SetFloat("_Min_Label_Grayscale", minGray/255.0f);
-                            backgroundAndLabelSphereMaterial.SetFloat("_Max_Label_Grayscale", maxGray/255.0f);
-                            // backgroundAndLabelSphereMaterial.SetFloat("_Avg_Label_Grayscale", (avgGray/count)/255.0f);
-
-                            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", 0.0f);
-                            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", 0.0f);
-                            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", 0.0f);
-
-                            requests.Dequeue();
-                        }
-                    }));
-            }
-            // backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", 0.0f);
-            // backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", 0.0f);
-            // backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", 0.0f);
+        // if there's no scene change, assign pre-calculated average values based on different granularity levels
+        if (granularityMethod == 2){
+            // Assign the average background RGB colors to the inverse cull shader
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", (float)(backgroundAvg.r/255.0));
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", (float)(backgroundAvg.g/255.0));
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", (float)(backgroundAvg.b/255.0));
+        }
+        else{
+            // Assign the average background RGB colors to the inverse cull shader
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_r", (float)(labelAvg.r/255.0));
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_g", (float)(labelAvg.g/255.0));
+            backgroundAndLabelSphereMaterial.SetFloat("_Background_sum_b", (float)(labelAvg.b/255.0));
         }
         
-    }
+}
 
 
     void OnDestroy() // Destroy render textures upon stopping the run
     {
         RenderTexture.ReleaseTemporary(backgroundRT);
-        RenderTexture.ReleaseTemporary(labelRT);
     }
 }

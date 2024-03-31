@@ -32,11 +32,14 @@ public class QuestionCycler : MonoBehaviour
     public List<Image> answerPanels;
     private Color unselected = new Color(1.0f, 215 / 255f, 215 / 255f);
     public GameObject labelSphere;
+    public GameObject backgroundAndLabelSphere;
+    Material labelSphereMaterial;
 
     // private GameObject sceneContainer;
     private bool rIndexTriggerHeld = false;
     private bool lIndexTriggerHeld = false;
     private bool lHandTriggerHeld = false;
+    int currentMode;
 
 
     private List<string> ParseName(string sceneName)
@@ -131,6 +134,10 @@ public class QuestionCycler : MonoBehaviour
         ParseQuestions();
 
         LoadNext(true);
+
+        // Set the first label display mode
+        labelSphereMaterial = backgroundAndLabelSphere.GetComponent<Renderer>().material;
+        currentMode = 0;
     }
 
 
@@ -303,11 +310,68 @@ public class QuestionCycler : MonoBehaviour
             SceneManager.LoadScene(sceneToIdx[nextScn]);
             HideQuestion();
             UpdateQuestion();
+            UpdateDisplayMode(currentMode-1);
             detectionSW.Reset();
             detectionSW.Start();
         }
 
 
+    }
+
+
+    void UpdateDisplayMode(int currentLabelDisplayMode)
+    {
+        if (currentLabelDisplayMode == 0){ // Baseline + 40% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 5);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            // modeID.text = "Mode ID: 0";
+        }
+        else if (currentLabelDisplayMode == 1){ // Baseline + 70% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 5);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            // modeID.text = "Mode ID: 1";
+        }
+        else if (currentLabelDisplayMode == 2){ // CIELAB + Per-pixel + 40% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 0);
+            // modeID.text = "Mode ID: 2";
+        }
+        else if (currentLabelDisplayMode == 3){ // CIELAB + Per-area + 40% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            // modeID.text = "Mode ID: 3";
+        }
+        else if (currentLabelDisplayMode == 4){ // CIELAB + Per-background + 30% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 2);
+            // modeID.text = "Mode ID: 4";
+        }
+        else if (currentLabelDisplayMode == 5){ // CIELAB + Per-pixel + 70% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 0);
+            // modeID.text = "Mode ID: 5";
+        }
+        else if (currentLabelDisplayMode == 6){ // CIELAB + Per-area + 70% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            // modeID.text = "Mode ID: 6";
+        }
+        else if (currentLabelDisplayMode == 7){ // CIELAB + Per-background + 70% opacity
+            labelSphereMaterial.SetInt("_ColorMethod", 4);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            labelSphereMaterial.SetInt("_GranularityMethod", 2);
+            // modeID.text = "Mode ID: 7";
+        }
+        else if (currentLabelDisplayMode == 8){ // No label
+            labelSphereMaterial.SetInt("_ColorMethod", 6);
+            labelSphereMaterial.SetFloat("_OpacityLevel", 0.0f);
+            // modeID.text = "Mode ID: No label";
+        }
     }
 
     //Update is called once per frame

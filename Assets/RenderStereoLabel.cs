@@ -13,22 +13,7 @@ public class RenderStereoLabel : MonoBehaviour
     public GameObject player;
     public Material backgroundAndLabelSphereMaterial;
     RenderTexture labelRenderTexture;
-    // Quaternion initialRotation;
-    // Matrix4x4 m;
-
-    public Shader surface_shader;
-    //public Cubemap backgroundCubeMap; 
-    // private ComputeBuffer rotation_matrix_buffer;
-
-    // public ComputeShader cShader;
-    // private ComputeBuffer sumBuffer;
-    // private int kernelID_main;
-    // private int kernelID_init;
-  
-    //sum a character
-    private TMP_Text m_TextComponent;
-    // Cubemap newLabelCubemap;
-
+ 
     // Start is called before the first frame update
     void Start()
     {
