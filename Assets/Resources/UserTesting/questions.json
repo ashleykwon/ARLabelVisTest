@@ -1,8 +1,8 @@
 {
     "sceneQuestions": [
       {
-        "sceneName": "CityBridge",
-        "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "sceneName": "Train",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
         "mask": "HeptTrue",
         "answers": [
           "UserTesting/Answers/Hept1",
@@ -12,8 +12,8 @@
         ]
       },
       {
-        "sceneName": "CityBridge",
-        "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "sceneName": "HotelParanal",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
         "mask": "HexTrue",
         "answers": [
           "UserTesting/Answers/Hex1",
@@ -23,8 +23,8 @@
         ]
       },
       {
-        "sceneName": "CityBridge",
-        "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "sceneName": "HotelParanal",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
         "mask": "OctTrue",
         "answers": [
           "UserTesting/Answers/OctTrue",
