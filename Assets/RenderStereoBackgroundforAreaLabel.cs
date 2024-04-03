@@ -50,13 +50,12 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     public bool backgroundOrLableChanged;
 
 
-
-
     void toTexture2D(RenderTexture rTex, Texture2D screenshot, int width, int height)
     {
         RenderTexture.active = rTex;
         screenshot.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
         screenshot.Apply();
+        // RenderTexture.active = null;
     }
 
     Color32 LAB2RGB(Vector3 LAB)
@@ -263,6 +262,10 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         labelScreenshotCamera = FindObjectsOfType<Camera>()[2]; // left eye anchor
         centerEyeCamera = FindObjectsOfType<Camera>()[1]; // center eye anchor -> this is a physical camera
 
+        // backgroundScreenshotCamera = FindObjectsOfType<Camera>()[2]; // right eye anchor
+        // labelScreenshotCamera = FindObjectsOfType<Camera>()[0]; // left eye anchor
+        // centerEyeCamera = FindObjectsOfType<Camera>()[1];
+        
         w = LabelMask.width;
         h = LabelMask.height;
 
@@ -371,6 +374,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
 
         // if the background scene or label changes, calculate the background average
         if (backgroundOrLableChanged == true){ 
+            Debug.Log("background or label changed");
             // Calculate the new background average value
             ApplyMask(backgroundRT, EquirectangularBackground, BackgroundMask, w, h);
             FindHistogramAverageColor(maskedBackgroundAsTex2D, 2);
@@ -378,7 +382,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
             // Calculate the new label average value
             ApplyMask(backgroundRT, EquirectangularBackground, LabelMask, w, h);
             FindHistogramAverageColor(maskedBackgroundAsTex2D, 1);
-            
+
             // Debug.Log(backgroundAvg);
             // Debug.Log(labelAvg);
             backgroundOrLableChanged = false;

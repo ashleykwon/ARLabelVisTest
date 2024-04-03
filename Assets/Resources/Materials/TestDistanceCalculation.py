@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+import cv2
 
 def great_circle_distance(target_pixel, source_pixel, image_width, image_height):
     # Assuming the image represents a full 360 degree view of the sphere
@@ -32,7 +33,7 @@ def pixel_to_coord(pixel, image_width, image_height):
 # background_filepath = './360Images/HotelParanal2D.jpeg'
 # background = np.asarray(Image.open(background_filepath))
 
-label_mask_filepath = 'CenterMarked_HotelParanal_Test3.jpeg'
+label_mask_filepath = 'OctTrue2D.jpg'
 label_mask = np.asarray(Image.open(label_mask_filepath))
 # labelCenterIdx = np.zeros(2)
 # labelCenterCount = 0
@@ -45,12 +46,15 @@ label_mask = np.asarray(Image.open(label_mask_filepath))
 #             labelCenterCount += 1
 # print(labelCenterCount)
 
-labelCenterIdx = [3949, 6780]
+labelCenterIdx = [3747, 3769]
+# [3366, 6870]
 distances = np.zeros((label_mask.shape[0], label_mask.shape[1]))
 for i in range(label_mask.shape[0]):
     for j in range(label_mask.shape[1]):
         distances[i,j] = great_circle_distance(labelCenterIdx, [i,j], label_mask.shape[0], label_mask.shape[1])
-
-distanceAsImage = Image.fromarray(distances) # max = 3035.0, min = 0.0
-distanceAsImage.save("distances.jpeg")
+distancesMask = distances > 1000
+distances[distancesMask] = 0
+# distanceAsImage = Image.fromarray(distances) # max = 3035.0, min = 0.0
+cv2.imwrite("OctTrue2D_BG.jpeg", distances)
+# distanceAsImage.save("HeptTrue2D_BG.jpeg")
 

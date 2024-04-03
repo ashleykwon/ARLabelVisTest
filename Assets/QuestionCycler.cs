@@ -33,13 +33,18 @@ public class QuestionCycler : MonoBehaviour
     private Color unselected = new Color(1.0f, 215 / 255f, 215 / 255f);
     public GameObject labelSphere;
     public GameObject backgroundAndLabelSphere;
+    public GameObject CamerasContainer;
     Material labelSphereMaterial;
+    Material backgroundAndLabelSphereMaterial;
 
     // private GameObject sceneContainer;
     private bool rIndexTriggerHeld = false;
     private bool lIndexTriggerHeld = false;
     private bool lHandTriggerHeld = false;
-    int currentMode;
+    int currentVisModeIdx;
+    RenderStereoBackgroundforAreaLabel CurrentScript;
+    List<int> allVisualizationModes;
+    int currentQuestionIdx;
 
 
     private List<string> ParseName(string sceneName)
@@ -100,6 +105,7 @@ public class QuestionCycler : MonoBehaviour
 
         for (int j = 0; j < qMap.Count; j++)
         {
+            // int SceneID = j;
             SceneQuestion cur = sceneQuestions[qMap[j]];
             if (!uniqScntoi.ContainsKey(cur.sceneName))
             {
@@ -131,13 +137,18 @@ public class QuestionCycler : MonoBehaviour
             sceneToIdx.Add(tokens[0], i);
         }
 
-        ParseQuestions();
-
-        LoadNext(true);
-
         // Set the first label display mode
-        labelSphereMaterial = backgroundAndLabelSphere.GetComponent<Renderer>().material;
-        currentMode = 0;
+        labelSphereMaterial = labelSphere.GetComponent<Renderer>().material;
+        backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<Renderer>().material;
+        currentVisModeIdx = 0;
+
+        // Add all visualization modes to the list and randomize them
+        allVisualizationModes = CreateAndShuffleList(8);
+
+        ParseQuestions();
+        UnityEngine.Debug.Log(sceneQuestions.Count);
+        currentQuestionIdx = 0;
+        LoadNext(true);
     }
 
 
@@ -152,7 +163,7 @@ public class QuestionCycler : MonoBehaviour
 
         string json = JsonUtility.ToJson(responses, true);
         string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-        string outpath = Path.Combine(Application.persistentDataPath, $"UserResponse_{dateString}.json");
+        string outpath = Path.Combine(Application.dataPath, $"UserResponse_{dateString}.json");
         UnityEngine.Debug.Log(outpath);
         using (StreamWriter writer = new StreamWriter(outpath, false))
         {
@@ -162,16 +173,15 @@ public class QuestionCycler : MonoBehaviour
 
     public void RecordResponse()
     {
-        SceneQuestion cur = sceneQuestions[qMap[qIdx]];
+        SceneQuestion cur = sceneQuestions[currentQuestionIdx];
         if (!cur.responded)
         {
-
             UserTestingMovePlayer instance = FindObjectOfType<UserTestingMovePlayer>();
             responseSW.Stop();
             long detectionTime = detectionSW.ElapsedMilliseconds;
             long responseTime = responseSW.ElapsedMilliseconds;
             cur.response = aIdx.ToString();
-            cur.labelMode = instance.currentLabelDisplayMode;
+            cur.labelMode = allVisualizationModes[currentVisModeIdx];
             cur.detectionTime = detectionTime;
             cur.responseTime = responseTime;
             cur.responded = true;
@@ -183,9 +193,9 @@ public class QuestionCycler : MonoBehaviour
     public void ManualResponse()
     {
         UserTestingMovePlayer instance = FindObjectOfType<UserTestingMovePlayer>();
-        SceneQuestion cur = sceneQuestions[qMap[qIdx]];
+        SceneQuestion cur = sceneQuestions[currentQuestionIdx];
         cur.response = aIdx.ToString();
-        cur.labelMode = instance.currentLabelDisplayMode;
+        cur.labelMode = allVisualizationModes[currentVisModeIdx];
         cur.responded = true;
     }
 
@@ -208,7 +218,7 @@ public class QuestionCycler : MonoBehaviour
 
     public bool Responded()
     {
-        return sceneQuestions[qMap[qIdx]].responded;
+        return sceneQuestions[currentQuestionIdx].responded;
     }
 
     public string SceneName()
@@ -227,7 +237,7 @@ public class QuestionCycler : MonoBehaviour
     // false - task 1 (polygons), true - task 2 (optimal label)
     public bool Mode()
     {
-        return sceneQuestions[qMap[qIdx]].answers.Count == 0;
+        return sceneQuestions[currentQuestionIdx].answers.Count == 0;
     }
 
     public void ShowPanels()
@@ -245,27 +255,56 @@ public class QuestionCycler : MonoBehaviour
         questionUI.SetActive(false);
     }
 
-    public void UpdateMask(string name)
+    public void UpdateMask(SceneQuestion currentQuestion)
     {
-        Cubemap newLabelCubemap = Resources.Load("Materials/" + name, typeof(Cubemap)) as Cubemap;
+        Cubemap newLabelCubemap = Resources.Load("Materials/" + currentQuestion.mask+"3D", typeof(Cubemap)) as Cubemap;
         labelSphere.GetComponent<Renderer>().material.SetTexture("_CubeMap", newLabelCubemap);
+        // UnityEngine.Debug.Log(currentQuestion.mask);
+
+        currentVisModeIdx += 1;
+        if (currentVisModeIdx >= 8){
+            currentVisModeIdx = 0;
+        }
+
+        UpdateDisplayMode(allVisualizationModes[currentVisModeIdx]);
+        
+
+        // Load new 2D masks for average background value calculation
+        CurrentScript = CamerasContainer.GetComponent<RenderStereoBackgroundforAreaLabel>(); 
+        CurrentScript.LabelMask = Resources.Load<Texture2D>("Materials/" + currentQuestion.mask+"2D");
+        CurrentScript.BackgroundMask = Resources.Load<Texture2D>("Materials/" + currentQuestion.mask+"2D_BG");
+
+        // Recalculate average background values 
+        CurrentScript.backgroundOrLableChanged = true;
+    }
+
+
+    public void UpdateBackground(SceneQuestion currentQuestion)
+    {
+        // Load new Equirectangular background 
+        CurrentScript = CamerasContainer.GetComponent<RenderStereoBackgroundforAreaLabel>();
+        CurrentScript.EquirectangularBackground = Resources.Load<Texture2D>("Materials/" + currentQuestion.sceneName+"2D");
+
+        // Recalculate average background values 
+        CurrentScript.backgroundOrLableChanged = true;
     }
 
     // Updates active question based on current state of qIdx
     public void UpdateQuestion()
     {
         
-        SceneQuestion curQ = sceneQuestions[qMap[qIdx]];
+        SceneQuestion curQ = sceneQuestions[currentQuestionIdx];
         questionText.SetText(curQ.question);
 
-        UpdateMask(curQ.mask);
+        UpdateMask(curQ);
+        UpdateBackground(curQ);
 
         for (int i = 0; i < answerImgs.Count; i++)
         {
             if (i < curQ.answers.Count)
             {
                 Sprite sprite = Resources.Load<Sprite>(curQ.answers[i]);
-                UnityEngine.Debug.Log(curQ.answers[i]);
+                // UnityEngine.Debug.Log(curQ.answers[i]);
                 answerImgs[i].sprite = sprite;
             }
         }
@@ -283,8 +322,10 @@ public class QuestionCycler : MonoBehaviour
         {   
             ShowPanels();
 
-            qIdx = (qIdx + 1) % qMap.Count;
-            string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
+            // qIdx = (qIdx + 1) % qMap.Count;
+            currentQuestionIdx = (currentQuestionIdx+1) % qMap.Count;
+            // string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
+            string nextScn = sceneQuestions[currentQuestionIdx].sceneName;
             SceneManager.LoadScene(sceneToIdx[nextScn]);
             HideQuestion();
             UpdateQuestion();
@@ -310,7 +351,6 @@ public class QuestionCycler : MonoBehaviour
             SceneManager.LoadScene(sceneToIdx[nextScn]);
             HideQuestion();
             UpdateQuestion();
-            UpdateDisplayMode(currentMode-1);
             detectionSW.Reset();
             detectionSW.Start();
         }
@@ -322,54 +362,54 @@ public class QuestionCycler : MonoBehaviour
     void UpdateDisplayMode(int currentLabelDisplayMode)
     {
         if (currentLabelDisplayMode == 0){ // Baseline + 40% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 5);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 5);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
             // modeID.text = "Mode ID: 0";
         }
         else if (currentLabelDisplayMode == 1){ // Baseline + 70% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 5);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 5);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
             // modeID.text = "Mode ID: 1";
         }
         else if (currentLabelDisplayMode == 2){ // CIELAB + Per-pixel + 40% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 0);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 0);
             // modeID.text = "Mode ID: 2";
         }
         else if (currentLabelDisplayMode == 3){ // CIELAB + Per-area + 40% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 1);
             // modeID.text = "Mode ID: 3";
         }
         else if (currentLabelDisplayMode == 4){ // CIELAB + Per-background + 30% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 2);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.4f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 2);
             // modeID.text = "Mode ID: 4";
         }
         else if (currentLabelDisplayMode == 5){ // CIELAB + Per-pixel + 70% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 0);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 0);
             // modeID.text = "Mode ID: 5";
         }
         else if (currentLabelDisplayMode == 6){ // CIELAB + Per-area + 70% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 1);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 1);
             // modeID.text = "Mode ID: 6";
         }
         else if (currentLabelDisplayMode == 7){ // CIELAB + Per-background + 70% opacity
-            labelSphereMaterial.SetInt("_ColorMethod", 4);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
-            labelSphereMaterial.SetInt("_GranularityMethod", 2);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 4);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.7f);
+            backgroundAndLabelSphereMaterial.SetInt("_GranularityMethod", 2);
             // modeID.text = "Mode ID: 7";
         }
         else if (currentLabelDisplayMode == 8){ // No label
-            labelSphereMaterial.SetInt("_ColorMethod", 6);
-            labelSphereMaterial.SetFloat("_OpacityLevel", 0.0f);
+            backgroundAndLabelSphereMaterial.SetInt("_ColorMethod", 6);
+            backgroundAndLabelSphereMaterial.SetFloat("_OpacityLevel", 0.0f);
             // modeID.text = "Mode ID: No label";
         }
     }
@@ -388,6 +428,7 @@ public class QuestionCycler : MonoBehaviour
 
         if (stickInput.magnitude > 0.8f)
         {
+            UnityEngine.Debug.Log("joystick input detected");
             if (stickInput.x < 0 && stickInput.y >= 0)
             {
                 UpdateResponse(0);

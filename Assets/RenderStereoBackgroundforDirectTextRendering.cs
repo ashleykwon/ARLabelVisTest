@@ -38,20 +38,24 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
         renderTexture.autoGenerateMips = false;
         renderTexture.useMipMap = false;
         renderTexture.filterMode = FilterMode.Point;
+        // ScreenshotCamera = gameObject.GetComponent<Camera>(); 
+        // ScreenshotCamera.cullingMask &=  ~(1 << LayerMask.NameToLayer("BackgroundAndLabel"));
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {     
         // Take a screenshot and render it to a cubemap
        
-        backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
+        
         
         ScreenshotCamera.targetTexture = renderTexture;
         RenderTexture.active = renderTexture;
+       
         
         // Render the background and the label
         ScreenshotCamera.RenderToCubemap(renderTexture, 63); 
+        backgroundAndLabelSphereMaterial.SetTexture("_CubeMap", renderTexture);
 
         // if (RenderTexture.active != null)
         // {

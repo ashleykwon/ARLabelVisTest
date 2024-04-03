@@ -3,7 +3,7 @@ Shader "Unlit/LabelBackgroundShader"
     Properties
     {
         _CubeMap( "Cube Map", Cube ) = "white" {}
-        _Scale("label_scale", Range(0,1000)) = 0.1
+        // _Scale("label_scale", Range(0,1000)) = 0.1
     }
     SubShader
     {
@@ -24,7 +24,7 @@ Shader "Unlit/LabelBackgroundShader"
 
             // Initialize variables        
             samplerCUBE _CubeMap;
-            float _Scale;
+            // float _Scale;
     
         
             struct v2f 
@@ -55,7 +55,7 @@ Shader "Unlit/LabelBackgroundShader"
                 }
 
                 else{ // is a background pixel
-                    col = float4(0.0, 0.0, 0.0, 0.0);
+                    col = float4(0.0, 0.0, 0.0, 1.0);
                 }
                 return col;
             }

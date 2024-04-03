@@ -3,41 +3,35 @@
       {
         "sceneName": "CityBridge",
         "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
-        "mask": "Test",
+        "mask": "HeptTrue",
+        "answers": [
+          "UserTesting/Answers/Hept1",
+          "UserTesting/Answers/Hept2",
+          "UserTesting/Answers/HeptTrue",
+          "UserTesting/Answers/Hept3"
+        ]
+      },
+      {
+        "sceneName": "CityBridge",
+        "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
+        "mask": "HexTrue",
         "answers": [
           "UserTesting/Answers/Hex1",
           "UserTesting/Answers/Hex2",
           "UserTesting/Answers/Hex3",
-          "UserTesting/Answers/HexTrue_HotelParanal"
+          "UserTesting/Answers/HexTrue"
         ]
       },
       {
-        "sceneName": "HotelParanal",
+        "sceneName": "CityBridge",
         "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
-        "mask": "HotelParanal_Test2",
+        "mask": "OctTrue",
         "answers": [
-          "UserTesting/Answers/Hex1",
-          "UserTesting/Answers/Hex3",
-          "UserTesting/Answers/HexTrue_HotelParanal",
-          "UserTesting/Answers/Hex2"
+          "UserTesting/Answers/OctTrue",
+          "UserTesting/Answers/Oct2",
+          "UserTesting/Answers/Oct3",
+          "UserTesting/Answers/Oct1"
         ]
-      },
-      {
-        "sceneName": "LaSilla",
-        "question": "Which polygon has the same shape as the label? Press the right hand joystick to confirm.",
-        "mask": "Test",
-        "answers": [
-          "UserTesting/Answers/HexTrue_HotelParanal",
-          "UserTesting/Answers/Hex1",
-          "UserTesting/Answers/Hex2",
-          "UserTesting/Answers/Hex3"
-        ]
-      },
-      {
-        "sceneName": "LaSilla",
-        "question": "Choose the labelling mode that optimizes visibility.",
-        "mask": "Test",
-        "answers": []
       }
     ]
   }
