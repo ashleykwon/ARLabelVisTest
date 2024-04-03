@@ -181,8 +181,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Which mode is better at enhancing the label's visibility, while not occluding
-    background details?
+  m_text: Which mode is better at keeping the label outline visible, while not occluding
+    the background?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -574,9 +574,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d753a1f171be3bb429bcb7c74f74b61a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  randomize: 1
-  answerImgs: []
-  answerPanels: []
 --- !u!1 &747280902
 GameObject:
   m_ObjectHideFlags: 0
@@ -1484,7 +1481,7 @@ MonoBehaviour:
   BackgroundAndLabelSphere: {fileID: 747280902}
   modeID: {fileID: 195067706}
   confirmationMessage: {fileID: 1245589135}
-  numComparisons: 4
+  numComparisons: 8
 --- !u!114 &2057361871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1532,9 +1529,9 @@ MonoBehaviour:
   backgroundAndLabelSphere: {fileID: 747280902}
   labelSphere: {fileID: 452877973}
   player: {fileID: 775743277}
-  LabelMask: {fileID: 2800000, guid: a106b435c7662964f8a25d38fcf94cfd, type: 3}
+  LabelMask: {fileID: 2800000, guid: ded32e2a7bcc6964395b3df43eb9af17, type: 3}
   EquirectangularBackground: {fileID: 2800000, guid: 4857ba9b623ce0e47bb5579d1763f1b9, type: 3}
-  BackgroundMask: {fileID: 2800000, guid: a6e080369b52aef4c81080bb13900d19, type: 3}
+  BackgroundMask: {fileID: 2800000, guid: 2b688afbb6fa07d41861f5e63d8dd6ca, type: 3}
   cShaderForMask: {fileID: 7200000, guid: c9a235625146cfd4480f04a868d4b0c9, type: 3}
   LookupTable: {fileID: 11700000, guid: 98c29dca8403d6544ae8e989dbe6d787, type: 2}
   backgroundOrLableChanged: 1

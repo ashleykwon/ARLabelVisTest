@@ -1,0 +1,52 @@
+{
+    "sceneQuestions": [
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HeptTrue",
+            "answers": [
+                "UserTesting/Answers/Hept1",
+                "UserTesting/Answers/Hept2",
+                "UserTesting/Answers/HeptTrue",
+                "UserTesting/Answers/Hept3"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HexTrue",
+            "answers": [
+                "UserTesting/Answers/Hex1",
+                "UserTesting/Answers/Hex2",
+                "UserTesting/Answers/Hex3",
+                "UserTesting/Answers/HexTrue"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "OctTrue",
+            "answers": [
+                "UserTesting/Answers/OctTrue",
+                "UserTesting/Answers/Oct2",
+                "UserTesting/Answers/Oct3",
+                "UserTesting/Answers/Oct1"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        }
+    ]
+}

@@ -1,0 +1,52 @@
+{
+    "sceneQuestions": [
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg1",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg1_1",
+                "UserTesting/Answers/HotelParanal_Seg1_2",
+                "UserTesting/Answers/HotelParanal_Seg1True",
+                "UserTesting/Answers/HotelParanal_Seg1_3"
+            ],
+            "responded": true,
+            "response": "0",
+            "labelMode": 2,
+            "detectionTime": 2064,
+            "responseTime": 2314
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg3",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg3_1",
+                "UserTesting/Answers/HotelParanal_Seg3True",
+                "UserTesting/Answers/HotelParanal_Seg3_2",
+                "UserTesting/Answers/HotelParanal_Seg3_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 3,
+            "detectionTime": 15720,
+            "responseTime": 10331
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg6",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg6True",
+                "UserTesting/Answers/HotelParanal_Seg6_1",
+                "UserTesting/Answers/HotelParanal_Seg6_2",
+                "UserTesting/Answers/HotelParanal_Seg6_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 0,
+            "detectionTime": 5767,
+            "responseTime": 19371
+        }
+    ]
+}

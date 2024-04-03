@@ -1,0 +1,52 @@
+{
+    "sceneQuestions": [
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg1",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg1_1",
+                "UserTesting/Answers/HotelParanal_Seg1_2",
+                "UserTesting/Answers/HotelParanal_Seg1True",
+                "UserTesting/Answers/HotelParanal_Seg1_3"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg3",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg3_1",
+                "UserTesting/Answers/HotelParanal_Seg3True",
+                "UserTesting/Answers/HotelParanal_Seg3_2",
+                "UserTesting/Answers/HotelParanal_Seg3_3"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HotelParanal_Seg6",
+            "answers": [
+                "UserTesting/Answers/HotelParanal_Seg6True",
+                "UserTesting/Answers/HotelParanal_Seg6_1",
+                "UserTesting/Answers/HotelParanal_Seg6_2",
+                "UserTesting/Answers/HotelParanal_Seg6_3"
+            ],
+            "responded": false,
+            "response": "",
+            "labelMode": -1,
+            "detectionTime": -1,
+            "responseTime": -1
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+{
+    "sceneQuestions": [
+      {
+        "sceneName": "CityBridge",
+        "mask": "HeptTrue"
+      },
+      {
+        "sceneName": "Train",
+        "mask": "HexTrue"
+      },
+      {
+        "sceneName": "MansonBayPier",
+        "mask": "OctTrue"
+      }
+    ]
+  }

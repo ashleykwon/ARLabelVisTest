@@ -1,36 +1,36 @@
 {
     "sceneQuestions": [
       {
-        "sceneName": "Train",
+        "sceneName": "HotelParanal",
         "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
-        "mask": "HeptTrue",
+        "mask": "HotelParanal_Seg1",
         "answers": [
-          "UserTesting/Answers/Hept1",
-          "UserTesting/Answers/Hept2",
-          "UserTesting/Answers/HeptTrue",
-          "UserTesting/Answers/Hept3"
+          "UserTesting/Answers/HotelParanal_Seg1_1",
+          "UserTesting/Answers/HotelParanal_Seg1_2",
+          "UserTesting/Answers/HotelParanal_Seg1True",
+          "UserTesting/Answers/HotelParanal_Seg1_3"
         ]
       },
       {
         "sceneName": "HotelParanal",
         "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
-        "mask": "HexTrue",
+        "mask": "HotelParanal_Seg3",
         "answers": [
-          "UserTesting/Answers/Hex1",
-          "UserTesting/Answers/Hex2",
-          "UserTesting/Answers/Hex3",
-          "UserTesting/Answers/HexTrue"
+          "UserTesting/Answers/HotelParanal_Seg3_1",
+          "UserTesting/Answers/HotelParanal_Seg3True",
+          "UserTesting/Answers/HotelParanal_Seg3_2",
+          "UserTesting/Answers/HotelParanal_Seg3_3"
         ]
       },
       {
         "sceneName": "HotelParanal",
         "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
-        "mask": "OctTrue",
+        "mask": "HotelParanal_Seg6",
         "answers": [
-          "UserTesting/Answers/OctTrue",
-          "UserTesting/Answers/Oct2",
-          "UserTesting/Answers/Oct3",
-          "UserTesting/Answers/Oct1"
+          "UserTesting/Answers/HotelParanal_Seg6True",
+          "UserTesting/Answers/HotelParanal_Seg6_1",
+          "UserTesting/Answers/HotelParanal_Seg6_2",
+          "UserTesting/Answers/HotelParanal_Seg6_3"
         ]
       }
     ]

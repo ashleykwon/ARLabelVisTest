@@ -146,7 +146,7 @@ public class QuestionCycler : MonoBehaviour
         allVisualizationModes = CreateAndShuffleList(8);
 
         ParseQuestions();
-        UnityEngine.Debug.Log(sceneQuestions.Count);
+        // UnityEngine.Debug.Log(sceneQuestions.Count);
         currentQuestionIdx = 0;
         LoadNext(true);
     }
@@ -323,7 +323,7 @@ public class QuestionCycler : MonoBehaviour
             ShowPanels();
 
             // qIdx = (qIdx + 1) % qMap.Count;
-            currentQuestionIdx = (currentQuestionIdx+1) % qMap.Count;
+            currentQuestionIdx = (currentQuestionIdx+1) % qMap.Count; // maybe this line needs to be fixed
             // string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
             string nextScn = sceneQuestions[currentQuestionIdx].sceneName;
             SceneManager.LoadScene(sceneToIdx[nextScn]);

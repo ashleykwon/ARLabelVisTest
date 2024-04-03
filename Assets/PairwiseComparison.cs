@@ -4,6 +4,7 @@ using UnityEngine;
 using OVR;
 using TMPro;
 using System;
+using System.IO;
 
 public class PairwiseComparison : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class PairwiseComparison : MonoBehaviour
     Vector2 stickInput;
     int[] currentComparison;
     int currentComparisonPairIdx; // index in numComparisons
+    string outputFilePath;
+    StreamWriter writer;
 
 
     // Start is called before the first frame update
@@ -34,7 +37,7 @@ public class PairwiseComparison : MonoBehaviour
     {
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
-        numComparisons = 4; // default number
+        numComparisons = 8; // default number
 
         // Add all available comparisons to the int array of modeIDs
         allComparisons = new List<int[]>();
@@ -74,6 +77,11 @@ public class PairwiseComparison : MonoBehaviour
         displayMode(currentComparison[0]); // set the initial display
         modePreferences = new List<int[]>();
         confirmationMessage.text = "";
+
+        // Start a text file to write answers
+        string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+        outputFilePath = Path.Combine(Application.dataPath, $"UserResponse_Test2_{dateString}.txt");
+        writer = new StreamWriter(outputFilePath, true);
     }
 
     void displayMode(int currentLabelDisplayMode)
@@ -191,6 +199,10 @@ public class PairwiseComparison : MonoBehaviour
                 modePreferences.Add(preference);
                 string chosenModeAsString = preference[0].ToString();
                 confirmationMessage.text = "Mode " + chosenModeAsString + " chosen!";
+
+                // Write the 2 modes that were compared and the mode that was chosen as a line in a txt file
+                writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
+
                 // Move on to the next comparison
                 currentComparisonPairIdx += 1;  
                 currentComparison = comparisonsToUse[currentComparisonPairIdx];
@@ -207,5 +219,10 @@ public class PairwiseComparison : MonoBehaviour
             }
         }
     }
-}
 
+    void OnDestroy()
+    {
+        // Save the text file at the end of the comparison
+        writer.Close();
+    }
+}
