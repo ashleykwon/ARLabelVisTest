@@ -30,6 +30,7 @@ public class PairwiseComparison : MonoBehaviour
     int currentComparisonPairIdx; // index in numComparisons
     string outputFilePath;
     StreamWriter writer;
+    public string SceneName;
 
 
     // Start is called before the first frame update
@@ -80,7 +81,7 @@ public class PairwiseComparison : MonoBehaviour
 
         // Start a text file to write answers
         string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-        outputFilePath = Path.Combine(Application.dataPath, $"UserResponse_Test2_{dateString}.txt");
+        outputFilePath = Path.Combine(Application.dataPath, SceneName+$"UserResponse_Test2_{dateString}.txt");
         writer = new StreamWriter(outputFilePath, true);
     }
 

@@ -33,7 +33,7 @@ def pixel_to_coord(pixel, image_width, image_height):
 # background_filepath = './360Images/HotelParanal2D.jpeg'
 # background = np.asarray(Image.open(background_filepath))
 
-label_mask_filepath = 'Train_Polygon.jpeg'
+label_mask_filepath = 'Hept2True2D.jpeg'
 label_mask = np.asarray(Image.open(label_mask_filepath))
 # labelCenterIdx = np.zeros(2)
 # labelCenterCount = 0
@@ -46,7 +46,7 @@ label_mask = np.asarray(Image.open(label_mask_filepath))
 #             labelCenterCount += 1
 # print(labelCenterCount)
 
-labelCenterIdx = [2530, 10571]
+labelCenterIdx = [2726, 4056]
 # [3366, 6870]
 distances = np.zeros((label_mask.shape[0], label_mask.shape[1]))
 for i in range(label_mask.shape[0]):
@@ -55,6 +55,6 @@ for i in range(label_mask.shape[0]):
 distancesMask = distances > 1000
 distances[distancesMask] = 0
 # distanceAsImage = Image.fromarray(distances) # max = 3035.0, min = 0.0
-cv2.imwrite("Train_Polygon2D_BG.jpeg", distances)
+cv2.imwrite("Hept2True2D_BG.jpeg", distances)
 # distanceAsImage.save("HeptTrue2D_BG.jpeg")
 
