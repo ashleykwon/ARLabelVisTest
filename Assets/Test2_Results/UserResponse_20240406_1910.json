@@ -1,0 +1,14 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPier",
+            "test": 12
+        },
+        {
+            "sceneName": "HotelParanal",
+            "mask": "HotelParanal",
+            "test": 12
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+  "sceneComparisons": [
+    {
+      "sceneName": "CityBridge",
+      "mask": "CityBridge_GazeboMask"
+    },
+    {
+      "sceneName": "MansonBayPier",
+      "mask": "MansonBayPier"
+    }
+  ]
+}

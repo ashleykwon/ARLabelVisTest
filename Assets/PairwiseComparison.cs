@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 using OVR;
 using TMPro;
@@ -8,8 +10,16 @@ using System.IO;
 
 public class PairwiseComparison : MonoBehaviour
 {
+    public string comparisonJson;
+    private List<SceneComparison> sceneComparisons = new List<SceneComparison>();
+    private int numSceneComparisons;
+    private int scIdx = 0;
+    private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
+
     public Rigidbody player;
+    public GameObject labelSphere;
     public GameObject BackgroundAndLabelSphere;
+    public GameObject OVRCameraRig;
     // public TMP_Text labelColorMode;
     // public TMP_Text opacityLevel;
     // public TMP_Text granularitymode;
@@ -29,65 +39,98 @@ public class PairwiseComparison : MonoBehaviour
     int[] currentComparison;
     int currentComparisonPairIdx; // index in numComparisons
     string outputFilePath;
+    // private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
     StreamWriter writer;
     public string SceneName;
-    public bool isPractice;
-    // public string userID;
 
 
     // Start is called before the first frame update
     void Start()
     {
+
+        for (int i = 1; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string sceneFile = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            string sceneName = sceneFile.Split('_')[0];
+            sceneToIdx.Add(sceneName, i);
+        }
+
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
         numComparisons = 8; // default number
 
-        // Add all available comparisons to the int array of modeIDs
-        allComparisons = new List<int[]>();
-        // Debug.Log("Beginning to add comparisons");
-        for (int j = 0; j <= 6; j++){
-            for (int k = 1; k <= 7; k++){
-                if (k > j){
-                    int[] comparison = new int[2];
-                    comparison[0] = j;
-                    comparison[1] = k;
-                    allComparisons.Add(comparison);
-                }
+        ParseComparisonJson();
+        UpdateScene();
+
+        // // Add all available comparisons to the int array of modeIDs
+        // allComparisons = new List<int[]>();
+        // // Debug.Log("Beginning to add comparisons");
+        // for (int j = 0; j <= 6; j++){
+        //     for (int k = 1; k <= 7; k++){
+        //         if (k > j){
+        //             int[] comparison = new int[2];
+        //             comparison[0] = j;
+        //             comparison[1] = k;
+        //             allComparisons.Add(comparison);
+        //         }
+        //     }
+        // }
+
+        // // Randomly select comparisons to use
+        // randomIdx = new System.Random();
+        // comparisonsToUse = new List<int[]>();
+        // for (int i = 0; i < numComparisons; i++){
+        //     int currentPairIdx = randomIdx.Next(0, allComparisons.Count-1);
+        //     comparisonsToUse.Add(allComparisons[currentPairIdx]);
+        //     allComparisons.RemoveAt(currentPairIdx);
+        // }
+
+        // // For debugging purposes only
+        // // comparisonsToUse[0][0] = 5;
+
+
+        // // Set default values for label mode visualization 
+        // currentMode = 0; // 0 by default
+        // triggerLeft = false;
+        // preferenceChosen = false;
+        // currentComparisonPairIdx = 0;
+        // currentComparison = new int[2];
+        // currentComparison[0] = comparisonsToUse[currentComparisonPairIdx][0]; // set the initial comparison
+        // currentComparison[1] = comparisonsToUse[currentComparisonPairIdx][1]; // set the initial comparison
+        // displayMode(currentComparison[0]); // set the initial display
+        // modePreferences = new List<int[]>();
+        // confirmationMessage.text = "";
+
+        // Start a text file to write answers
+        // string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+        // outputFilePath = Path.Combine(Application.dataPath, SceneName+$"UserResponse_Test2_{dateString}.txt");
+        // writer = new StreamWriter(outputFilePath, true);
+    }
+
+    private void ParseComparisonJson()
+    {
+        string filePath = Path.Combine(Application.dataPath, $"Resources/UserTesting/{comparisonJson}.json");
+        string json = File.ReadAllText(filePath);
+
+        SceneComparisonList comparisonsList = JsonUtility.FromJson<SceneComparisonList>(json);
+        sceneComparisons = comparisonsList.sceneComparisons;
+        numSceneComparisons = comparisonsList.sceneComparisons.Count;
+        Debug.Log($"num scene comps: {numSceneComparisons}");
+
+        for (int i = 0; i < numSceneComparisons; i++)
+        {
+            for (int j = 0; j < numComparisons; j++)
+            {
+                sceneComparisons[i].responses.Add(new CompResponse());
             }
         }
 
-        // Randomly select comparisons to use
-        randomIdx = new System.Random();
-        comparisonsToUse = new List<int[]>();
-        for (int i = 0; i < numComparisons; i++){
-            int currentPairIdx = randomIdx.Next(0, allComparisons.Count-1);
-            comparisonsToUse.Add(allComparisons[currentPairIdx]);
-            allComparisons.RemoveAt(currentPairIdx);
-        }
-
-        // For debugging purposes only
-        // comparisonsToUse[0][0] = 5;
-
-
-        // Set default values for label mode visualization 
-        currentMode = 0; // 0 by default
-        triggerLeft = false;
-        preferenceChosen = false;
-        currentComparisonPairIdx = 0;
-        currentComparison = new int[2];
-        currentComparison[0] = comparisonsToUse[currentComparisonPairIdx][0]; // set the initial comparison
-        currentComparison[1] = comparisonsToUse[currentComparisonPairIdx][1]; // set the initial comparison
-        displayMode(currentComparison[0]); // set the initial display
-        modePreferences = new List<int[]>();
-        confirmationMessage.text = "";
-
-        // Start a text file to write answers
-        if (!isPractice){
-             string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-            outputFilePath = Path.Combine(Application.dataPath+"/Test2_Results/", SceneName+$"UserResponse_Test2_{dateString}.txt");
-            Debug.Log(Application.dataPath);
-            writer = new StreamWriter(outputFilePath, true);
-        }
+        // foreach (SceneComparison comp in comparisonsList.sceneComparisons)
+        // {
+        //     sceneComparisons.Add(comp);
+        // }
     }
 
     void displayMode(int currentLabelDisplayMode)
@@ -143,6 +186,80 @@ public class PairwiseComparison : MonoBehaviour
             labelSphereMaterial.SetFloat("_OpacityLevel", 0.0f);
             modeID.text = "Mode ID: No label";
         }
+    }
+
+    public async Task WriteResponses()
+    {
+        SceneComparisonList scResponses = new SceneComparisonList();
+        scResponses.sceneComparisons = sceneComparisons;
+        
+        string json = JsonUtility.ToJson(scResponses, true);
+        string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+        string outpath = Path.Combine(Application.dataPath, $"Test2_Results/UserResponse_{dateString}.json");
+        UnityEngine.Debug.Log(outpath);
+        using (StreamWriter writer = new StreamWriter(outpath, false))
+        {
+            await writer.WriteAsync(json);
+        }
+    }
+
+    void UpdateScene()
+    {
+        SceneComparison currentSC = sceneComparisons[scIdx];
+
+        // Update scene
+        SceneManager.LoadScene(sceneToIdx[currentSC.sceneName]);
+
+        Cubemap newLabelCubemap = Resources.Load("Materials/" + currentSC.mask+"3D", typeof(Cubemap)) as Cubemap;
+        labelSphere.GetComponent<Renderer>().material.SetTexture("_CubeMap", newLabelCubemap);
+
+        // Load new 2D masks for average background value calculation
+        RenderStereoBackgroundforAreaLabel CurrentScript = OVRCameraRig.GetComponent<RenderStereoBackgroundforAreaLabel>(); 
+        CurrentScript.LabelMask = Resources.Load<Texture2D>("Materials/" + currentSC.mask+"2D");
+        CurrentScript.BackgroundMask = Resources.Load<Texture2D>("Materials/" + currentSC.mask+"2D_BG");
+        CurrentScript.EquirectangularBackground = Resources.Load<Texture2D>("Materials/" + currentSC.sceneName + "2D");
+
+        // Recalculate average background values 
+        CurrentScript.backgroundOrLableChanged = true;
+
+        // Add all available comparisons to the int array of modeIDs
+        allComparisons = new List<int[]>();
+        // Debug.Log("Beginning to add comparisons");
+        for (int j = 0; j <= 6; j++){
+            for (int k = 1; k <= 7; k++){
+                if (k > j){
+                    int[] comparison = new int[2];
+                    comparison[0] = j;
+                    comparison[1] = k;
+                    allComparisons.Add(comparison);
+                }
+            }
+        }
+
+        // Randomly select comparisons to use
+        randomIdx = new System.Random();
+        comparisonsToUse = new List<int[]>();
+        for (int i = 0; i < numComparisons; i++){
+            int currentPairIdx = randomIdx.Next(0, allComparisons.Count-1);
+            comparisonsToUse.Add(allComparisons[currentPairIdx]);
+            allComparisons.RemoveAt(currentPairIdx);
+        }
+
+        // For debugging purposes only
+        // comparisonsToUse[0][0] = 5;
+
+
+        // Set default values for label mode visualization 
+        currentMode = 0; // 0 by default
+        triggerLeft = false;
+        preferenceChosen = false;
+        currentComparisonPairIdx = 0;
+        currentComparison = new int[2];
+        currentComparison[0] = comparisonsToUse[currentComparisonPairIdx][0]; // set the initial comparison
+        currentComparison[1] = comparisonsToUse[currentComparisonPairIdx][1]; // set the initial comparison
+        displayMode(currentComparison[0]); // set the initial display
+        modePreferences = new List<int[]>();
+        confirmationMessage.text = "";
     }
    
 
@@ -207,14 +324,21 @@ public class PairwiseComparison : MonoBehaviour
                 confirmationMessage.text = "Mode " + chosenModeAsString + " chosen!";
 
                 // Write the 2 modes that were compared and the mode that was chosen as a line in a txt file
-                if (!isPractice){
-                    writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
-                }
-                
+                // writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
+
+                SceneComparison curSC = sceneComparisons[scIdx];
+                CompResponse compRes = new CompResponse();
+                compRes.pair = new List<int>() {preference[0], preference[1]};
+                curSC.responses[currentComparisonPairIdx] = compRes;
+
                 // Move on to the next comparison
                 currentComparisonPairIdx += 1;  
                 currentComparison = comparisonsToUse[currentComparisonPairIdx];
                 displayMode(currentComparison[0]);
+                // if (currentComparisonPairIdx == numComparisons-1){
+                //     Debug.Log("Done!");
+                //     modeID.text = "End of all comparisons!";
+                // }
 
             }
             else{
@@ -222,14 +346,31 @@ public class PairwiseComparison : MonoBehaviour
                 modeID.text = "End of all comparisons!";
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            scIdx -= 1;
+            if (scIdx == -1)
+            {
+                scIdx = numSceneComparisons - 1;
+            }
+            UpdateScene();
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            scIdx = (scIdx + 1) % numSceneComparisons;
+            UpdateScene();
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            WriteResponses();
+        }
     }
 
     void OnDestroy()
     {
         // Save the text file at the end of the comparison
-        if (!isPractice){
-            writer.Close();
-        }
-        
+        WriteResponses();
     }
 }

@@ -1,0 +1,72 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPier",
+            "test": 12,
+            "responses": [
+                {
+                    "pair": [
+                        7,
+                        0
+                    ]
+                },
+                {
+                    "pair": [
+                        6,
+                        2
+                    ]
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        },
+        {
+            "sceneName": "HotelParanal",
+            "mask": "HotelParanal",
+            "test": 12,
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        }
+    ]
+}

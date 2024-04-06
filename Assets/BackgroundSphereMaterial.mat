@@ -108,7 +108,7 @@ Material:
     - _CIEDE_label_b: 0
     - _CIEDE_label_g: 0
     - _CIEDE_label_r: 0
-    - _ColorMethod: 4
+    - _ColorMethod: 5
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
