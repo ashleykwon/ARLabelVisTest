@@ -1337,11 +1337,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9db3d415f35a646c49122df378a9b7d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelAsset: {fileID: 5022602860645237092, guid: f72da5265511d4c68b0d892b53f9201d, type: 3}
-  texture: {fileID: 2800000, guid: a362b7d1a0c7d4ef6864c528ccad970d, type: 3}
-  prediction:
-    predictedValue: 0
-    predicted: []
 --- !u!4 &1608676288 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4897607310870066, guid: a9d2de84afb308a4796cc671d3432b4d, type: 3}
@@ -1482,6 +1477,7 @@ MonoBehaviour:
   modeID: {fileID: 195067706}
   confirmationMessage: {fileID: 1245589135}
   numComparisons: 8
+  SceneName: CityBridge
 --- !u!114 &2057361871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1533,7 +1529,7 @@ MonoBehaviour:
   EquirectangularBackground: {fileID: 2800000, guid: 4857ba9b623ce0e47bb5579d1763f1b9, type: 3}
   BackgroundMask: {fileID: 2800000, guid: 2b688afbb6fa07d41861f5e63d8dd6ca, type: 3}
   cShaderForMask: {fileID: 7200000, guid: c9a235625146cfd4480f04a868d4b0c9, type: 3}
-  LookupTable: {fileID: 11700000, guid: 98c29dca8403d6544ae8e989dbe6d787, type: 2}
+  LookupTable: {fileID: 11700000, guid: 60b118a9abc1d274fa20c7ee90ba6f25, type: 2}
   backgroundOrLableChanged: 1
 --- !u!4 &2057361879 stripped
 Transform:

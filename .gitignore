@@ -73,3 +73,5 @@ crashlytics-build.properties
 
 # Ignore TL videos
 /[Aa]ssets/360_TL/*.mp4
+
+/Assets/LookupTexture*

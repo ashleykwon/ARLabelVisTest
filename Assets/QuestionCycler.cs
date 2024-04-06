@@ -45,6 +45,8 @@ public class QuestionCycler : MonoBehaviour
     RenderStereoBackgroundforAreaLabel CurrentScript;
     List<int> allVisualizationModes;
     int currentQuestionIdx;
+    public bool isPractice;
+    bool visualizeUI;
 
 
     private List<string> ParseName(string sceneName)
@@ -84,6 +86,9 @@ public class QuestionCycler : MonoBehaviour
     private void ParseQuestions()
     {
         string filePath = Path.Combine(Application.dataPath, "Resources/UserTesting/questions.json");
+        if (isPractice){
+            filePath = Path.Combine(Application.dataPath, "Resources/UserTesting/test1_practice_questions.json");
+        }
         string json = File.ReadAllText(filePath);
 
         SceneQuestionsList questionsList = JsonUtility.FromJson<SceneQuestionsList>(json);
@@ -141,6 +146,7 @@ public class QuestionCycler : MonoBehaviour
         labelSphereMaterial = labelSphere.GetComponent<Renderer>().material;
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<Renderer>().material;
         currentVisModeIdx = 0;
+        visualizeUI = false;
 
         // Add all visualization modes to the list and randomize them
         allVisualizationModes = CreateAndShuffleList(8);
@@ -163,7 +169,7 @@ public class QuestionCycler : MonoBehaviour
 
         string json = JsonUtility.ToJson(responses, true);
         string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-        string outpath = Path.Combine(Application.dataPath, $"UserResponse_{dateString}.json");
+        string outpath = Path.Combine(Application.dataPath+"/Test1_Results/", $"UserResponse_Test1_{dateString}.json");
         UnityEngine.Debug.Log(outpath);
         using (StreamWriter writer = new StreamWriter(outpath, false))
         {
@@ -231,7 +237,9 @@ public class QuestionCycler : MonoBehaviour
         detectionSW.Stop();
         responseSW.Reset();
         responseSW.Start();
-        questionUI.SetActive(true);
+        if (visualizeUI || (!visualizeUI && !Responded())){
+            questionUI.SetActive(true);
+        }
     }
 
     // false - task 1 (polygons), true - task 2 (optimal label)
@@ -449,7 +457,9 @@ public class QuestionCycler : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            WriteResponses();
+            if (!isPractice){
+                WriteResponses();
+            }
         }
         else if (Input.GetKeyDown(KeyCode.R))
         {
@@ -505,11 +515,20 @@ public class QuestionCycler : MonoBehaviour
             }
             LoadNext();
         }
+
+        // UI toggle (to handle the cases in which the UI covers the label)
+        // if (((lIndexTrigger > 0.3f) && !lIndexTriggerHeld)){
+        //     lHandTriggerHeld = true;
+        //     visualizeUI = !visualizeUI;
+        //     questionUI.SetActive(visualizeUI);
+        // }   
    
     }
 
     void OnDestroy()
     {
-        WriteResponses();
+        if (!isPractice){
+            WriteResponses();
+        }    
     }
 }

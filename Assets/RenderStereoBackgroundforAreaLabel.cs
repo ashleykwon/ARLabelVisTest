@@ -293,7 +293,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         ////// The lines below are for creating and saving a new lookup texture ///////////
         // Read the txt file that contains candidate LAB values and copy their values into CandidateCIELABVals
         // CandidateCIELABVals = new List<Color32>();
-        // var linesReadLAB = File.ReadLines("./Assets/AllCandidateLABvals.txt");
+        // var linesReadLAB = File.ReadLines("./Assets/AllCandidateLABvals2.txt");
         // foreach (var lineReadLAB in linesReadLAB)
         // {
         //     string[] num = lineReadLAB.Split(",");
@@ -311,7 +311,7 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
         // LookupTable = new Texture3D(256, 256, 256, TextureFormat.RGBA32, false);
         
         // // LookupTable.mipCount = 0;
-        // var linesReadRGB = File.ReadLines("./Assets/AllCorrespondingRGBVals.txt");
+        // var linesReadRGB = File.ReadLines("./Assets/AllCorrespondingRGBVals2.txt");
        
         // foreach (var lineReadRGB in linesReadRGB){
         //     string[] num = lineReadRGB.Split(",");

@@ -31,6 +31,8 @@ public class PairwiseComparison : MonoBehaviour
     string outputFilePath;
     StreamWriter writer;
     public string SceneName;
+    public bool isPractice;
+    // public string userID;
 
 
     // Start is called before the first frame update
@@ -80,9 +82,12 @@ public class PairwiseComparison : MonoBehaviour
         confirmationMessage.text = "";
 
         // Start a text file to write answers
-        string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-        outputFilePath = Path.Combine(Application.dataPath, SceneName+$"UserResponse_Test2_{dateString}.txt");
-        writer = new StreamWriter(outputFilePath, true);
+        if (!isPractice){
+             string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
+            outputFilePath = Path.Combine(Application.dataPath+"/Test2_Results/", SceneName+$"UserResponse_Test2_{dateString}.txt");
+            Debug.Log(Application.dataPath);
+            writer = new StreamWriter(outputFilePath, true);
+        }
     }
 
     void displayMode(int currentLabelDisplayMode)
@@ -202,16 +207,14 @@ public class PairwiseComparison : MonoBehaviour
                 confirmationMessage.text = "Mode " + chosenModeAsString + " chosen!";
 
                 // Write the 2 modes that were compared and the mode that was chosen as a line in a txt file
-                writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
-
+                if (!isPractice){
+                    writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
+                }
+                
                 // Move on to the next comparison
                 currentComparisonPairIdx += 1;  
                 currentComparison = comparisonsToUse[currentComparisonPairIdx];
                 displayMode(currentComparison[0]);
-                // if (currentComparisonPairIdx == numComparisons-1){
-                //     Debug.Log("Done!");
-                //     modeID.text = "End of all comparisons!";
-                // }
 
             }
             else{
@@ -224,6 +227,9 @@ public class PairwiseComparison : MonoBehaviour
     void OnDestroy()
     {
         // Save the text file at the end of the comparison
-        writer.Close();
+        if (!isPractice){
+            writer.Close();
+        }
+        
     }
 }

@@ -979,11 +979,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 487254, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
   m_PrefabInstance: {fileID: 775743276}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &775743279 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 113768, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
-  m_PrefabInstance: {fileID: 775743276}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &775743280 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
@@ -1861,23 +1856,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1963187619}
   m_CullTransparentMesh: 1
---- !u!114 &2046572611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775743279}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ff91da45ace39240908671a4f206731, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 2057361872}
-  BackgroundAndLabelSphere: {fileID: 747280902}
-  modeID: {fileID: 0}
-  confirmationMessage: {fileID: 0}
-  numComparisons: 4
 --- !u!114 &2057361871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1929,7 +1907,7 @@ MonoBehaviour:
   EquirectangularBackground: {fileID: 2800000, guid: 4857ba9b623ce0e47bb5579d1763f1b9, type: 3}
   BackgroundMask: {fileID: 2800000, guid: a6e080369b52aef4c81080bb13900d19, type: 3}
   cShaderForMask: {fileID: 7200000, guid: c9a235625146cfd4480f04a868d4b0c9, type: 3}
-  LookupTable: {fileID: 11700000, guid: 98c29dca8403d6544ae8e989dbe6d787, type: 2}
+  LookupTable: {fileID: 11700000, guid: 60b118a9abc1d274fa20c7ee90ba6f25, type: 2}
   backgroundOrLableChanged: 1
 --- !u!4 &2057361879 stripped
 Transform:

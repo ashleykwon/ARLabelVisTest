@@ -20,7 +20,7 @@ public class RenderStereoLabel : MonoBehaviour
         // newLabelCubemap = Resources.Load("Materials/Test", typeof(Cubemap)) as Cubemap;
         // labelSphere.GetComponent<Renderer>().material.SetTexture("_CubeMap", newLabelCubemap);
         
-        int cubemapSize = 2048; // this can change for a better resolution            
+        int cubemapSize = 4096; // this can change for a better resolution            
 
         // Define a cube-shaped render texture for the white label + black background (default where alpha = 0)
         labelRenderTexture = new RenderTexture(cubemapSize, cubemapSize, 16); 

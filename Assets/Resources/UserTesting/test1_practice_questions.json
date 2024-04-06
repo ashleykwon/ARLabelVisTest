@@ -1,0 +1,37 @@
+{
+    "sceneQuestions": [
+      {
+        "sceneName": "LaSilla",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+        "mask": "HexTrue",
+        "answers": [
+          "UserTesting/Answers/Hept_1",
+          "UserTesting/Answers/HexTrue",
+          "UserTesting/Answers/OctTrue",
+          "UserTesting/Answers/Oct2True"
+        ]
+      },
+      {
+        "sceneName": "LaSilla",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+        "mask": "Hex2True",
+        "answers": [
+          "UserTesting/Answers/Hex2True",
+          "UserTesting/Answers/Oct2True",
+          "UserTesting/Answers/Hept3True",
+          "UserTesting/Answers/Hex2_1"
+        ]
+      },
+      {
+        "sceneName": "LivingRoom",
+        "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+        "mask": "Oct2True",
+        "answers": [
+          "UserTesting/Answers/Hex2True",
+          "UserTesting/Answers/Hex2_3",
+          "UserTesting/Answers/Hept3True",
+          "UserTesting/Answers/Oct2True"
+        ]
+      }
+    ]
+  }

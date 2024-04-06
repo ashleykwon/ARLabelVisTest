@@ -26,7 +26,7 @@ public class RenderStereoBackgroundforDirectTextRendering : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int cubemapSize = 2048; // this can change for a better resolution
+        int cubemapSize = 4096; // this can change for a better resolution
         
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
         
