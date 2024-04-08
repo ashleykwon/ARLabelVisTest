@@ -217,7 +217,7 @@ public class PairwiseComparison : MonoBehaviour
         RenderStereoBackgroundforAreaLabel CurrentScript = OVRCameraRig.GetComponent<RenderStereoBackgroundforAreaLabel>(); 
         CurrentScript.LabelMask = Resources.Load<Texture2D>("Materials/" + currentSC.mask+"2D");
         CurrentScript.BackgroundMask = Resources.Load<Texture2D>("Materials/" + currentSC.mask+"2D_BG");
-        CurrentScript.EquirectangularBackground = Resources.Load<Texture2D>("Materials/" + currentSC.sceneName + "2D");
+        CurrentScript.EquirectangularBackground = Resources.Load<Texture2D>("Materials/" + currentSC.sceneName);
 
         // Recalculate average background values 
         CurrentScript.backgroundOrLableChanged = true;

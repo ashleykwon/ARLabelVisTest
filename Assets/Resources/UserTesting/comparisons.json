@@ -6,7 +6,11 @@
     },
     {
       "sceneName": "MansonBayPier",
-      "mask": "MansonBayPier"
+      "mask": "MansonBayPierMask"
+    },
+    {
+      "sceneName": "Train",
+      "mask": "TrainMask"
     }
   ]
 }
