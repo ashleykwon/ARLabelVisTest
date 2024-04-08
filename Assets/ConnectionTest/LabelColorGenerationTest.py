@@ -562,17 +562,14 @@ if __name__ == '__main__':
          # Plot the losses
         
         iterations = np.linspace(0, MAX_ITER, MAX_ITER//100)
-        print(iterations.shape)
-        print(iterations)
-        print(len(losses))
-        print(losses)
         plt.plot(iterations, losses)
         plt.xlabel('Iteration')
-        plt.ylabel('Loss')
-        plt.title('Loss Curve')
+        plt.ylabel('Distance')
+        plt.title('Distance Curve')
 
         # Save the plot locally
         plt.savefig(f"./testResults/{date}/{image_name}_{args.metric}_itr{args.itr}_loss_plot.png")
+        print("Distance plot saved.")
 
         plt.show()
 
