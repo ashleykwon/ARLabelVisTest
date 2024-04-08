@@ -13,6 +13,7 @@ import argparse
 import datetime
 from torch.autograd import Variable
 from skimage import color
+from DISTS_pytorch import DISTS
 
 from ssim import ssim, ms_ssim, SSIM, MS_SSIM
 from torchmetrics.image import StructuralSimilarityIndexMeasure
@@ -246,7 +247,7 @@ if __name__ == '__main__':
                                                                       ,'./testImages/testRiver/river.jpg'
                                                                     #  ,'./testRiver/river_white.jpg'
                                                                       ,'./testImages/testSingleColor/blue.jpg'
-                                                                      ,'./testImages/testSingleColor/red.jpg'
+                                                                    #   ,'./testImages/testSingleColor/red.jpg'
                                                                     #  ,'./testImages/testRainbow/rainbow.jpg' 
                                                                     #  ,'./testSingleColor/blueRG.jpg'
                                                                       ,'./testImages/testBeach/beach.jpg'
@@ -263,7 +264,7 @@ if __name__ == '__main__':
                                                                       ,'./testImages/testRiver/riverAndLabel.jpg'
                                                                     #  ,'./testRiver/riverAndLabel_white.jpg'
                                                                       ,'./testImages/testSingleColor/blueAndLabel.jpg'
-                                                                      ,'./testImages/testSingleColor/redAndLabel.jpg'
+                                                                    #   ,'./testImages/testSingleColor/redAndLabel.jpg'
                                                                     # ,'./testImages/testRainbow/rainbowAndLabel.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabel.jpg'
                                                                       ,'./testImages/testBeach/beachAndLabel_purple.jpg'
@@ -280,7 +281,7 @@ if __name__ == '__main__':
                                                                       ,'./testImages/testRiver/riverMask.jpg'
                                                                     #  ,'./testRiver/riverMask.jpg'
                                                                       ,'./testImages/testSingleColor/mask.jpg'
-                                                                      ,'./testImages/testSingleColor/mask.jpg'
+                                                                    #   ,'./testImages/testSingleColor/mask.jpg'
                                                                     # ,'./testImages/testRainbow/rainbowMask.jpg'
                                                                     #  ,'./testSingleColor/blueAndRGLabelMask.jpg'
                                                                       ,'./testImages/testBeach/beachMask.jpg'
@@ -295,7 +296,7 @@ if __name__ == '__main__':
     parser.add_argument('--deltaE',  default=False, help='Add delta E to loss')
     parser.add_argument('--bg_label', default = False, help='Use background as initial label')
 
-    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr', 'palette_dist'], default='lpips', help='Distance calculation method')
+    parser.add_argument('--metric', choices=['lpips', 'ssim', 'mssim', 'psnr', 'palette_dist', 'dists'], default='lpips', help='Distance calculation method')
     args = parser.parse_args()
 
     ssim_sigma = 1.5 # default 1.5
@@ -316,6 +317,10 @@ if __name__ == '__main__':
     elif args.metric == 'palette_dist':
         loss_fn = lpips.LPIPS(net='vgg', version=0.1) #changed from alex to vgg based on this documentation: https://pypi.org/project/lpips/#b-backpropping-through-the-metric
         loss_fn.to(device)
+    elif args.metric == 'dists':
+        dists = DISTS()
+        dists.to(device)
+
 
     if args.deltaE:
         deltaE_loss = DeltaELoss()
@@ -396,6 +401,8 @@ if __name__ == '__main__':
 
         # imageFlat = Variable(imageFlat, requires_grad=True)
         palette = []
+        losses = []
+        loss = 0
 
         for iter in range(MAX_ITER): 
             # initialize to the origianl full image (does not matter what the pixels in label region are bc they will be overwritten later)
@@ -453,6 +460,13 @@ if __name__ == '__main__':
                 LPIPSLoss = loss_fn.forward(full_img.to(device), backgroundImgAsTensor.to(device))
                 palette_dist = palette_dist_loss(labelFlat, palette)
                 neg_loss = palette_weight * palette_dist.view(1,1,1,1) - LPIPSLoss
+            elif args.metric == 'dists':
+                # calculate DISTS between X, Y (a batch of RGB images, data range: 0~1)
+                # X: (N,C,H,W) 
+                # Y: (N,C,H,W) 
+                # set 'require_grad=True, batch_average=True' to get a scalar value as loss.
+                dists_loss = dists(full_img.cuda(), backgroundImgAsTensor.cuda(), require_grad=True, batch_average=True) 
+                neg_loss = - dists_loss
                 
 
             weight = 1
@@ -483,7 +497,7 @@ if __name__ == '__main__':
             # for name, param in ssim.named_parameters():
             #     print(name, torch.isfinite(param.grad).all())
             
-
+            
             # Print out losses/distances
             if iter % 100 == 0:
                 if args.metric == 'lpips':
@@ -502,8 +516,10 @@ if __name__ == '__main__':
                      print('total loss:' , neg_loss.item())
                      log_file.write(f'iter {iter}, dist {loss: .3g}, deltaE {delta_e.item()}\n')
                 else:
-                    log_file.write(f'iter {iter}, dist {loss: .3g}\n')       
-
+                    log_file.write(f'iter {iter}, dist {loss: .3g}\n')
+                losses.append(loss)
+                
+            
             # Save the output image
             if (iter == MAX_ITER - 1): 
                 if args.metric == 'lpips':
@@ -529,21 +545,41 @@ if __name__ == '__main__':
                 full_img.data = torch.clamp(full_img.data, -1, 1)
 
                 # Save the final result
+                date = "20240408-LPIPS"
                 pred_img = lpips.tensor2im(full_img.data)
                 image_name = os.path.splitext(os.path.basename(image_path))[0]  # Extract the base name without the extension
                 if args.blur:
-                    output_path = f"./testResults/test20231210_palette_dist/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                    output_path = f"./testResults/{date}/{image_name}_weight-{weight}_{args.metric}_blurredBG_sigma{args.sigma}_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 else:
                     if args.metric == 'ssim':
-                        output_path = f"./testResults/test20231210_palette_dist/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults/{date}/{image_name}_weight-{weight}_{args.metric}_a-{alpha}b-{beta}c-{gamma}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                         # output_path = f"./test20231205_ssim_exponents/{image_name}_weight-{weight}_{args.metric}_s-{ssim_sigma}k1-{k1}k2-{k2}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                     else:
-                        output_path = f"./testResults/test20231210_palette_dist/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
+                        output_path = f"./testResults/{date}/{image_name}_weight-{weight}_{args.metric}_unblurredBG_itr{args.itr}_lr{args.lr}_deltaE-{args.deltaE}.jpg"
                 Image.fromarray(pred_img).save(output_path)
                 break
 
+         # Plot the losses
+        
+        iterations = np.linspace(0, MAX_ITER, MAX_ITER//100)
+        print(iterations.shape)
+        print(iterations)
+        print(len(losses))
+        print(losses)
+        plt.plot(iterations, losses)
+        plt.xlabel('Iteration')
+        plt.ylabel('Loss')
+        plt.title('Loss Curve')
+
+        # Save the plot locally
+        plt.savefig(f"./testResults/{date}/{image_name}_{args.metric}_itr{args.itr}_loss_plot.png")
+
+        plt.show()
+
     
-    log_file.close()                        
+    log_file.close()   
+
+                        
 
 
 
