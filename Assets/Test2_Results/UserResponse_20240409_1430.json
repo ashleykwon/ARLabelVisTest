@@ -1,0 +1,115 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "CityBridge",
+            "mask": "CityBridge_GazeboMask",
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        },
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPierMask",
+            "responses": [
+                {
+                    "pair": [
+                        1,
+                        0
+                    ]
+                },
+                {
+                    "pair": [
+                        3,
+                        7
+                    ]
+                },
+                {
+                    "pair": [
+                        6,
+                        4
+                    ]
+                },
+                {
+                    "pair": [
+                        0,
+                        6
+                    ]
+                },
+                {
+                    "pair": [
+                        2,
+                        3
+                    ]
+                },
+                {
+                    "pair": [
+                        2,
+                        6
+                    ]
+                },
+                {
+                    "pair": [
+                        2,
+                        0
+                    ]
+                },
+                {
+                    "pair": []
+                }
+            ]
+        },
+        {
+            "sceneName": "Train",
+            "mask": "TrainMask",
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        }
+    ]
+}

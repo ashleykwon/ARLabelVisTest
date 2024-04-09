@@ -1,0 +1,94 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "CityBridge",
+            "mask": "CityBridge_GazeboMask",
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        },
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPierMask",
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        },
+        {
+            "sceneName": "Train",
+            "mask": "TrainMask",
+            "responses": [
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                },
+                {
+                    "pair": []
+                }
+            ]
+        }
+    ]
+}
