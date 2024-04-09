@@ -356,8 +356,8 @@ public class RenderStereoBackgroundforAreaLabel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
-        labelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+        // backgroundAndLabelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+        // labelSphere.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
         
         // Render to temporary render textures from both the background (right-eye) and the label (left-eye) cameras
         // backgroundScreenshotCamera.targetTexture = backgroundRT;
