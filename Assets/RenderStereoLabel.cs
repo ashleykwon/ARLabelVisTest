@@ -40,15 +40,16 @@ public class RenderStereoLabel : MonoBehaviour
         LabelScreenshotCamera.RenderToCubemap(labelRenderTexture, 63);
     }
 
-    void Update()
-    {
-        // Only render elements on the UI layer (black sphere + white label + magenta shadow + blue billboard)
-        LabelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
-    }
+    // void Update()
+    // {
+    //     // Only render elements on the UI layer (black sphere + white label + magenta shadow + blue billboard)
+        
+    // }
 
     // Update is called once per frame
-    void LateUpdate() // This part causes the double-rendering
+    void Update() // This part causes the double-rendering
     {
+        LabelScreenshotCamera.cullingMask &= (1 << LayerMask.NameToLayer("UI"));
 
         // Take a screenshot (white label + black background + blue billboard) and render it to billboard and label cubemaps (these two maps are initially simialr)
         LabelScreenshotCamera.targetTexture = labelRenderTexture;

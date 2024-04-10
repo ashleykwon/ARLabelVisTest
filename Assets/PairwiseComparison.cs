@@ -30,10 +30,11 @@ public class PairwiseComparison : MonoBehaviour
     List<int[]> allComparisons;
     List<int[]> comparisonsToUse;
     bool turnOffLabel = false;
+    bool buttonPressed = false;
     int currentMode; // currently displayed mode
     bool triggerLeft;
     System.Random randomIdx;
-    public int numComparisons;
+    public int numComparisons=8; // default number
     bool preferenceChosen;
     Vector2 stickInput;
     int[] currentComparison;
@@ -42,6 +43,9 @@ public class PairwiseComparison : MonoBehaviour
     // private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
     StreamWriter writer;
     public string SceneName;
+    public bool isPractice;
+    public GameObject QuestionContainer;
+    public GameObject MCQContainer;
 
 
     // Start is called before the first frame update
@@ -59,60 +63,25 @@ public class PairwiseComparison : MonoBehaviour
 
         labelSphereMaterial = BackgroundAndLabelSphere.GetComponent<MeshRenderer>().sharedMaterial;
 
-        numComparisons = 8; // default number
+        // numComparisons = numComparisons; 
+        
+        QuestionContainer.SetActive(true);
+        MCQContainer.SetActive(false);
 
         ParseComparisonJson();
         UpdateScene();
+        
 
-        // // Add all available comparisons to the int array of modeIDs
-        // allComparisons = new List<int[]>();
-        // // Debug.Log("Beginning to add comparisons");
-        // for (int j = 0; j <= 6; j++){
-        //     for (int k = 1; k <= 7; k++){
-        //         if (k > j){
-        //             int[] comparison = new int[2];
-        //             comparison[0] = j;
-        //             comparison[1] = k;
-        //             allComparisons.Add(comparison);
-        //         }
-        //     }
-        // }
-
-        // // Randomly select comparisons to use
-        // randomIdx = new System.Random();
-        // comparisonsToUse = new List<int[]>();
-        // for (int i = 0; i < numComparisons; i++){
-        //     int currentPairIdx = randomIdx.Next(0, allComparisons.Count-1);
-        //     comparisonsToUse.Add(allComparisons[currentPairIdx]);
-        //     allComparisons.RemoveAt(currentPairIdx);
-        // }
-
-        // // For debugging purposes only
-        // // comparisonsToUse[0][0] = 5;
-
-
-        // // Set default values for label mode visualization 
-        // currentMode = 0; // 0 by default
-        // triggerLeft = false;
-        // preferenceChosen = false;
-        // currentComparisonPairIdx = 0;
-        // currentComparison = new int[2];
-        // currentComparison[0] = comparisonsToUse[currentComparisonPairIdx][0]; // set the initial comparison
-        // currentComparison[1] = comparisonsToUse[currentComparisonPairIdx][1]; // set the initial comparison
-        // displayMode(currentComparison[0]); // set the initial display
-        // modePreferences = new List<int[]>();
-        // confirmationMessage.text = "";
-
-        // Start a text file to write answers
-        // string dateString = DateTime.Now.ToString("yyyyMMdd_HHmm");
-        // outputFilePath = Path.Combine(Application.dataPath, SceneName+$"UserResponse_Test2_{dateString}.txt");
-        // writer = new StreamWriter(outputFilePath, true);
     }
 
     private void ParseComparisonJson()
     {
         string filePath = Path.Combine(Application.dataPath, $"Resources/UserTesting/{comparisonJson}.json");
+        if (isPractice){
+            filePath =  Path.Combine(Application.dataPath, $"Resources/UserTesting/practiceComparisons.json");
+        }
         string json = File.ReadAllText(filePath);
+        Debug.Log(json);
 
         SceneComparisonList comparisonsList = JsonUtility.FromJson<SceneComparisonList>(json);
         sceneComparisons = comparisonsList.sceneComparisons;
@@ -268,9 +237,10 @@ public class PairwiseComparison : MonoBehaviour
     {
         stickInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick, OVRInput.Controller.LTouch);
         triggerLeft = OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger);
+        buttonPressed = (OVRInput.GetDown(OVRInput.RawButton.X) || OVRInput.GetDown(OVRInput.RawButton.Y));
 
         // Run the comparison 
-        if (triggerLeft) 
+        if (buttonPressed) 
         {
             turnOffLabel = !turnOffLabel;
             if (turnOffLabel){
@@ -306,7 +276,27 @@ public class PairwiseComparison : MonoBehaviour
             }
         }
 
-        if(OVRInput.GetUp(OVRInput.Button.PrimaryThumbstick))
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            currentComparisonPairIdx = (currentComparisonPairIdx + 1) % numComparisons;  
+            currentComparison = comparisonsToUse[currentComparisonPairIdx];
+            displayMode(currentComparison[0]);
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            currentComparisonPairIdx = (currentComparisonPairIdx - 1);  
+            if (currentComparisonPairIdx >= numComparisons){
+                currentComparisonPairIdx = numComparisons-1;
+            }
+            else if (currentComparisonPairIdx < 0){
+                currentComparisonPairIdx = 0;
+            }
+            currentComparison = comparisonsToUse[currentComparisonPairIdx];
+            displayMode(currentComparison[0]);
+        }
+
+        // Preferred mode chosen
+        if(triggerLeft)
         {
             int[] preference = new int[2];
             if (currentMode == currentComparison[0]){
@@ -323,9 +313,6 @@ public class PairwiseComparison : MonoBehaviour
                 string chosenModeAsString = preference[0].ToString();
                 confirmationMessage.text = "Mode " + chosenModeAsString + " chosen!";
 
-                // Write the 2 modes that were compared and the mode that was chosen as a line in a txt file
-                // writer.WriteLine(currentComparison[0].ToString() + ", " + currentComparison[1].ToString() +", " + chosenModeAsString);
-
                 SceneComparison curSC = sceneComparisons[scIdx];
                 CompResponse compRes = new CompResponse();
                 compRes.pair = new List<int>() {preference[0], preference[1]};
@@ -335,10 +322,6 @@ public class PairwiseComparison : MonoBehaviour
                 currentComparisonPairIdx += 1;  
                 currentComparison = comparisonsToUse[currentComparisonPairIdx];
                 displayMode(currentComparison[0]);
-                // if (currentComparisonPairIdx == numComparisons-1){
-                //     Debug.Log("Done!");
-                //     modeID.text = "End of all comparisons!";
-                // }
 
             }
             else{
@@ -364,13 +347,18 @@ public class PairwiseComparison : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            WriteResponses();
+            if (!isPractice){
+                WriteResponses();
+            }
+            
         }
     }
 
     void OnDestroy()
     {
         // Save the text file at the end of the comparison
-        WriteResponses();
+        if (!isPractice){
+            WriteResponses();
+        }
     }
 }

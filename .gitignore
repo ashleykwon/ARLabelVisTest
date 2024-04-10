@@ -75,3 +75,6 @@ crashlytics-build.properties
 /[Aa]ssets/360_TL/*.mp4
 
 /Assets/LookupTexture*
+/Assets/Resources/Materials/Seg2_HP2D*
+/Assets/Resources/Materials/Seg6_HP2D*
+/Assets/Resources/Materials/Seg6_HP3D*

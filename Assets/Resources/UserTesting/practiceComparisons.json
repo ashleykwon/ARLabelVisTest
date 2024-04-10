@@ -1,0 +1,12 @@
+{
+    "sceneComparisons": [
+      {
+        "sceneName": "LivingRoom",
+        "mask": "LivingRoom_ChairMask"
+      },
+      {
+        "sceneName": "LaSilla",
+        "mask": "PracticeHeptTrue"
+      }
+    ]
+  }

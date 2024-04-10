@@ -1485,6 +1485,7 @@ MonoBehaviour:
   confirmationMessage: {fileID: 1245589135}
   numComparisons: 8
   SceneName: MansonBayPier
+  isPractice: 0
 --- !u!114 &2057361871
 MonoBehaviour:
   m_ObjectHideFlags: 0
