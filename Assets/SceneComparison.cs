@@ -14,6 +14,7 @@ public class SceneComparison
 public class CompResponse
 {
     public List<int> pair = new List<int>();
+    public string reason = "";
 }
 
 [System.Serializable]

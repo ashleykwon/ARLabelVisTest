@@ -7,6 +7,8 @@ using OVR;
 using TMPro;
 using System;
 using System.IO;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class PairwiseComparison : MonoBehaviour
 {
@@ -35,7 +37,8 @@ public class PairwiseComparison : MonoBehaviour
     bool triggerLeft;
     System.Random randomIdx;
     public int numComparisons=8; // default number
-    bool preferenceChosen;
+    bool preferenceChosenForCurrentMode = false;
+    bool MCQAnswerChosenForCurrentMode = false;
     Vector2 stickInput;
     int[] currentComparison;
     int currentComparisonPairIdx; // index in numComparisons
@@ -46,6 +49,9 @@ public class PairwiseComparison : MonoBehaviour
     public bool isPractice;
     public GameObject QuestionContainer;
     public GameObject MCQContainer;
+    int currentMCQIdx;
+    Button chosenMCQButton;
+
 
 
     // Start is called before the first frame update
@@ -67,6 +73,7 @@ public class PairwiseComparison : MonoBehaviour
         
         QuestionContainer.SetActive(true);
         MCQContainer.SetActive(false);
+        currentMCQIdx = 0;
 
         ParseComparisonJson();
         UpdateScene();
@@ -81,7 +88,6 @@ public class PairwiseComparison : MonoBehaviour
             filePath =  Path.Combine(Application.dataPath, $"Resources/UserTesting/practiceComparisons.json");
         }
         string json = File.ReadAllText(filePath);
-        Debug.Log(json);
 
         SceneComparisonList comparisonsList = JsonUtility.FromJson<SceneComparisonList>(json);
         sceneComparisons = comparisonsList.sceneComparisons;
@@ -221,16 +227,32 @@ public class PairwiseComparison : MonoBehaviour
         // Set default values for label mode visualization 
         currentMode = 0; // 0 by default
         triggerLeft = false;
-        preferenceChosen = false;
+        preferenceChosenForCurrentMode = false;
         currentComparisonPairIdx = 0;
         currentComparison = new int[2];
         currentComparison[0] = comparisonsToUse[currentComparisonPairIdx][0]; // set the initial comparison
         currentComparison[1] = comparisonsToUse[currentComparisonPairIdx][1]; // set the initial comparison
         displayMode(currentComparison[0]); // set the initial display
         modePreferences = new List<int[]>();
-        confirmationMessage.text = "";
+        // confirmationMessage.text = "";
     }
-   
+
+    public void UpdateResponse(int chosenIdx)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (i == chosenIdx)
+            {
+                MCQContainer.transform.GetChild(1).GetChild(i).GetComponentInChildren<TextMeshProUGUI>().faceColor  = new Color(255, 0, 0, 255);
+            }
+            else
+            {
+                MCQContainer.transform.GetChild(1).GetChild(i).GetComponentInChildren<TextMeshProUGUI>().faceColor  = new Color(255, 255, 255, 255);
+            }
+
+        }
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -240,6 +262,7 @@ public class PairwiseComparison : MonoBehaviour
         buttonPressed = (OVRInput.GetDown(OVRInput.RawButton.X) || OVRInput.GetDown(OVRInput.RawButton.Y));
 
         // Run the comparison 
+        // Disable/enable label visualization upon left hand controller button press
         if (buttonPressed) 
         {
             turnOffLabel = !turnOffLabel;
@@ -252,10 +275,11 @@ public class PairwiseComparison : MonoBehaviour
             }  
         }
 
-        if (!turnOffLabel){
+        // Switch between two label modes in the current mode pair
+        if (!turnOffLabel && !preferenceChosenForCurrentMode){
             if (stickInput.magnitude > 0.8f)
             {
-                confirmationMessage.text = "";
+                // confirmationMessage.text = "";
                 if (stickInput.x < 0) // tilt to the left
                 {
                     // Set the current mode<
@@ -276,6 +300,7 @@ public class PairwiseComparison : MonoBehaviour
             }
         }
 
+        // For moving between previous (A key) and next (D key) comparison pairs
         if (Input.GetKeyDown(KeyCode.D))
         {
             currentComparisonPairIdx = (currentComparisonPairIdx + 1) % numComparisons;  
@@ -295,39 +320,93 @@ public class PairwiseComparison : MonoBehaviour
             displayMode(currentComparison[0]);
         }
 
-        // Preferred mode chosen
+        if (MCQContainer.activeSelf){
+            if (stickInput.magnitude > 0.8f)
+            {
+                // Debug.Log("Stick moved");
+                if (stickInput.y >= 0){
+                    currentMCQIdx -= 1;
+                    if (currentMCQIdx < 0){
+                        currentMCQIdx = 0;
+                    }
+                    // Debug.Log(currentMCQIdx);
+                }
+                if (stickInput.y < 0){
+                    currentMCQIdx += 1;
+                    if (currentMCQIdx > 3){
+                        currentMCQIdx = 3;
+                    }
+                    // Debug.Log(currentMCQIdx);
+                }
+            }
+            chosenMCQButton = MCQContainer.transform.GetChild(1).GetChild(currentMCQIdx).GetComponent<Button>(); // get the chosen button
+            UpdateResponse(currentMCQIdx);
+        }
+
+        // Preferred mode chosen OR MCQ answer chosen 
         if(triggerLeft)
-        {
-            int[] preference = new int[2];
-            if (currentMode == currentComparison[0]){
-                preference[0] = currentComparison[0];
-                preference[1] = currentComparison[1];
-            }
-            else{
-                preference[0] = currentComparison[1];
-                preference[1] = currentComparison[0];
-            }
+        {  
             if (currentComparisonPairIdx < numComparisons){
-                // Add the chosen preference to modePreferences
-                modePreferences.Add(preference);
-                string chosenModeAsString = preference[0].ToString();
-                confirmationMessage.text = "Mode " + chosenModeAsString + " chosen!";
+                // When the user chooses their preferred mode, display the MCQ UI asking them why they chose the mode
+                if (!preferenceChosenForCurrentMode && !MCQAnswerChosenForCurrentMode){
+                    // Display MCQ UI
+                    QuestionContainer.SetActive(false);
+                    MCQContainer.SetActive(true);
 
-                SceneComparison curSC = sceneComparisons[scIdx];
-                CompResponse compRes = new CompResponse();
-                compRes.pair = new List<int>() {preference[0], preference[1]};
-                curSC.responses[currentComparisonPairIdx] = compRes;
+                    int[] preference = new int[2];
+                    if (currentMode == currentComparison[0]){
+                        preference[0] = currentComparison[0];
+                        preference[1] = currentComparison[1];
+                    }
+                    else{
+                        preference[0] = currentComparison[1];
+                        preference[1] = currentComparison[0];
+                    }
 
-                // Move on to the next comparison
-                currentComparisonPairIdx += 1;  
-                currentComparison = comparisonsToUse[currentComparisonPairIdx];
-                displayMode(currentComparison[0]);
+                    // Record the preference info
+                    SceneComparison curSC = sceneComparisons[scIdx];
+                    CompResponse compRes = new CompResponse();
+                    compRes.pair = new List<int>() {preference[0], preference[1]};
+                    curSC.responses[currentComparisonPairIdx] = compRes;
+                    preferenceChosenForCurrentMode = true;
+
+                    // Add the chosen preference to modePreferences
+                    modePreferences.Add(preference);
+                    string chosenModeAsString = preference[0].ToString();
+
+                    // MCQ UI interactions
+                    confirmationMessage.text = "Why did you choose mode " + chosenModeAsString + " over mode "+ preference[1].ToString()+"?";
+                    
+                    // chosenMCQButton.colors = chosenMCQButton.colors.highlightedColor;
+                    // MCQAnswerChosenForCurrentMode = false;
+                }
+                // else if (preferenceChosenForCurrentMode && !MCQAnswerChosenForCurrentMode)
+                // {
+                   
+                // }
+                else{   
+                    // Debug.Log(chosenMCQButton.GetComponentInChildren<TMP_Text>().text);
+                    sceneComparisons[scIdx].responses[currentComparisonPairIdx].reason = chosenMCQButton.GetComponentInChildren<TMP_Text>().text;
+                    // MCQAnswerChosenForCurrentMode = true;
+                    preferenceChosenForCurrentMode = false;
+                    // Display MCQ UI
+                    QuestionContainer.SetActive(true);
+                    MCQContainer.SetActive(false);
+                    confirmationMessage.text = "";
+                    // Move on to the next comparison
+                    currentComparisonPairIdx += 1;  
+                    currentComparison = comparisonsToUse[currentComparisonPairIdx];
+                    displayMode(currentComparison[0]);
+                }
+                
 
             }
             else{
                 Debug.Log("Done!");
                 modeID.text = "End of all comparisons!";
             }
+
+           
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
