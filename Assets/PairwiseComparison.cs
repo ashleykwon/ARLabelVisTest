@@ -321,17 +321,17 @@ public class PairwiseComparison : MonoBehaviour
         }
 
         if (MCQContainer.activeSelf){
-            if (stickInput.magnitude > 0.8f)
+            if (stickInput.magnitude > 0.9f)
             {
                 // Debug.Log("Stick moved");
-                if (stickInput.y >= 0){
+                if (stickInput.y >= 0.5){
                     currentMCQIdx -= 1;
                     if (currentMCQIdx < 0){
                         currentMCQIdx = 0;
                     }
                     // Debug.Log(currentMCQIdx);
                 }
-                if (stickInput.y < 0){
+                if (stickInput.y < 0.5){
                     currentMCQIdx += 1;
                     if (currentMCQIdx > 3){
                         currentMCQIdx = 3;
@@ -376,14 +376,7 @@ public class PairwiseComparison : MonoBehaviour
 
                     // MCQ UI interactions
                     confirmationMessage.text = "Why did you choose mode " + chosenModeAsString + " over mode "+ preference[1].ToString()+"?";
-                    
-                    // chosenMCQButton.colors = chosenMCQButton.colors.highlightedColor;
-                    // MCQAnswerChosenForCurrentMode = false;
                 }
-                // else if (preferenceChosenForCurrentMode && !MCQAnswerChosenForCurrentMode)
-                // {
-                   
-                // }
                 else{   
                     // Debug.Log(chosenMCQButton.GetComponentInChildren<TMP_Text>().text);
                     sceneComparisons[scIdx].responses[currentComparisonPairIdx].reason = chosenMCQButton.GetComponentInChildren<TMP_Text>().text;
