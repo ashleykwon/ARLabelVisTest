@@ -2589,7 +2589,7 @@ MonoBehaviour:
   confirmationMessage: {fileID: 1245589135}
   numComparisons: 4
   SceneName: Practice
-  isPractice: 0
+  isPractice: 1
   QuestionContainer: {fileID: 248146890}
   MCQContainer: {fileID: 1316088790}
 --- !u!114 &2057361871

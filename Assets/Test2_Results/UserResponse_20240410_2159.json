@@ -1,0 +1,136 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "CityBridge",
+            "mask": "CityBridge_GazeboMask",
+            "responses": [
+                {
+                    "pair": [
+                        3,
+                        1
+                    ],
+                    "reason": "Label outline was more salient "
+                },
+                {
+                    "pair": [
+                        5,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        2
+                    ],
+                    "reason": "Label outline was more salient "
+                },
+                {
+                    "pair": [
+                        5,
+                        3
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        7,
+                        1
+                    ],
+                    "reason": "None of the above\n"
+                },
+                {
+                    "pair": [
+                        6,
+                        4
+                    ],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                }
+            ]
+        },
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPierMask",
+            "responses": [
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                }
+            ]
+        },
+        {
+            "sceneName": "Train",
+            "mask": "TrainMask",
+            "responses": [
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                }
+            ]
+        }
+    ]
+}

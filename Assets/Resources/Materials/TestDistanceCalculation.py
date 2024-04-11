@@ -46,7 +46,7 @@ label_mask = np.asarray(Image.open(label_mask_filepath))
 #             labelCenterCount += 1
 # print(labelCenterCount)
 
-labelCenterIdx = [2726, 4056]
+labelCenterIdx = [3434, 5040]
 # [3366, 6870]
 distances = np.zeros((label_mask.shape[0], label_mask.shape[1]))
 for i in range(label_mask.shape[0]):
@@ -55,6 +55,6 @@ for i in range(label_mask.shape[0]):
 distancesMask = distances > 1000
 distances[distancesMask] = 0
 # distanceAsImage = Image.fromarray(distances) # max = 3035.0, min = 0.0
-cv2.imwrite("Seg2_HP2D_BG.png", distances)
+cv2.imwrite("Seg2_HP2D_BG.jpg", distances)
 # distanceAsImage.save("HeptTrue2D_BG.jpeg")
 

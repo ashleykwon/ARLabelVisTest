@@ -304,9 +304,12 @@ public class PairwiseComparison : MonoBehaviour
         // For moving between previous (A key) and next (D key) comparison pairs
         if (Input.GetKeyDown(KeyCode.D))
         {
+            
             currentComparisonPairIdx = (currentComparisonPairIdx + 1) % numComparisons;  
             currentComparison = comparisonsToUse[currentComparisonPairIdx];
             displayMode(currentComparison[0]);
+            QuestionContainer.SetActive(true);
+            MCQContainer.SetActive(false);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
@@ -319,6 +322,8 @@ public class PairwiseComparison : MonoBehaviour
             }
             currentComparison = comparisonsToUse[currentComparisonPairIdx];
             displayMode(currentComparison[0]);
+            QuestionContainer.SetActive(true);
+            MCQContainer.SetActive(false);
         }
 
         if (MCQContainer.activeSelf){
