@@ -243,6 +243,7 @@ public class PairwiseComparison : MonoBehaviour
         {
             if (i == chosenIdx)
             {
+                Debug.Log("color changed");
                 MCQContainer.transform.GetChild(1).GetChild(i).GetComponentInChildren<TextMeshProUGUI>().faceColor  = new Color(255, 0, 0, 255);
             }
             else
@@ -321,22 +322,28 @@ public class PairwiseComparison : MonoBehaviour
         }
 
         if (MCQContainer.activeSelf){
-            if (stickInput.magnitude > 0.9f)
+            if (stickInput.magnitude > 0.8f)
             {
                 // Debug.Log("Stick moved");
-                if (stickInput.y >= 0.5){
-                    currentMCQIdx -= 1;
-                    if (currentMCQIdx < 0){
-                        currentMCQIdx = 0;
-                    }
-                    // Debug.Log(currentMCQIdx);
+                if (stickInput.x < 0 && stickInput.y >= 0)
+                {   
+                    currentMCQIdx = 0;
+                    UpdateResponse(0);
                 }
-                if (stickInput.y < 0.5){
-                    currentMCQIdx += 1;
-                    if (currentMCQIdx > 3){
-                        currentMCQIdx = 3;
-                    }
-                    // Debug.Log(currentMCQIdx);
+                else if (stickInput.x >= 0 && stickInput.y >= 0)
+                {
+                    currentMCQIdx = 1;
+                    UpdateResponse(1);
+                }
+                else if (stickInput.x < 0 && stickInput.y < 0)
+                {
+                    currentMCQIdx = 2;
+                    UpdateResponse(2);
+                }
+                else if (stickInput.x >= 0 && stickInput.y < 0)
+                {
+                    currentMCQIdx = 3;
+                    UpdateResponse(3);
                 }
             }
             chosenMCQButton = MCQContainer.transform.GetChild(1).GetChild(currentMCQIdx).GetComponent<Button>(); // get the chosen button
@@ -348,7 +355,7 @@ public class PairwiseComparison : MonoBehaviour
         {  
             if (currentComparisonPairIdx < numComparisons){
                 // When the user chooses their preferred mode, display the MCQ UI asking them why they chose the mode
-                if (!preferenceChosenForCurrentMode && !MCQAnswerChosenForCurrentMode){
+                if (!preferenceChosenForCurrentMode){
                     // Display MCQ UI
                     QuestionContainer.SetActive(false);
                     MCQContainer.SetActive(true);
@@ -377,7 +384,7 @@ public class PairwiseComparison : MonoBehaviour
                     // MCQ UI interactions
                     confirmationMessage.text = "Why did you choose mode " + chosenModeAsString + " over mode "+ preference[1].ToString()+"?";
                 }
-                else{   
+                else{   // Record the chosen reason
                     // Debug.Log(chosenMCQButton.GetComponentInChildren<TMP_Text>().text);
                     sceneComparisons[scIdx].responses[currentComparisonPairIdx].reason = chosenMCQButton.GetComponentInChildren<TMP_Text>().text;
                     // MCQAnswerChosenForCurrentMode = true;
