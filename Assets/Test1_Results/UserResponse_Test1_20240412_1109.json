@@ -1,0 +1,260 @@
+{
+    "sceneQuestions": [
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg1_HP",
+            "answers": [
+                "UserTesting/Answers/Seg1_HP2D_1",
+                "UserTesting/Answers/Seg1_HP2D_2",
+                "UserTesting/Answers/Seg1_HP2DTrue",
+                "UserTesting/Answers/Seg1_HP2D_3"
+            ],
+            "responded": true,
+            "response": "2",
+            "labelMode": 7,
+            "detectionTime": 1414,
+            "responseTime": 6365
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg2_HP",
+            "answers": [
+                "UserTesting/Answers/Seg2_HP2DTrue",
+                "UserTesting/Answers/Seg2_HP2D_1",
+                "UserTesting/Answers/Seg2_HP2D_2",
+                "UserTesting/Answers/Seg2_HP2D_3"
+            ],
+            "responded": true,
+            "response": "0",
+            "labelMode": 3,
+            "detectionTime": 4761,
+            "responseTime": 1778
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg3_HP",
+            "answers": [
+                "UserTesting/Answers/Seg3_HP2D_1",
+                "UserTesting/Answers/Seg3_HP2DTrue",
+                "UserTesting/Answers/Seg3_HP2D_2",
+                "UserTesting/Answers/Seg3_HP2D_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 4,
+            "detectionTime": 1182,
+            "responseTime": 5391
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg4_HP",
+            "answers": [
+                "UserTesting/Answers/Seg4_HP2D_1",
+                "UserTesting/Answers/Seg4_HP2D_2",
+                "UserTesting/Answers/Seg4_HP2DTrue",
+                "UserTesting/Answers/Seg4_HP2D_3"
+            ],
+            "responded": true,
+            "response": "2",
+            "labelMode": 1,
+            "detectionTime": 1279,
+            "responseTime": 7340
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg5_HP",
+            "answers": [
+                "UserTesting/Answers/Seg5_HP2D_1",
+                "UserTesting/Answers/Seg5_HP2D_2",
+                "UserTesting/Answers/Seg5_HP2D_3",
+                "UserTesting/Answers/Seg5_HP2DTrue"
+            ],
+            "responded": true,
+            "response": "3",
+            "labelMode": 5,
+            "detectionTime": 1862,
+            "responseTime": 5878
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg6_HP",
+            "answers": [
+                "UserTesting/Answers/Seg6_HP2DTrue",
+                "UserTesting/Answers/Seg6_HP2D_1",
+                "UserTesting/Answers/Seg6_HP2D_2",
+                "UserTesting/Answers/Seg6_HP2D_3"
+            ],
+            "responded": true,
+            "response": "0",
+            "labelMode": 0,
+            "detectionTime": 2293,
+            "responseTime": 5165
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg7_HP",
+            "answers": [
+                "UserTesting/Answers/Seg7_HP2D_1",
+                "UserTesting/Answers/Seg7_HP2D_2",
+                "UserTesting/Answers/Seg7_HP2DTrue",
+                "UserTesting/Answers/Seg7_HP2D_3"
+            ],
+            "responded": true,
+            "response": "2",
+            "labelMode": 2,
+            "detectionTime": 1345,
+            "responseTime": 4261
+        },
+        {
+            "sceneName": "HotelParanal",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Seg8_HP",
+            "answers": [
+                "UserTesting/Answers/Seg8_HP2D_1",
+                "UserTesting/Answers/Seg8_HP2D_2",
+                "UserTesting/Answers/Seg8_HP2D_3",
+                "UserTesting/Answers/Seg8_HP2DTrue"
+            ],
+            "responded": true,
+            "response": "3",
+            "labelMode": 6,
+            "detectionTime": 1025,
+            "responseTime": 5654
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HexTrue",
+            "answers": [
+                "UserTesting/Answers/Hex_1",
+                "UserTesting/Answers/HexTrue",
+                "UserTesting/Answers/Hex_2",
+                "UserTesting/Answers/Hex_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 7,
+            "detectionTime": 1536,
+            "responseTime": 4652
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "OctTrue",
+            "answers": [
+                "UserTesting/Answers/Oct_1",
+                "UserTesting/Answers/Oct_2",
+                "UserTesting/Answers/OctTrue",
+                "UserTesting/Answers/Oct_3"
+            ],
+            "responded": true,
+            "response": "2",
+            "labelMode": 3,
+            "detectionTime": 596,
+            "responseTime": 5599
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "HeptTrue",
+            "answers": [
+                "UserTesting/Answers/HeptTrue",
+                "UserTesting/Answers/Hept_1",
+                "UserTesting/Answers/Hept_2",
+                "UserTesting/Answers/Hept_3"
+            ],
+            "responded": true,
+            "response": "0",
+            "labelMode": 4,
+            "detectionTime": 1229,
+            "responseTime": 2006
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Oct2True",
+            "answers": [
+                "UserTesting/Answers/Oct2_1",
+                "UserTesting/Answers/Oct2_2",
+                "UserTesting/Answers/Oct2_3",
+                "UserTesting/Answers/Oct2True"
+            ],
+            "responded": true,
+            "response": "3",
+            "labelMode": 1,
+            "detectionTime": 599,
+            "responseTime": 6756
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Hex2True",
+            "answers": [
+                "UserTesting/Answers/Hex2_1",
+                "UserTesting/Answers/Hex2True",
+                "UserTesting/Answers/Hex2_2",
+                "UserTesting/Answers/Hex2_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 5,
+            "detectionTime": 896,
+            "responseTime": 3858
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Hept2True",
+            "answers": [
+                "UserTesting/Answers/Hept2True",
+                "UserTesting/Answers/Hept2_1",
+                "UserTesting/Answers/Hept2_2",
+                "UserTesting/Answers/Hept2_3"
+            ],
+            "responded": true,
+            "response": "0",
+            "labelMode": 0,
+            "detectionTime": 1203,
+            "responseTime": 4207
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Hex3True",
+            "answers": [
+                "UserTesting/Answers/Hex3_1",
+                "UserTesting/Answers/Hex3_2",
+                "UserTesting/Answers/Hex3True",
+                "UserTesting/Answers/Hex3_3"
+            ],
+            "responded": true,
+            "response": "2",
+            "labelMode": 2,
+            "detectionTime": 1492,
+            "responseTime": 2967
+        },
+        {
+            "sceneName": "Foliage",
+            "question": "Which polygon has the same shape as the label? Press the right hand trigger to confirm.",
+            "mask": "Hept3True",
+            "answers": [
+                "UserTesting/Answers/Hept3_1",
+                "UserTesting/Answers/Hept3True",
+                "UserTesting/Answers/Hept3_2",
+                "UserTesting/Answers/Hept3_3"
+            ],
+            "responded": true,
+            "response": "1",
+            "labelMode": 6,
+            "detectionTime": 979,
+            "responseTime": 6129
+        }
+    ]
+}
