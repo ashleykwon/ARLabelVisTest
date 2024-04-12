@@ -41,11 +41,9 @@ public class PairwiseComparison : MonoBehaviour
     bool MCQAnswerChosenForCurrentMode = false;
     Vector2 stickInput;
     int[] currentComparison;
-    int currentComparisonPairIdx; // index in numComparisons
+    int currentComparisonPairIdx=0; // index in numComparisons
     string outputFilePath;
     // private Dictionary<string, int> sceneToIdx = new Dictionary<string, int>();
-    StreamWriter writer;
-    public string SceneName;
     public bool isPractice;
     public GameObject QuestionContainer;
     public GameObject MCQContainer;
@@ -84,9 +82,9 @@ public class PairwiseComparison : MonoBehaviour
     private void ParseComparisonJson()
     {
         string filePath = Path.Combine(Application.dataPath, $"Resources/UserTesting/{comparisonJson}.json");
-        if (isPractice){
-            filePath =  Path.Combine(Application.dataPath, $"Resources/UserTesting/practiceComparisons.json");
-        }
+        // if (isPractice){
+        //     filePath =  Path.Combine(Application.dataPath, $"Resources/UserTesting/practiceComparisons.json");
+        // }
         string json = File.ReadAllText(filePath);
 
         SceneComparisonList comparisonsList = JsonUtility.FromJson<SceneComparisonList>(json);
@@ -243,7 +241,6 @@ public class PairwiseComparison : MonoBehaviour
         {
             if (i == chosenIdx)
             {
-                Debug.Log("color changed");
                 MCQContainer.transform.GetChild(1).GetChild(i).GetComponentInChildren<TextMeshProUGUI>().faceColor  = new Color(255, 0, 0, 255);
             }
             else
@@ -304,16 +301,17 @@ public class PairwiseComparison : MonoBehaviour
         // For moving between previous (A key) and next (D key) comparison pairs
         if (Input.GetKeyDown(KeyCode.D))
         {
-            
             currentComparisonPairIdx = (currentComparisonPairIdx + 1) % numComparisons;  
             currentComparison = comparisonsToUse[currentComparisonPairIdx];
             displayMode(currentComparison[0]);
+            preferenceChosenForCurrentMode = false;
             QuestionContainer.SetActive(true);
             MCQContainer.SetActive(false);
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
             currentComparisonPairIdx = (currentComparisonPairIdx - 1);  
+            Debug.Log(currentComparisonPairIdx);
             if (currentComparisonPairIdx >= numComparisons){
                 currentComparisonPairIdx = numComparisons-1;
             }
@@ -322,6 +320,7 @@ public class PairwiseComparison : MonoBehaviour
             }
             currentComparison = comparisonsToUse[currentComparisonPairIdx];
             displayMode(currentComparison[0]);
+            preferenceChosenForCurrentMode = false;
             QuestionContainer.SetActive(true);
             MCQContainer.SetActive(false);
         }

@@ -3157,7 +3157,6 @@ MonoBehaviour:
   modeID: {fileID: 654064864}
   confirmationMessage: {fileID: 1540261184}
   numComparisons: 8
-  SceneName: MansonBayPier
   isPractice: 0
   QuestionContainer: {fileID: 1547979332}
   MCQContainer: {fileID: 1107521105}
