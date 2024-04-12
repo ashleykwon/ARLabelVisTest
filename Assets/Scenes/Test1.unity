@@ -569,6 +569,7 @@ MonoBehaviour:
   labelSphere: {fileID: 452877973}
   backgroundAndLabelSphere: {fileID: 747280902}
   CamerasContainer: {fileID: 775743277}
+  isPractice: 0
 --- !u!1 &663727445
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,11 +1537,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9db3d415f35a646c49122df378a9b7d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelAsset: {fileID: 5022602860645237092, guid: f72da5265511d4c68b0d892b53f9201d, type: 3}
-  texture: {fileID: 2800000, guid: a362b7d1a0c7d4ef6864c528ccad970d, type: 3}
-  prediction:
-    predictedValue: 0
-    predicted: []
 --- !u!1 &1459274613
 GameObject:
   m_ObjectHideFlags: 0

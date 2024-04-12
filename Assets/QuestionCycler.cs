@@ -41,7 +41,7 @@ public class QuestionCycler : MonoBehaviour
     private bool rIndexTriggerHeld = false;
     private bool lIndexTriggerHeld = false;
     private bool lHandTriggerHeld = false;
-    int currentVisModeIdx;
+    int currentVisModeIdx=-1;
     RenderStereoBackgroundforAreaLabel CurrentScript;
     List<int> allVisualizationModes;
     int currentQuestionIdx;
@@ -145,15 +145,14 @@ public class QuestionCycler : MonoBehaviour
         // Set the first label display mode
         labelSphereMaterial = labelSphere.GetComponent<Renderer>().material;
         backgroundAndLabelSphereMaterial = backgroundAndLabelSphere.GetComponent<Renderer>().material;
-        currentVisModeIdx = 0;
+        // currentVisModeIdx = 0;
         visualizeUI = false;
 
         // Add all visualization modes to the list and randomize them
         allVisualizationModes = CreateAndShuffleList(8);
 
         ParseQuestions();
-        // UnityEngine.Debug.Log(sceneQuestions.Count);
-        currentQuestionIdx = 0;
+        currentQuestionIdx = -1;
         LoadNext(true);
     }
 
@@ -229,7 +228,8 @@ public class QuestionCycler : MonoBehaviour
 
     public string SceneName()
     {
-        return sceneQuestions[qMap[qIdx]].sceneName;
+        // return sceneQuestions[qMap[qIdx]].sceneName;
+        return sceneQuestions[currentQuestionIdx].sceneName;
     }
     
     public void ShowQuestion()
@@ -237,7 +237,8 @@ public class QuestionCycler : MonoBehaviour
         detectionSW.Stop();
         responseSW.Reset();
         responseSW.Start();
-        if (visualizeUI || (!visualizeUI && !Responded())){
+        // if (visualizeUI || (!visualizeUI && !Responded())){
+        if (!Responded()){
             questionUI.SetActive(true);
         }
     }
@@ -269,10 +270,10 @@ public class QuestionCycler : MonoBehaviour
         labelSphere.GetComponent<Renderer>().material.SetTexture("_CubeMap", newLabelCubemap);
         // UnityEngine.Debug.Log(currentQuestion.mask);
 
-        currentVisModeIdx += 1;
-        if (currentVisModeIdx >= 8){
-            currentVisModeIdx = 0;
-        }
+        // currentVisModeIdx += 1;
+        // if ((currentVisModeIdx >= 8) || (currentVisModeIdx < 0)){
+        //     currentVisModeIdx = 0;
+        // }
 
         UpdateDisplayMode(allVisualizationModes[currentVisModeIdx]);
         
@@ -312,7 +313,6 @@ public class QuestionCycler : MonoBehaviour
             if (i < curQ.answers.Count)
             {
                 Sprite sprite = Resources.Load<Sprite>(curQ.answers[i]);
-                // UnityEngine.Debug.Log(curQ.answers[i]);
                 answerImgs[i].sprite = sprite;
             }
         }
@@ -329,10 +329,14 @@ public class QuestionCycler : MonoBehaviour
         if (bypass || Responded())
         {   
             ShowPanels();
-
-            // qIdx = (qIdx + 1) % qMap.Count;
-            currentQuestionIdx = (currentQuestionIdx+1) % qMap.Count; // maybe this line needs to be fixed
-            // string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
+            currentQuestionIdx = (currentQuestionIdx+1) % qMap.Count;
+            // if (currentQuestionIdx >= qMap.Count){
+            //     currentQuestionIdx = 0;
+            // }
+            currentVisModeIdx += 1;
+            if (currentVisModeIdx >= allVisualizationModes.Count){
+                currentVisModeIdx = 0;
+            }
             string nextScn = sceneQuestions[currentQuestionIdx].sceneName;
             SceneManager.LoadScene(sceneToIdx[nextScn]);
             HideQuestion();
@@ -348,20 +352,31 @@ public class QuestionCycler : MonoBehaviour
 
     public void LoadPrev(bool bypass = false)
     {
-        if (bypass || Responded())
-        {   
+        // if (bypass || Responded())
+        // {   
             ShowPanels();
-
-            qIdx = mod(qIdx - 1, qMap.Count);
-            UnityEngine.Debug.Log(-1 );
-            UnityEngine.Debug.Log(qMap[qIdx]);
-            string nextScn = sceneQuestions[qMap[qIdx]].sceneName;
-            SceneManager.LoadScene(sceneToIdx[nextScn]);
+            currentQuestionIdx = currentQuestionIdx-1; 
+            if (currentQuestionIdx < 0){
+                currentQuestionIdx = 0;
+            }
+            else if (currentQuestionIdx >= qMap.Count){
+                currentQuestionIdx = qMap.Count - 1;
+            }
+            // UnityEngine.Debug.Log(-1 );
+            // UnityEngine.Debug.Log(qMap[qIdx]);
+            sceneQuestions[currentQuestionIdx].responded = false;
+            string prevScn = sceneQuestions[currentQuestionIdx].sceneName;
+            SceneManager.LoadScene(sceneToIdx[prevScn]);
+            
+            currentVisModeIdx -= 1;
+            if (currentVisModeIdx < 0){
+                currentVisModeIdx = 0;
+            }
             HideQuestion();
             UpdateQuestion();
             detectionSW.Reset();
             detectionSW.Start();
-        }
+        // }
 
 
     }
@@ -436,7 +451,6 @@ public class QuestionCycler : MonoBehaviour
 
         if (stickInput.magnitude > 0.8f)
         {
-            UnityEngine.Debug.Log("joystick input detected");
             if (stickInput.x < 0 && stickInput.y >= 0)
             {
                 UpdateResponse(0);
@@ -469,12 +483,12 @@ public class QuestionCycler : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             LoadPrev(true);
-            UnityEngine.Debug.Log($"Question manually updated to question {qIdx} ({SceneName()}) from question.json");
+            UnityEngine.Debug.Log($"Question manually updated to question {currentQuestionIdx} ({SceneName()}) from question.json");
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             LoadNext(true);
-            UnityEngine.Debug.Log($"Question manually updated to question {qIdx} ({SceneName()}) from question.json");
+            UnityEngine.Debug.Log($"Question manually updated to question {currentQuestionIdx} ({SceneName()}) from question.json");
         }
 
         if (Input.GetKeyDown(KeyCode.S))
@@ -515,13 +529,6 @@ public class QuestionCycler : MonoBehaviour
             }
             LoadNext();
         }
-
-        // UI toggle (to handle the cases in which the UI covers the label)
-        // if (((lIndexTrigger > 0.3f) && !lIndexTriggerHeld)){
-        //     lHandTriggerHeld = true;
-        //     visualizeUI = !visualizeUI;
-        //     questionUI.SetActive(visualizeUI);
-        // }   
    
     }
 
