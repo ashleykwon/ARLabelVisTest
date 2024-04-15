@@ -1,0 +1,166 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "CityBridge",
+            "mask": "CityBridge_GazeboMask",
+            "responses": [
+                {
+                    "pair": [
+                        0,
+                        2
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        4,
+                        5
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        5,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        5
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        4,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                }
+            ]
+        },
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPierMask",
+            "responses": [
+                {
+                    "pair": [
+                        2,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        4
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        0,
+                        2
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        2,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        0
+                    ],
+                    "reason": "All of the above"
+                }
+            ]
+        },
+        {
+            "sceneName": "Train",
+            "mask": "TrainMask",
+            "responses": [
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                },
+                {
+                    "pair": [],
+                    "reason": ""
+                }
+            ]
+        }
+    ]
+}
