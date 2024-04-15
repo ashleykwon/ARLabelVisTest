@@ -125,7 +125,7 @@ Material:
     - _Min_Label_Grayscale: 0.010457517
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OpacityLevel: 0.4
+    - _OpacityLevel: 0.7
     - _Parallax: 0.02
     - _SampleBoost: 0
     - _SampleKernelSize: 87.3
