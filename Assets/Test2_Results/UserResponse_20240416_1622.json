@@ -6,56 +6,56 @@
             "responses": [
                 {
                     "pair": [
-                        2,
+                        5,
                         7
                     ],
                     "reason": "Background under the label was more visible"
                 },
                 {
                     "pair": [
-                        2,
+                        5,
                         1
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        4,
+                        5
                     ],
                     "reason": "Background under the label was more visible"
                 },
                 {
                     "pair": [
                         3,
-                        4
-                    ],
-                    "reason": "All of the above"
-                },
-                {
-                    "pair": [
-                        0,
                         7
                     ],
                     "reason": "Background under the label was more visible"
                 },
                 {
                     "pair": [
-                        1,
-                        7
-                    ],
-                    "reason": "Background under the label was more visible"
-                },
-                {
-                    "pair": [
-                        0,
-                        4
-                    ],
-                    "reason": "All of the above"
-                },
-                {
-                    "pair": [
-                        0,
-                        6
+                        2,
+                        3
                     ],
                     "reason": "Background under the label was more visible"
                 },
                 {
                     "pair": [
                         4,
+                        6
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        7,
+                        1
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        0,
                         7
                     ],
                     "reason": "Background under the label was more visible"
@@ -69,48 +69,6 @@
                 {
                     "pair": [
                         0,
-                        3
-                    ],
-                    "reason": "Label outline was more salient"
-                },
-                {
-                    "pair": [
-                        5,
-                        6
-                    ],
-                    "reason": "Background under the label was more visible"
-                },
-                {
-                    "pair": [
-                        6,
-                        1
-                    ],
-                    "reason": "None of the above: both modes looked similar"
-                },
-                {
-                    "pair": [
-                        4,
-                        6
-                    ],
-                    "reason": "Background under the label was more visible"
-                },
-                {
-                    "pair": [
-                        5,
-                        7
-                    ],
-                    "reason": "Background under the label was more visible"
-                },
-                {
-                    "pair": [
-                        3,
-                        5
-                    ],
-                    "reason": "None of the above: the label looked over saturated in mode 5"
-                },
-                {
-                    "pair": [
-                        3,
                         6
                     ],
                     "reason": "Background under the label was more visible"
@@ -120,7 +78,49 @@
                         0,
                         2
                     ],
-                    "reason": "None of the above: the label looked over saturated in mode 2"
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        3,
+                        2
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        3
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        4,
+                        5
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        1
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        2,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
                 }
             ]
         },
@@ -130,28 +130,28 @@
             "responses": [
                 {
                     "pair": [
-                        6,
-                        0
+                        4,
+                        1
                     ],
-                    "reason": "Label outline was more salient"
+                    "reason": "All of the above"
                 },
                 {
                     "pair": [
-                        6,
-                        5
+                        5,
+                        7
                     ],
-                    "reason": "Background under the label was more visible"
-                },
-                {
-                    "pair": [
-                        7,
-                        4
-                    ],
-                    "reason": "Label outline was more salient"
+                    "reason": "All of the above"
                 },
                 {
                     "pair": [
                         3,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
                         5
                     ],
                     "reason": "Background under the label was more visible"
@@ -159,30 +159,30 @@
                 {
                     "pair": [
                         6,
-                        3
-                    ],
-                    "reason": "Label outline was more salient"
-                },
-                {
-                    "pair": [
-                        2,
-                        0
-                    ],
-                    "reason": "Label outline was more salient"
-                },
-                {
-                    "pair": [
-                        7,
                         1
                     ],
-                    "reason": "Label outline was more salient"
+                    "reason": "All of the above"
                 },
                 {
                     "pair": [
-                        0,
-                        4
+                        4,
+                        5
                     ],
-                    "reason": "Label outline was more salient"
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        6,
+                        0
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        4,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
                 }
             ]
         }
