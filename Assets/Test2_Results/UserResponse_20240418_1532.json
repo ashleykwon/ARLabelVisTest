@@ -1,0 +1,190 @@
+{
+    "sceneComparisons": [
+        {
+            "sceneName": "CityBridge",
+            "mask": "CityBridge_GazeboMask",
+            "responses": [
+                {
+                    "pair": [
+                        2,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        3,
+                        5
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        4,
+                        0
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        2,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        1,
+                        5
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        3,
+                        0
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        5
+                    ],
+                    "reason": "Background under the label was more visible"
+                }
+            ]
+        },
+        {
+            "sceneName": "MansonBayPier",
+            "mask": "MansonBayPierMask",
+            "responses": [
+                {
+                    "pair": [
+                        2,
+                        3
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        4,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        6
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        2,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        0,
+                        2
+                    ],
+                    "reason": "All of the above"
+                },
+                {
+                    "pair": [
+                        3,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                }
+            ]
+        },
+        {
+            "sceneName": "Train",
+            "mask": "TrainMask",
+            "responses": [
+                {
+                    "pair": [
+                        7,
+                        3
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        5,
+                        0
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        0,
+                        7
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        6,
+                        5
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        1,
+                        7
+                    ],
+                    "reason": "Label outline was more salient"
+                },
+                {
+                    "pair": [
+                        3,
+                        0
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        6,
+                        1
+                    ],
+                    "reason": "Background under the label was more visible"
+                },
+                {
+                    "pair": [
+                        5,
+                        4
+                    ],
+                    "reason": "Label outline was more salient"
+                }
+            ]
+        }
+    ]
+}
